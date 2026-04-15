@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claim Annotation Tool</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f5f5f5;
+    color: #333;
+    line-height: 1.5;
+  }
+
+  /* Header */
+  .header {
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .header h1 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+  }
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .header-right label {
+    font-size: 13px;
+    color: #666;
+  }
+  .header-right input {
+    padding: 4px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 13px;
+    width: 150px;
+  }
+
+  /* Progress */
+  .progress-bar-container {
+    background: #fff;
+    padding: 8px 24px 12px;
+    border-bottom: 1px solid #eee;
+  }
+  .progress-text {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 4px;
+  }
+  .progress-track {
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: #4caf50;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+  }
+
+  /* Main content */
+  .main {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 0 20px;
+  }
+
+  /* Card */
+  .card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+  }
+  .card.unsaved {
+    border-color: #f0ad4e;
+  }
+
+  /* Claim box */
+  .claim-text {
+    font-size: 17px;
+    font-weight: 500;
+    line-height: 1.6;
+    padding: 16px;
+    background: #fafafa;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    margin-bottom: 12px;
+  }
+
+  /* Metadata labels */
+  .meta-row {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: #666;
+  }
+  .meta-row strong {
+    color: #444;
+  }
+
+  /* Excerpt collapsible */
+  .excerpt-toggle {
+    background: none;
+    border: none;
+    color: #0066cc;
+    cursor: pointer;
+    font-size: 13px;
+    padding: 0;
+    margin-bottom: 8px;
+  }
+  .excerpt-toggle:hover { text-decoration: underline; }
+  .excerpt-content {
+    display: none;
+    padding: 12px;
+    background: #f9f9f9;
+    border: 1px solid #e8e8e8;
+    border-radius: 4px;
+    font-size: 14px;
+    white-space: pre-wrap;
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 8px;
+  }
+  .excerpt-content.open { display: block; }
+
+  /* Agent assessment */
+  .agent-section {
+    background: #f7f7f7;
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #888;
+    margin: 0 0 10px 0;
+    letter-spacing: 0.5px;
+  }
+  .agent-fields {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  .agent-reasoning {
+    font-size: 14px;
+    color: #555;
+    white-space: pre-wrap;
+  }
+
+  /* Rating badge */
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .badge-grounded, .badge-no_issue { background: #e8f5e9; color: #2e7d32; }
+  .badge-outdated { background: #fff3e0; color: #e65100; }
+  .badge-inaccurate { background: #ffebee; color: #c62828; }
+  .badge-inconclusive { background: #f5f5f5; color: #757575; }
+  .badge-major { background: #ffebee; color: #c62828; }
+  .badge-minor { background: #fff8e1; color: #f57f17; }
+  .badge-trivial { background: #ede7f6; color: #4527a0; }
+  .badge-trivially_inconclusive { background: #e8eaf6; color: #283593; }
+
+  /* Human assessment form */
+  .form-group {
+    margin-bottom: 14px;
+  }
+  .form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 6px;
+  }
+  .radio-group {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .radio-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .radio-btn:hover { border-color: #999; }
+  .radio-btn input { display: none; }
+  .radio-btn.selected { border-color: #333; background: #f0f0f0; font-weight: 600; }
+
+  .severity-group { display: flex; gap: 4px; }
+  .severity-group.hidden { display: none; }
+
+  textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 14px;
+    resize: vertical;
+    line-height: 1.5;
+  }
+  textarea:focus { outline: none; border-color: #666; }
+
+  /* Navigation */
+  .nav-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .nav-bar .claim-counter {
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .claim-counter input[type="number"] {
+    width: 60px;
+    padding: 3px 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    -moz-appearance: textfield;
+  }
+  .claim-counter input[type="number"]::-webkit-inner-spin-button,
+  .claim-counter input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .claim-counter input[type="number"]:focus {
+    outline: none;
+    border-color: #666;
+  }
+  .nav-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  button {
+    padding: 8px 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  button:hover { border-color: #999; background: #f8f8f8; }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+  button.primary {
+    background: #333;
+    color: #fff;
+    border-color: #333;
+  }
+  button.primary:hover { background: #555; border-color: #555; }
+
+  /* Footer nav */
+  .footer-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 12px 0;
+  }
+
+  /* Status indicator */
+  .save-status {
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: opacity 0.3s;
+  }
+  .save-status.saved { color: #4caf50; }
+  .save-status.unsaved { color: #f0ad4e; }
+  .save-status.saving { color: #999; }
+
+  /* Error flash */
+  .grader-error {
+    color: #c62828;
+    font-size: 12px;
+    font-weight: 600;
+    margin-left: 8px;
+    animation: flash 0.15s ease 3;
+  }
+  @keyframes flash {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+  .header-right input.input-error {
+    border-color: #c62828;
+    box-shadow: 0 0 0 2px rgba(198, 40, 40, 0.2);
+  }
+
+  /* Filter panel */
+  .filter-panel {
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+    padding: 12px 24px;
+  }
+  .filter-toggle-btn {
+    background: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    color: #555;
+  }
+  .filter-toggle-btn:hover { border-color: #999; }
+  .filter-toggle-btn.active {
+    background: #f0f0f0;
+    border-color: #999;
+    font-weight: 600;
+  }
+  .filter-body {
+    display: none;
+    margin-top: 12px;
+  }
+  .filter-body.open { display: block; }
+  .filter-row {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+    align-items: flex-start;
+  }
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .filter-group-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #888;
+    letter-spacing: 0.5px;
+  }
+  .filter-checks {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .filter-checks label {
+    font-size: 13px;
+    color: #555;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .filter-checks input[type="checkbox"] {
+    margin: 0;
+  }
+  .search-input {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 13px;
+    width: 300px;
+    font-family: inherit;
+  }
+  .search-input:focus { outline: none; border-color: #666; }
+  .filter-count {
+    font-size: 12px;
+    color: #888;
+    margin-top: 4px;
+  }
+
+  /* Star button */
+  .star-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0 4px;
+    color: #ccc;
+    line-height: 1;
+    transition: color 0.15s;
+  }
+  .star-btn:hover { color: #f5c518; }
+  .star-btn.starred { color: #f5c518; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <h1>Claim Annotation Tool</h1>
+  <div class="header-right">
+    <label for="grader-input">Grader:</label>
+    <input type="text" id="grader-input" placeholder="your name">
+    <span id="grader-error" class="grader-error" style="display:none;">Name required</span>
+  </div>
+</div>
+
+<!-- Progress bar -->
+<div class="progress-bar-container">
+  <div class="progress-text" id="progress-text">Loading...</div>
+  <div class="progress-track">
+    <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+  </div>
+</div>
+
+<!-- Filter panel -->
+<div class="filter-panel">
+  <button class="filter-toggle-btn" id="filter-toggle">Filter &amp; Search</button>
+  <div class="filter-body" id="filter-body">
+
+    <!-- Search -->
+    <div class="filter-row">
+      <div class="filter-group" style="flex:1; max-width:500px;">
+        <span class="filter-group-label">Search</span>
+        <input type="text" class="search-input" id="search-input" placeholder="Search claims...">
+      </div>
+      <div class="filter-group">
+        <span class="filter-group-label">Search in</span>
+        <div class="filter-checks">
+          <label><input type="checkbox" id="search-claim"> Claims</label>
+          <label><input type="checkbox" id="search-agent-reasoning"> Agent reasoning</label>
+          <label><input type="checkbox" id="search-human-reasoning"> Human reasoning</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-row">
+      <div class="filter-group">
+        <span class="filter-group-label">Annotation status</span>
+        <div class="filter-checks">
+          <label><input type="checkbox" id="filter-graded-only"> Human graded only</label>
+          <label><input type="checkbox" id="filter-starred-only"> Starred only</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-row">
+      <div class="filter-group">
+        <span class="filter-group-label">Agent rating</span>
+        <div class="filter-checks">
+          <label><input type="checkbox" id="filter-agent-no_issue"> no_issue</label>
+          <label><input type="checkbox" id="filter-agent-outdated"> outdated</label>
+          <label><input type="checkbox" id="filter-agent-inaccurate"> inaccurate</label>
+          <label><input type="checkbox" id="filter-agent-inconclusive"> inconclusive</label>
+        </div>
+      </div>
+      <div class="filter-group">
+        <span class="filter-group-label">Agent severity</span>
+        <div class="filter-checks">
+          <label><input type="checkbox" id="filter-agent-sev-major"> major</label>
+          <label><input type="checkbox" id="filter-agent-sev-minor"> minor</label>
+          <label><input type="checkbox" id="filter-agent-sev-trivial"> trivial</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-row">
+      <div class="filter-group">
+        <span class="filter-group-label">Human rating</span>
+        <div class="filter-checks">
+          <label><input type="checkbox" id="filter-human-no_issue"> no_issue</label>
+          <label><input type="checkbox" id="filter-human-outdated"> outdated</label>
+          <label><input type="checkbox" id="filter-human-inaccurate"> inaccurate</label>
+          <label><input type="checkbox" id="filter-human-inconclusive"> inconclusive</label>
+          <label><input type="checkbox" id="filter-human-trivially_inconclusive"> trivially_inconclusive</label>
+        </div>
+      </div>
+      <div class="filter-group">
+        <span class="filter-group-label">Human severity</span>
+        <div class="filter-checks">
+          <label><input type="checkbox" id="filter-human-sev-major"> major</label>
+          <label><input type="checkbox" id="filter-human-sev-minor"> minor</label>
+          <label><input type="checkbox" id="filter-human-sev-trivial"> trivial</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-row">
+      <button id="filter-clear" style="font-size:12px; padding:4px 10px;">Clear all filters</button>
+      <span class="filter-count" id="filter-count"></span>
+    </div>
+
+  </div>
+</div>
+
+<!-- Main content -->
+<div class="main">
+
+  <!-- Navigation top -->
+  <div class="nav-bar">
+    <span class="claim-counter">Claim <input type="number" id="claim-jump-input" min="1" value="1"> of <span id="claim-total">-</span></span>
+    <div class="nav-buttons">
+      <button id="btn-jump" title="Jump to first unannotated claim">Jump to unannotated</button>
+      <button id="btn-export">Export CSV</button>
+    </div>
+  </div>
+
+  <!-- Claim card -->
+  <div class="card" id="claim-card">
+
+    <!-- Claim text -->
+    <div style="display:flex; align-items:flex-start; gap:8px;">
+      <button class="star-btn" id="star-btn" title="Star this claim">&#9734;</button>
+      <div class="claim-text" id="claim-text" style="flex:1;">Loading...</div>
+    </div>
+
+    <!-- Metadata -->
+    <div class="meta-row">
+      <span><strong>Category:</strong> <span id="claim-category">-</span></span>
+      <span><strong>Title:</strong> <span id="claim-title">-</span></span>
+    </div>
+
+    <!-- Excerpt -->
+    <button class="excerpt-toggle" id="excerpt-toggle">Show excerpt</button>
+    <div class="excerpt-content" id="excerpt-content"></div>
+
+    <!-- Agent assessment -->
+    <div class="agent-section">
+      <div class="section-title">Agent Assessment (reference)</div>
+      <div class="agent-fields">
+        <span>Rating: <span id="agent-rating" class="badge">-</span></span>
+        <span>Severity: <span id="agent-severity" class="badge">-</span></span>
+      </div>
+      <div class="agent-reasoning" id="agent-reasoning"></div>
+    </div>
+
+    <!-- Human assessment -->
+    <div>
+      <div class="section-title">Your Assessment</div>
+
+      <div class="form-group">
+        <label>Rating</label>
+        <div class="radio-group" id="rating-group">
+          <label class="radio-btn" data-value="no_issue">
+            <input type="radio" name="human_rating" value="no_issue">
+            no_issue          </label>
+          <label class="radio-btn" data-value="outdated">
+            <input type="radio" name="human_rating" value="outdated">
+            outdated          </label>
+          <label class="radio-btn" data-value="inaccurate">
+            <input type="radio" name="human_rating" value="inaccurate">
+            inaccurate          </label>
+          <label class="radio-btn" data-value="inconclusive">
+            <input type="radio" name="human_rating" value="inconclusive">
+            inconclusive          </label>
+          <label class="radio-btn" data-value="trivially_inconclusive">
+            <input type="radio" name="human_rating" value="trivially_inconclusive">
+            trivially inconclusive          </label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Agree with agent reasoning?</label>
+        <div class="radio-group" id="agree-group">
+          <label class="radio-btn" data-value="true">
+            <input type="radio" name="agree_with_reasoning" value="true">
+            yes          </label>
+          <label class="radio-btn" data-value="false">
+            <input type="radio" name="agree_with_reasoning" value="false">
+            no          </label>
+        </div>
+      </div>
+
+      <div class="form-group" id="severity-container">
+        <label>Severity</label>
+        <div class="severity-group" id="severity-group">
+          <label class="radio-btn" data-value="major">
+            <input type="radio" name="human_severity" value="major">
+            major          </label>
+          <label class="radio-btn" data-value="minor">
+            <input type="radio" name="human_severity" value="minor">
+            minor          </label>
+          <label class="radio-btn" data-value="trivial">
+            <input type="radio" name="human_severity" value="trivial">
+            trivial          </label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Reasoning</label>
+        <textarea id="human-reasoning" placeholder="Your reasoning..."></textarea>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer navigation -->
+  <div class="footer-nav">
+    <button id="btn-prev">&#8592; Previous</button>
+    <span class="save-status" id="save-status"></span>
+    <button id="btn-skip">Skip &#8594;</button>
+    <button id="btn-next" class="primary">Save &amp; Next &#8594;</button>
+  </div>
+
+
+</div>
+
+<script>
+(function() {
+  "use strict";
+
+  // API base path — routed through nginx reverse proxy
+  var API = "/annotation/api";
+
+  // ---------------------------------------------------------------------------
+  // State
+  // ---------------------------------------------------------------------------
+  let claimsList = [];       // lightweight index from API
+  let filteredIndices = [];  // indices into claimsList that pass current filters
+  let filteredPos = 0;       // position within filteredIndices
+  let currentIndex = 0;
+  let currentClaim = null;   // full claim data
+  let dirty = false;         // unsaved changes flag
+
+  // DOM references
+  const graderInput = document.getElementById("grader-input");
+  const progressText = document.getElementById("progress-text");
+  const progressFill = document.getElementById("progress-fill");
+  const claimJumpInput = document.getElementById("claim-jump-input");
+  const claimTotal = document.getElementById("claim-total");
+  const claimCard = document.getElementById("claim-card");
+  const claimText = document.getElementById("claim-text");
+  const claimCategory = document.getElementById("claim-category");
+  const claimTitle = document.getElementById("claim-title");
+  const excerptToggle = document.getElementById("excerpt-toggle");
+  const excerptContent = document.getElementById("excerpt-content");
+  const agentRating = document.getElementById("agent-rating");
+  const agentSeverity = document.getElementById("agent-severity");
+  const agentReasoning = document.getElementById("agent-reasoning");
+  const ratingGroup = document.getElementById("rating-group");
+  const severityContainer = document.getElementById("severity-container");
+  const severityGroup = document.getElementById("severity-group");
+  const humanReasoning = document.getElementById("human-reasoning");
+  const saveStatus = document.getElementById("save-status");
+  const agreeGroup = document.getElementById("agree-group");
+  const graderError = document.getElementById("grader-error");
+  const btnPrev = document.getElementById("btn-prev");
+  const btnNext = document.getElementById("btn-next");
+  const btnSkip = document.getElementById("btn-skip");
+  const btnJump = document.getElementById("btn-jump");
+  const btnExport = document.getElementById("btn-export");
+
+  // Filter DOM refs
+  const filterToggle = document.getElementById("filter-toggle");
+  const filterBody = document.getElementById("filter-body");
+  const searchInput = document.getElementById("search-input");
+  const searchClaim = document.getElementById("search-claim");
+  const searchAgentReasoning = document.getElementById("search-agent-reasoning");
+  const searchHumanReasoning = document.getElementById("search-human-reasoning");
+  const filterGradedOnly = document.getElementById("filter-graded-only");
+  const filterStarredOnly = document.getElementById("filter-starred-only");
+  const filterCount = document.getElementById("filter-count");
+  const filterClear = document.getElementById("filter-clear");
+  const starBtn = document.getElementById("star-btn");
+
+  // ---------------------------------------------------------------------------
+  // Grader persistence
+  // ---------------------------------------------------------------------------
+  graderInput.value = localStorage.getItem("annotate_grader") || "";
+
+  // ---------------------------------------------------------------------------
+  // API helpers
+  // ---------------------------------------------------------------------------
+  async function fetchJSON(url) {
+    const resp = await fetch(url);
+    return resp.json();
+  }
+
+  async function postJSON(url, body) {
+    const resp = await fetch(url, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(body),
+    });
+    return resp.json();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Progress
+  // ---------------------------------------------------------------------------
+  async function updateProgress() {
+    const p = await fetchJSON(API + "/progress");
+    const pct = p.total > 0 ? ((p.annotated / p.total) * 100).toFixed(1) : "0";
+    progressText.textContent = p.annotated + " / " + p.total + " annotated (" + pct + "%)";
+    progressFill.style.width = pct + "%";
+  }
+
+  // ---------------------------------------------------------------------------
+  // Badge helper
+  // ---------------------------------------------------------------------------
+  function badgeClass(value) {
+    const v = (value || "").toLowerCase();
+    if (v === "grounded" || v === "no_issue") return "badge badge-no_issue";
+    if (v === "outdated") return "badge badge-outdated";
+    if (v === "inaccurate") return "badge badge-inaccurate";
+    if (v === "inconclusive") return "badge badge-inconclusive";
+    if (v === "trivially_inconclusive") return "badge badge-trivially_inconclusive";
+    if (v === "major") return "badge badge-major";
+    if (v === "minor") return "badge badge-minor";
+    if (v === "trivial") return "badge badge-trivial";
+    return "badge";
+  }
+
+  // ---------------------------------------------------------------------------
+  // Severity visibility
+  // ---------------------------------------------------------------------------
+  function updateSeverityVisibility() {
+    const rating = getSelectedRating();
+    if (rating === "no_issue") {
+      severityContainer.style.display = "none";
+      clearSeverity();
+    } else {
+      severityContainer.style.display = "";
+    }
+  }
+
+  function clearSeverity() {
+    severityGroup.querySelectorAll(".radio-btn").forEach(function(btn) {
+      btn.querySelector("input").checked = false;
+      btn.classList.remove("selected");
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // Radio button helpers
+  // ---------------------------------------------------------------------------
+  function getSelectedRating() {
+    const el = ratingGroup.querySelector("input:checked");
+    return el ? el.value : "";
+  }
+
+  function getSelectedSeverity() {
+    const el = severityGroup.querySelector("input:checked");
+    return el ? el.value : "";
+  }
+
+  function selectRating(value) {
+    ratingGroup.querySelectorAll(".radio-btn").forEach(function(btn) {
+      const input = btn.querySelector("input");
+      if (input.value === value) {
+        input.checked = true;
+        btn.classList.add("selected");
+      } else {
+        input.checked = false;
+        btn.classList.remove("selected");
+      }
+    });
+    updateSeverityVisibility();
+    markDirty();
+  }
+
+  function selectSeverity(value) {
+    severityGroup.querySelectorAll(".radio-btn").forEach(function(btn) {
+      const input = btn.querySelector("input");
+      if (input.value === value) {
+        input.checked = true;
+        btn.classList.add("selected");
+      } else {
+        input.checked = false;
+        btn.classList.remove("selected");
+      }
+    });
+    markDirty();
+  }
+
+  function getSelectedAgree() {
+    const el = agreeGroup.querySelector("input:checked");
+    return el ? el.value : "";
+  }
+
+  function selectAgree(value) {
+    agreeGroup.querySelectorAll(".radio-btn").forEach(function(btn) {
+      const input = btn.querySelector("input");
+      if (input.value === value) {
+        input.checked = true;
+        btn.classList.add("selected");
+      } else {
+        input.checked = false;
+        btn.classList.remove("selected");
+      }
+    });
+    markDirty();
+  }
+
+  // Grader validation
+  function requireGrader() {
+    if (graderInput.value.trim()) {
+      graderInput.classList.remove("input-error");
+      graderError.style.display = "none";
+      return true;
+    }
+    graderInput.classList.add("input-error");
+    graderError.style.display = "";
+    // Re-trigger the flash animation
+    graderError.style.animation = "none";
+    graderError.offsetHeight; // force reflow
+    graderError.style.animation = "";
+    graderInput.focus();
+    return false;
+  }
+
+  graderInput.addEventListener("input", function() {
+    localStorage.setItem("annotate_grader", graderInput.value);
+    if (graderInput.value.trim()) {
+      graderInput.classList.remove("input-error");
+      graderError.style.display = "none";
+    }
+  });
+
+  // Wire up click handlers on radio buttons
+  ratingGroup.querySelectorAll(".radio-btn").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      selectRating(btn.dataset.value);
+    });
+  });
+  severityGroup.querySelectorAll(".radio-btn").forEach(function(btn) {
+    btn.addEventListener("click", function(e) {
+      // Labels with nested inputs fire click twice; ignore the input's click
+      if (e.target.tagName === "INPUT") return;
+      if (getSelectedSeverity() === btn.dataset.value) {
+        clearSeverity();
+        markDirty();
+      } else {
+        selectSeverity(btn.dataset.value);
+      }
+    });
+  });
+  agreeGroup.querySelectorAll(".radio-btn").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      selectAgree(btn.dataset.value);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Dirty / save status
+  // ---------------------------------------------------------------------------
+  function markDirty() {
+    dirty = true;
+    claimCard.classList.add("unsaved");
+    saveStatus.textContent = "unsaved";
+    saveStatus.className = "save-status unsaved";
+  }
+
+  function markClean() {
+    dirty = false;
+    claimCard.classList.remove("unsaved");
+    saveStatus.textContent = "saved";
+    saveStatus.className = "save-status saved";
+    setTimeout(function() {
+      if (!dirty) {
+        saveStatus.textContent = "";
+      }
+    }, 2000);
+  }
+
+  humanReasoning.addEventListener("input", markDirty);
+
+  // ---------------------------------------------------------------------------
+  // Excerpt toggle
+  // ---------------------------------------------------------------------------
+  excerptToggle.addEventListener("click", function() {
+    const isOpen = excerptContent.classList.toggle("open");
+    excerptToggle.textContent = isOpen ? "Hide excerpt" : "Show excerpt";
+  });
+
+  // ---------------------------------------------------------------------------
+  // Load & render a claim
+  // ---------------------------------------------------------------------------
+  async function loadClaim(index) {
+    if (index < 0 || index >= claimsList.length) return;
+
+    // Auto-save current before navigating
+    if (dirty && currentClaim !== null) {
+      const saved = await saveCurrent();
+      if (!saved) return;
+    }
+
+    currentIndex = index;
+    currentClaim = await fetchJSON(API + "/claims/" + index);
+
+    // Claim text
+    claimText.textContent = currentClaim.claim || "(no claim text)";
+
+    // Metadata
+    claimCategory.textContent = currentClaim.category || "-";
+    claimTitle.textContent = currentClaim.title || "-";
+
+    // Excerpt — collapse on load
+    excerptContent.textContent = currentClaim.excerpt || "(no excerpt)";
+    excerptContent.classList.remove("open");
+    excerptToggle.textContent = "Show excerpt";
+
+    // Agent assessment
+    agentRating.textContent = currentClaim.rating || "-";
+    agentRating.className = badgeClass(currentClaim.rating);
+    agentSeverity.textContent = currentClaim.severity || "-";
+    agentSeverity.className = badgeClass(currentClaim.severity);
+    agentReasoning.textContent = currentClaim.reasoning || "";
+
+    // Human assessment — pre-populated
+    selectRating(currentClaim.human_rating || "");
+    selectSeverity(currentClaim.human_severity || "");
+    selectAgree(currentClaim.agree_with_reasoning || "");
+    humanReasoning.value = currentClaim.human_reasoning || "";
+
+    // Star state
+    updateStarButton(currentClaim.starred === "*");
+
+    // Counter — show position within filtered set
+    filteredPos = filteredIndices.indexOf(index);
+    claimJumpInput.value = filteredPos + 1;
+    claimTotal.textContent = filteredIndices.length;
+
+    // Button states
+    updateNavButtons();
+
+    // Reset dirty since we just loaded
+    dirty = false;
+    claimCard.classList.remove("unsaved");
+    saveStatus.textContent = "";
+    saveStatus.className = "save-status";
+
+    updateSeverityVisibility();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Save
+  // ---------------------------------------------------------------------------
+  async function saveCurrent() {
+    if (currentClaim === null) return false;
+
+    if (!requireGrader()) return false;
+
+    const rating = getSelectedRating();
+    const severity = getSelectedSeverity();
+
+    saveStatus.textContent = "saving...";
+    saveStatus.className = "save-status saving";
+
+    const body = {
+      grader: graderInput.value.trim(),
+      human_rating: rating,
+      human_severity: rating === "no_issue" ? "" : severity,
+      human_reasoning: humanReasoning.value,
+      agree_with_reasoning: getSelectedAgree(),
+    };
+
+    await postJSON(API + "/claims/" + currentIndex, body);
+
+    // Update local list annotation state so filters stay accurate
+    if (claimsList[currentIndex]) {
+      claimsList[currentIndex].has_annotation = !!graderInput.value.trim();
+      claimsList[currentIndex].human_rating = rating;
+      claimsList[currentIndex].human_severity = rating === "no_issue" ? "" : severity;
+      claimsList[currentIndex].human_reasoning = humanReasoning.value;
+    }
+
+    markClean();
+    updateProgress();
+    return true;
+  }
+
+  async function saveAndNext() {
+    const saved = await saveCurrent();
+    if (!saved) return;
+
+    // Remember which raw index we were on before re-filtering
+    var prevRawIndex = currentIndex;
+
+    // Re-apply filters since the save may have changed filter-relevant fields
+    applyFilters();
+
+    // Find the next claim after prevRawIndex in the updated filtered set
+    var nextPos = -1;
+    for (var i = 0; i < filteredIndices.length; i++) {
+      if (filteredIndices[i] > prevRawIndex) {
+        nextPos = i;
+        break;
+      }
+    }
+
+    if (nextPos >= 0) {
+      filteredPos = nextPos;
+      await loadClaim(filteredIndices[filteredPos]);
+    } else if (filteredIndices.length > 0) {
+      // Wrapped around or no more after current — stay on last match
+      filteredPos = filteredIndices.length - 1;
+      await loadClaim(filteredIndices[filteredPos]);
+    }
+  }
+
+  async function skipNext() {
+    // Discard unsaved changes and move to next filtered claim
+    dirty = false;
+    if (filteredPos < filteredIndices.length - 1) {
+      filteredPos++;
+      await loadClaim(filteredIndices[filteredPos]);
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Navigation
+  // ---------------------------------------------------------------------------
+  btnPrev.addEventListener("click", function() {
+    if (filteredPos > 0) {
+      filteredPos--;
+      loadClaim(filteredIndices[filteredPos]);
+    }
+  });
+
+  btnNext.addEventListener("click", function() {
+    saveAndNext();
+  });
+
+  btnSkip.addEventListener("click", function() {
+    skipNext();
+  });
+
+  btnJump.addEventListener("click", function() {
+    // Jump to first unannotated within current filtered set
+    for (var i = 0; i < filteredIndices.length; i++) {
+      if (!claimsList[filteredIndices[i]].has_annotation) {
+        filteredPos = i;
+        loadClaim(filteredIndices[i]);
+        return;
+      }
+    }
+    alert("All claims in the current view have been annotated!");
+  });
+
+  btnExport.addEventListener("click", function() {
+    window.open(API + "/export", "_blank");
+  });
+
+  // Jump-to-claim input: navigate on Enter or blur
+  function handleJumpInput() {
+    const target = parseInt(claimJumpInput.value, 10);
+    if (isNaN(target) || target < 1 || target > filteredIndices.length) {
+      claimJumpInput.value = filteredPos + 1;
+      return;
+    }
+    var newPos = target - 1;
+    if (newPos !== filteredPos) {
+      filteredPos = newPos;
+      loadClaim(filteredIndices[filteredPos]);
+    }
+  }
+
+  claimJumpInput.addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleJumpInput();
+      claimJumpInput.blur();
+    }
+  });
+
+  claimJumpInput.addEventListener("blur", function() {
+    handleJumpInput();
+  });
+
+  // ---------------------------------------------------------------------------
+  // Star toggle
+  // ---------------------------------------------------------------------------
+  function updateStarButton(isStarred) {
+    if (isStarred) {
+      starBtn.textContent = "\u2605";
+      starBtn.classList.add("starred");
+    } else {
+      starBtn.textContent = "\u2606";
+      starBtn.classList.remove("starred");
+    }
+  }
+
+  starBtn.addEventListener("click", async function() {
+    if (currentClaim === null) return;
+    var resp = await postJSON(API + "/claims/" + currentIndex + "/star", {});
+    var isStarred = resp.starred === "*";
+    updateStarButton(isStarred);
+    currentClaim.starred = resp.starred;
+    if (claimsList[currentIndex]) {
+      claimsList[currentIndex].starred = resp.starred;
+    }
+  });
+
+  // ---------------------------------------------------------------------------
+  // Filtering
+  // ---------------------------------------------------------------------------
+
+  // Toggle filter panel
+  filterToggle.addEventListener("click", function() {
+    filterBody.classList.toggle("open");
+    filterToggle.classList.toggle("active");
+  });
+
+  // Collect checked values from a group of checkboxes by id prefix
+  function getCheckedValues(prefix, values) {
+    var checked = [];
+    for (var i = 0; i < values.length; i++) {
+      var el = document.getElementById(prefix + values[i]);
+      if (el && el.checked) {
+        checked.push(values[i]);
+      }
+    }
+    return checked;
+  }
+
+  function applyFilters() {
+    var query = searchInput.value.trim().toLowerCase();
+    var inClaim = searchClaim.checked;
+    var inAgentReasoning = searchAgentReasoning.checked;
+    var inHumanReasoning = searchHumanReasoning.checked;
+    var gradedOnly = filterGradedOnly.checked;
+    var starredOnly = filterStarredOnly.checked;
+
+    var agentRatings = getCheckedValues("filter-agent-", [
+      "no_issue", "outdated", "inaccurate", "inconclusive"
+    ]);
+    var agentSeverities = getCheckedValues("filter-agent-sev-", [
+      "major", "minor", "trivial"
+    ]);
+    var humanRatings = getCheckedValues("filter-human-", [
+      "no_issue", "outdated", "inaccurate", "inconclusive", "trivially_inconclusive"
+    ]);
+    var humanSeverities = getCheckedValues("filter-human-sev-", [
+      "major", "minor", "trivial"
+    ]);
+
+    var hasAnyFilter = (
+      query ||
+      gradedOnly ||
+      starredOnly ||
+      agentRatings.length > 0 ||
+      agentSeverities.length > 0 ||
+      humanRatings.length > 0 ||
+      humanSeverities.length > 0
+    );
+
+    filteredIndices = [];
+
+    for (var i = 0; i < claimsList.length; i++) {
+      var c = claimsList[i];
+
+      // Graded-only filter
+      if (gradedOnly && !c.has_annotation) continue;
+
+      // Starred-only filter
+      if (starredOnly && c.starred !== "*") continue;
+
+      // Agent rating filter (OR within group)
+      if (agentRatings.length > 0) {
+        var r = (c.rating || "").toLowerCase();
+        // Map "grounded" to "no_issue" for consistency
+        if (r === "grounded") r = "no_issue";
+        if (agentRatings.indexOf(r) === -1) continue;
+      }
+
+      // Agent severity filter
+      if (agentSeverities.length > 0) {
+        var s = (c.severity || "").toLowerCase();
+        if (agentSeverities.indexOf(s) === -1) continue;
+      }
+
+      // Human rating filter
+      if (humanRatings.length > 0) {
+        var hr = (c.human_rating || "").toLowerCase();
+        if (humanRatings.indexOf(hr) === -1) continue;
+      }
+
+      // Human severity filter
+      if (humanSeverities.length > 0) {
+        var hs = (c.human_severity || "").toLowerCase();
+        if (humanSeverities.indexOf(hs) === -1) continue;
+      }
+
+      // Text search — if no field checkboxes are checked, search all fields
+      if (query) {
+        var noFieldSelected = !inClaim && !inAgentReasoning && !inHumanReasoning;
+        var matched = false;
+        if ((inClaim || noFieldSelected) && (c.claim || "").toLowerCase().indexOf(query) !== -1) {
+          matched = true;
+        }
+        if (!matched && (inAgentReasoning || noFieldSelected) && (c.reasoning || "").toLowerCase().indexOf(query) !== -1) {
+          matched = true;
+        }
+        if (!matched && (inHumanReasoning || noFieldSelected) && (c.human_reasoning || "").toLowerCase().indexOf(query) !== -1) {
+          matched = true;
+        }
+        if (!matched) continue;
+      }
+
+      filteredIndices.push(i);
+    }
+
+    // Update count display
+    if (hasAnyFilter) {
+      filterCount.textContent = filteredIndices.length + " of " + claimsList.length + " claims";
+    } else {
+      filterCount.textContent = "";
+    }
+
+    // Update total display and navigation
+    claimTotal.textContent = filteredIndices.length;
+
+    // If current claim is not in filtered set, jump to first filtered
+    filteredPos = filteredIndices.indexOf(currentIndex);
+    if (filteredPos === -1 && filteredIndices.length > 0) {
+      filteredPos = 0;
+      loadClaim(filteredIndices[0]);
+    } else if (filteredIndices.length === 0 && hasAnyFilter) {
+      claimText.textContent = "No claims match the current filters.";
+      claimJumpInput.value = 0;
+    } else {
+      // Update counter to show position within filtered set
+      claimJumpInput.value = filteredPos + 1;
+    }
+
+    updateNavButtons();
+  }
+
+  function updateNavButtons() {
+    btnPrev.disabled = (filteredPos <= 0);
+  }
+
+  // Debounce for search input
+  var searchTimer = null;
+  searchInput.addEventListener("input", function() {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(applyFilters, 200);
+  });
+
+  // Wire up all filter checkboxes
+  var allFilterCheckboxes = filterBody.querySelectorAll("input[type=checkbox]");
+  for (var i = 0; i < allFilterCheckboxes.length; i++) {
+    allFilterCheckboxes[i].addEventListener("change", applyFilters);
+  }
+
+  // Clear all filters
+  filterClear.addEventListener("click", function() {
+    searchInput.value = "";
+    for (var i = 0; i < allFilterCheckboxes.length; i++) {
+      allFilterCheckboxes[i].checked = false;
+    }
+    applyFilters();
+  });
+
+  // ---------------------------------------------------------------------------
+  // Init
+  // ---------------------------------------------------------------------------
+  async function init() {
+    claimsList = await fetchJSON(API + "/claims");
+    await updateProgress();
+
+    // Initialize filtered indices to all claims (no filter active)
+    filteredIndices = [];
+    for (var i = 0; i < claimsList.length; i++) {
+      filteredIndices.push(i);
+    }
+
+    claimJumpInput.max = claimsList.length;
+    claimTotal.textContent = claimsList.length;
+
+    if (claimsList.length > 0) {
+      // Start at first unannotated, or first claim
+      var firstUnannotated = -1;
+      for (var j = 0; j < filteredIndices.length; j++) {
+        if (!claimsList[filteredIndices[j]].has_annotation) {
+          firstUnannotated = j;
+          break;
+        }
+      }
+      filteredPos = firstUnannotated >= 0 ? firstUnannotated : 0;
+      await loadClaim(filteredIndices[filteredPos]);
+    } else {
+      claimText.textContent = "No claims loaded.";
+    }
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
