@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASN Content Freshness — Interactive Media</title>
+<style>
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #fafafa;
+  color: #333;
+  margin: 0;
+  padding: 48px 24px;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  color: #666;
+  font-size: 0.95rem;
+  margin-bottom: 36px;
+}
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card {
+  display: block;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 20px 24px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.card:hover {
+  border-color: #2563eb;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+}
+
+.card h2 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 0 0 6px;
+  color: #1e40af;
+}
+
+.card p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.card .sublinks {
+  margin-top: 10px;
+  font-size: 0.85rem;
+}
+
+.card .sublinks a {
+  color: #2563eb;
+  text-decoration: none;
+  margin-right: 16px;
+}
+
+.card .sublinks a:hover {
+  text-decoration: underline;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>ASN Content Freshness</h1>
+  <p class="subtitle">Interactive visualizations for the content freshness scoring model.</p>
+
+  <div class="cards">
+    <a class="card" href="/scoring-model/">
+      <h2>Scoring Model Explorer</h2>
+      <p>Browse per-document scoring results: claims, ratings, excerpts, and freshness scores across the full catalog evaluation.</p>
+    </a>
+
+    <div class="card">
+      <h2>Reproducibility Report</h2>
+      <p>Assess scoring stability across duplicate agent runs: agreement rates, score deltas, and claim-level comparisons.</p>
+      <div class="sublinks">
+        <a href="/repro-report/">Summary dashboard</a>
+        <a href="/repro-report/ethnography.html">Claim-level ethnography</a>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
