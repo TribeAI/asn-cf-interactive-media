@@ -1,19 +1,17 @@
 services:
-  nginx:
+  app:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
+      # oauth2-proxy listens on $PORT inside the container; Railway will
+      # set $PORT in prod, locally we pin it to 8080.
       - "8080:8080"
-    depends_on:
-      - annotation
-
-  annotation:
-    build:
-      context: ./annotation
-    volumes:
-      - ./annotation/data:/data
+    env_file:
+      - .env
     environment:
-      - CSV_PATH=/data/claims.csv
-    expose:
-      - "8888"
+      - PORT=8080
+    volumes:
+      # Mount the same CSV the legacy annotation service used so the
+      # Tornado backend (running inside this container) can find it.
+      - ./annotation/data:/data

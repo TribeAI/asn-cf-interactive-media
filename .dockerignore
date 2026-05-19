@@ -1,3 +1,5 @@
 .git
 README.md
 annotation/data/*.csv
+.env
+docs
