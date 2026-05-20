@@ -4,12 +4,15 @@ Static visualizations and annotation tools for the ASN content freshness scoring
 
 ## Visualizations
 
-| Path | Description |
-|------|-------------|
-| `/scoring-model/` | Per-document scoring explorer: claims, ratings, excerpts, freshness scores |
-| `/repro-report/` | Reproducibility report: agreement rates, score deltas across duplicate runs |
-| `/repro-report/ethnography.html` | Side-by-side claim comparison for sampled documents |
-| `/annotation/` | Claim annotation tool: human QA interface for grading AI claim assessments |
+| Path | Description | Data source |
+|------|-------------|-------------|
+| `/scoring-model/` | Per-document scoring explorer: claims, ratings, excerpts, freshness scores | self-contained |
+| `/repro-report/` | Reproducibility report: agreement rates, score deltas across duplicate runs | self-contained |
+| `/repro-report/ethnography.html` | Side-by-side claim comparison for sampled documents | self-contained |
+| `/annotation/` | Claim annotation tool: human QA interface for grading AI claim assessments | Tornado backend |
+| `/ontology-extraction/` | LinkedIn-skill-level topic extraction over MS Learn modules, Claude vs Qwen comparison | [asn-content-ontology](https://github.com/TribeAI/asn-content-ontology) |
+
+This repo is **the visualization server only** — it does not contain the extraction or scoring pipelines. Those live in sibling repos and produce the data files this repo serves. See [Fetching data](#fetching-data) for how to pull the latest outputs.
 
 ## Local development
 
@@ -81,11 +84,47 @@ When requesting the Auth0 client, register **both** of these callback URLs:
 
 Right now there's no mock-provider mode wired in. If you need to iterate on a static visualization without going through Auth0, use the `python3 -m http.server -d public 8080` shortcut above. (oauth2-proxy supports `--skip-auth-routes` for specific path regexes — if static-page-only auth bypass becomes useful, we can add it.)
 
+## Fetching data
+
+The visualizations that depend on external pipelines (currently
+`/ontology-extraction/`) load JSON/JSONL data files from `public/<slug>/`.
+Those files are **mirrored from sibling repos** by `make data` rather than
+authored here, so the upstream pipeline stays the source of truth.
+
+```bash
+# default: looks for asn-content-ontology at ../asn-content-ontology
+make data
+
+# or with a custom checkout path:
+make data ONTOLOGY_REPO=/path/to/asn-content-ontology
+
+# rebuild the upstream outputs first (re-runs the build scripts in the
+# ontology repo), then mirror them:
+make data-refresh
+```
+
+Sibling-repo paths are pinned in the [Makefile](./Makefile) — when the
+canonical extraction batch advances (e.g., `sample-2026-06-XX`), update
+`ONTOLOGY_SAMPLE_DIR` there.
+
+Why mirror instead of git-submodule the data:
+
+- Keeps the Docker build self-contained (Railway doesn't need access to the
+  upstream repo).
+- Lets the viz repo deploy from a known-good snapshot even if the upstream
+  pipeline is mid-refactor.
+- Updating the snapshot is one commit (`make data && git commit public/`),
+  reviewable as a normal PR.
+
 ## Adding a new visualization
 
 1. Create `public/<slug>/index.html` (plus any sibling data files it needs).
-2. Add a card link to `public/index.html`.
-3. Commit, push. Railway auto-deploys.
+2. If the viz depends on an external pipeline, add target rules to
+   `Makefile` so its data files are populated by `make data`. **Do not
+   commit extraction or data-generation code into this repo** — that
+   belongs upstream.
+3. Add a card link to `public/index.html`.
+4. Commit, push. Railway auto-deploys.
 
 No changes to `Dockerfile`, `nginx.conf`, or `oauth2-proxy.cfg` are needed — `try_files` serves any new directory automatically, and oauth2-proxy gates the whole site.
 
