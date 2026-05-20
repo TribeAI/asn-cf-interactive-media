@@ -1,3 +1,5 @@
 .DS_Store
 annotation/data/*.csv
+.env
+.claude/
 secure_data/
