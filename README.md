@@ -11,6 +11,7 @@ Static visualizations and annotation tools for the ASN content freshness scoring
 | `/repro-report/ethnography.html` | Side-by-side claim comparison for sampled documents | self-contained |
 | `/annotation/` | Claim annotation tool: human QA interface for grading AI claim assessments | Tornado backend |
 | `/ontology-extraction/` | LinkedIn-skill-level topic extraction over MS Learn modules, Claude vs Qwen comparison | [asn-content-ontology](https://github.com/TribeAI/asn-content-ontology) |
+| `/skills-roles/` | Skills (work-to-be-done) + roles (loose personas) extracted per-module, with role→skill composition links | [asn-content-ontology](https://github.com/TribeAI/asn-content-ontology) |
 
 This repo is **the visualization server only** — it does not contain the extraction or scoring pipelines. Those live in sibling repos and produce the data files this repo serves. See [Fetching data](#fetching-data) for how to pull the latest outputs.
 
@@ -87,9 +88,10 @@ Right now there's no mock-provider mode wired in. If you need to iterate on a st
 ## Fetching data
 
 The visualizations that depend on external pipelines (currently
-`/ontology-extraction/`) load JSON/JSONL data files from `public/<slug>/`.
-Those files are **mirrored from sibling repos** by `make data` rather than
-authored here, so the upstream pipeline stays the source of truth.
+`/ontology-extraction/` and `/skills-roles/`) load JSON/JSONL data files from
+`public/<slug>/`. Those files are **mirrored from sibling repos** by `make
+data` rather than authored here, so the upstream pipeline stays the source of
+truth.
 
 ```bash
 # default: looks for asn-content-ontology at ../asn-content-ontology
@@ -105,7 +107,7 @@ make data-refresh
 
 Sibling-repo paths are pinned in the [Makefile](./Makefile) — when the
 canonical extraction batch advances (e.g., `sample-2026-06-XX`), update
-`ONTOLOGY_SAMPLE_DIR` there.
+`ONTOLOGY_SAMPLE_DIR` / `SKILLSROLES_SAMPLE_DIR` there.
 
 Why mirror instead of git-submodule the data:
 
