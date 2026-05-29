@@ -1,0 +1,11 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: asn-cf-interactive-media
+  description: Static visualizations and annotation tools for the ASN content freshness scoring model, deployed on Railway.
+  annotations:
+    github.com/project-slug: TribeAI/asn-cf-interactive-media
+spec:
+  type: service
+  lifecycle: experimental
+  owner: user:default/cuevasclemente-tribe
