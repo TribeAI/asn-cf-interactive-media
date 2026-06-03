@@ -245,8 +245,27 @@ function render() {
     const CW = X0 * 2 + (cols - 1) * GX;
     const CH = Y0 * 2 + Math.floor((domains.length - 1) / cols) * GY;
 
-    nodes.forEach(n => { n._tx = center[n._domain].x; n._ty = center[n._domain].y + tierDelta[n.tier]; });
-    // seed at the cluster target (small jitter) so the sim settles quickly
+    // Blend each node's gravity target across its OWN domain + the DISTINCT
+    // domains of its neighbours, so a node that bridges clusters is pulled to
+    // the midpoint between them (a real spanning node) instead of staying glued
+    // to one cluster with a long tether. Single-domain nodes stay in place.
+    const nbrDoms = {};
+    links.forEach(l => {
+        const sd = byId.get(l.source)._domain, td = byId.get(l.target)._domain;
+        (nbrDoms[l.source] || (nbrDoms[l.source] = [])).push(td);
+        (nbrDoms[l.target] || (nbrDoms[l.target] = [])).push(sd);
+    });
+    nodes.forEach(n => {
+        const w = {};
+        w[n._domain] = 1.4;  // mild anchor toward its own domain / title
+        new Set(nbrDoms[n.id] || []).forEach(d => { w[d] = (w[d] || 0) + 1; });
+        let sx = 0, sy = 0, sw = 0;
+        for (const d in w) { sx += center[d].x * w[d]; sy += center[d].y * w[d]; sw += w[d]; }
+        n._tx = sx / sw;
+        n._ty = sy / sw + tierDelta[n.tier];
+        n._spanning = Object.keys(w).length > 1;  // bridges >1 domain
+    });
+    // seed at the (blended) target with small jitter so the sim settles quickly
     nodes.forEach((n, i) => { n.x = n._tx + (i % 9 - 4) * 16; n.y = n._ty + (i % 7 - 3) * 16; });
 
     // Measure each rendered label so collision can treat the node + its label
