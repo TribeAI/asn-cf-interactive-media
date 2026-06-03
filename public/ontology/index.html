@@ -37,15 +37,34 @@
     .col-head.topic { color: #b45309; }
     .col-head span { display: block; font-weight: 400; font-size: 0.78em; color: #94a3b8; }
 
-    #chart-wrap { padding: 8px 24px 40px; max-width: 1400px; margin: 0 auto; }
-    svg { width: 100%; height: auto; display: block; }
+    /* The chart is a fixed-height viewport; the graph is a much larger canvas
+       inside it that you pan (drag) and zoom (wheel / buttons). */
+    #chart-wrap { position: relative; width: 100%; height: calc(100vh - 200px); min-height: 460px;
+        background:
+            linear-gradient(#eef2f7 1px, transparent 1px) 0 0 / 26px 26px,
+            linear-gradient(90deg, #eef2f7 1px, transparent 1px) 0 0 / 26px 26px,
+            #f8fafc;
+        overflow: hidden; border-bottom: 1px solid #e2e8f0; }
+    svg.canvas { width: 100%; height: 100%; display: block; cursor: grab; }
+    svg.canvas.grabbing { cursor: grabbing; }
 
-    .node rect { cursor: pointer; stroke-width: 0; rx: 2; transition: opacity 0.12s; }
-    .node text { font-size: 11px; fill: #334155; pointer-events: none; }
-    .node.faded rect, .node.faded text { opacity: 0.18; }
+    .col-band { fill: #ffffff; opacity: 0.45; }
+    .col-title { font-size: 15px; font-weight: 700; }
+    .col-title small { font-weight: 400; }
+    .col-sub { font-size: 11px; fill: #94a3b8; }
+
+    .node rect { cursor: pointer; stroke-width: 0; transition: opacity 0.12s; }
+    .node text { font-size: 12px; fill: #334155; pointer-events: none; paint-order: stroke;
+        stroke: #f8fafc; stroke-width: 3px; stroke-linejoin: round; }
+    .node.faded rect, .node.faded text { opacity: 0.16; }
     .link { fill: none; transition: opacity 0.12s; }
     .link.weak { stroke-dasharray: 3 3; }
-    .link.faded { opacity: 0.06 !important; }
+    .link.faded { opacity: 0.05 !important; }
+
+    .zoom-controls { position: absolute; top: 12px; right: 16px; display: flex; flex-direction: column; gap: 6px; z-index: 5; }
+    .zoom-controls button { width: 34px; height: 34px; border: 1px solid #cbd5e1; background: white; border-radius: 7px; font-size: 1.1em; cursor: pointer; color: #475569; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .zoom-controls button:hover { background: #f1f5f9; }
+    .zoom-controls button.fit { font-size: 0.62em; font-weight: 700; letter-spacing: 0.03em; }
 
     .tooltip {
         position: fixed; pointer-events: none; z-index: 200;
@@ -77,16 +96,17 @@
 <div class="controls">
     <label><input type="checkbox" id="toggle-weak" checked> show weak job↔topic links</label>
     <button id="reset-btn">Reset highlight</button>
-    <span class="hint">Click a node to isolate its connected paths · hover for detail</span>
+    <span class="hint">Drag to pan · scroll to zoom · click a node to isolate its paths · hover for detail</span>
 </div>
 
-<div class="col-headers">
-    <div class="col-head role">Roles <span>derived personas</span></div>
-    <div class="col-head job">Jobs to be Done <span>goals / outcomes</span></div>
-    <div class="col-head topic">Topics <span>v3 taxonomy (merged)</span></div>
+<div id="chart-wrap">
+    <div class="zoom-controls">
+        <button id="zoom-in" title="Zoom in">+</button>
+        <button id="zoom-out" title="Zoom out">−</button>
+        <button id="zoom-fit" class="fit" title="Fit to view">FIT</button>
+    </div>
+    <div class="empty">Loading ontology…</div>
 </div>
-
-<div id="chart-wrap"><div class="empty">Loading ontology…</div></div>
 
 <div class="legend" id="legend"></div>
 <div class="tooltip" id="tooltip"></div>
@@ -129,6 +149,10 @@ async function init() {
         document.getElementById("reset-btn").addEventListener("click", () => {
             state.selected = null; applyHighlight();
         });
+        document.getElementById("zoom-in").addEventListener("click", () => zoomBy(1.3));
+        document.getElementById("zoom-out").addEventListener("click", () => zoomBy(1 / 1.3));
+        document.getElementById("zoom-fit").addEventListener("click", () => fitView(true));
+        let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => fitView(false), 150); });
     } catch (err) {
         document.getElementById("chart-wrap").innerHTML =
             `<div class="empty">Failed to load ontology: ${escapeHtml(err.message)}</div>`;
@@ -159,11 +183,10 @@ function renderLegend() {
 
 function render() {
     const wrap = document.getElementById("chart-wrap");
-    wrap.innerHTML = "";
+    wrap.querySelectorAll("svg.canvas, .empty").forEach(el => el.remove());
 
     const links = state.graph.links.filter(l =>
         state.showWeak || !(l.kind === "job-topic" && l.strength === "weak"));
-    // keep only nodes that still have an edge
     const usedIds = new Set();
     links.forEach(l => { usedIds.add(l.source); usedIds.add(l.target); });
     const nodes = state.graph.nodes
@@ -180,76 +203,119 @@ function render() {
         nodes.filter(n => n.tier === "job").length,
         nodes.filter(n => n.tier === "topic").length,
     );
-    // Guard against a tiny/zero clientWidth at first paint (would blow up the
-    // viewBox aspect ratio and render giant nodes). Floor at 900.
-    const width = Math.max(900, Math.min(1352, wrap.clientWidth || 1320));
-    const height = Math.max(560, perLayerMax * 18 + 40);
+
+    // A large internal canvas with generous spacing — you pan/zoom around it
+    // instead of squashing everything into the viewport. ROW px per node row.
+    const M = { left: 215, right: 285, top: 58, bottom: 30 };
+    const ROW = 30;
+    const CW = 1660;
+    const CH = Math.max(720, perLayerMax * ROW + M.top + M.bottom);
 
     const sankey = d3.sankey()
         .nodeId(d => d.id)
-        .nodeWidth(13)
-        .nodePadding(7)
+        .nodeWidth(15)
+        .nodePadding(13)
         .nodeAlign(d3.sankeyLeft)
-        .extent([[8, 8], [width - 8, height - 8]]);
+        .extent([[M.left, M.top], [CW - M.right, CH - M.bottom]]);
 
     let graph;
     try {
         graph = sankey({ nodes, links: sankeyLinks });
     } catch (e) {
-        wrap.innerHTML = `<div class="empty">Layout error: ${escapeHtml(e.message)}</div>`;
-        return;
+        const d = document.createElement("div");
+        d.className = "empty"; d.textContent = "Layout error: " + e.message;
+        wrap.appendChild(d); return;
     }
 
+    // viewBox = the full internal canvas, so the browser auto-fits the whole
+    // graph into the viewport (letterboxed) regardless of pixel size — robust
+    // to first-paint zero-width. d3-zoom then layers zoom-in / pan on top.
     const svg = d3.select(wrap).append("svg")
-        .attr("viewBox", `0 0 ${width} ${height}`)
-        .attr("preserveAspectRatio", "xMinYMin meet");
+        .attr("class", "canvas")
+        .attr("viewBox", `0 0 ${CW} ${CH}`)
+        .attr("preserveAspectRatio", "xMidYMid meet");
+    const g = svg.append("g").attr("class", "zoom-layer");
+
+    // column bands + headers (inside the zoom layer so they track the graph)
+    const cols = [
+        { tier: "role",  title: "Roles", sub: "derived personas", color: "#6d28d9" },
+        { tier: "job",   title: "Jobs to be Done", sub: "goals / outcomes", color: "#0f766e" },
+        { tier: "topic", title: "Topics", sub: "v3 taxonomy (merged)", color: "#b45309" },
+    ];
+    cols.forEach(c => {
+        const cn = graph.nodes.filter(n => n.tier === c.tier);
+        if (!cn.length) return;
+        const x0 = Math.min(...cn.map(n => n.x0));
+        const x1 = Math.max(...cn.map(n => n.x1));
+        const cx = (x0 + x1) / 2;
+        g.append("rect").attr("class", "col-band")
+            .attr("x", x0 - 14).attr("y", M.top - 10)
+            .attr("width", (x1 - x0) + 28).attr("height", CH - M.top - M.bottom + 14).attr("rx", 8);
+        g.append("text").attr("class", "col-title").attr("x", cx).attr("y", 30)
+            .attr("text-anchor", "middle").attr("fill", c.color).text(c.title);
+        g.append("text").attr("class", "col-sub").attr("x", cx).attr("y", 47)
+            .attr("text-anchor", "middle").text(c.sub);
+    });
 
     // links
-    svg.append("g").attr("class", "links")
-        .selectAll("path")
-        .data(graph.links)
-        .join("path")
+    g.append("g").attr("class", "links")
+        .selectAll("path").data(graph.links).join("path")
         .attr("class", d => "link" + (d.strength === "weak" ? " weak" : ""))
         .attr("d", d3.sankeyLinkHorizontal())
         .attr("stroke", d => nodeColor(d.source))
-        .attr("stroke-opacity", 0.32)
-        .attr("stroke-width", d => Math.max(1, d.width))
+        .attr("stroke-opacity", 0.34)
+        .attr("stroke-width", d => Math.max(1.2, d.width))
         .each(function (d) { d._el = this; });
 
     // nodes
-    const node = svg.append("g").attr("class", "nodes")
-        .selectAll("g")
-        .data(graph.nodes)
-        .join("g")
-        .attr("class", "node")
-        .each(function (d) { d._el = this; });
+    const node = g.append("g").attr("class", "nodes")
+        .selectAll("g").data(graph.nodes).join("g")
+        .attr("class", "node").each(function (d) { d._el = this; });
 
     node.append("rect")
-        .attr("x", d => d.x0)
-        .attr("y", d => d.y0)
-        .attr("height", d => Math.max(1, d.y1 - d.y0))
-        .attr("width", d => d.x1 - d.x0)
+        .attr("x", d => d.x0).attr("y", d => d.y0)
+        .attr("height", d => Math.max(2, d.y1 - d.y0))
+        .attr("width", d => d.x1 - d.x0).attr("rx", 2)
         .attr("fill", nodeColor)
         .on("click", (e, d) => { e.stopPropagation(); toggleSelect(d); })
         .on("mousemove", (e, d) => showTip(e, d))
         .on("mouseleave", hideTip);
 
+    // roles label into the left margin; jobs + topics label to the right of
+    // their node (jobs land in the middle gap, topics in the right margin).
     node.append("text")
-        .attr("x", d => d.tier === "topic" ? d.x0 - 6 : d.x1 + 6)
-        .attr("y", d => (d.y0 + d.y1) / 2)
-        .attr("dy", "0.35em")
-        .attr("text-anchor", d => d.tier === "topic" ? "end" : "start")
-        .text(d => {
-            const max = d.tier === "job" ? 46 : 34;
-            return d.label.length > max ? d.label.slice(0, max) + "…" : d.label;
-        })
-        // hide labels for tiny nodes when very dense
-        .style("display", d => (d.y1 - d.y0) < 6 ? "none" : null);
+        .attr("x", d => d.tier === "role" ? d.x0 - 8 : d.x1 + 8)
+        .attr("y", d => (d.y0 + d.y1) / 2).attr("dy", "0.35em")
+        .attr("text-anchor", d => d.tier === "role" ? "end" : "start")
+        .text(d => d.label.length > 58 ? d.label.slice(0, 58) + "…" : d.label)
+        .style("display", d => (d.y1 - d.y0) < 4 ? "none" : null);
 
-    svg.on("click", () => { state.selected = null; applyHighlight(); });
+    // pan + zoom
+    const zoom = d3.zoom().scaleExtent([0.15, 5])
+        .translateExtent([[-300, -300], [CW + 300, CH + 300]])
+        .on("start", () => svg.classed("grabbing", true))
+        .on("end", () => svg.classed("grabbing", false))
+        .on("zoom", (e) => g.attr("transform", e.transform));
+    svg.call(zoom);
+    svg.on("click", (e) => { if (e.target.tagName === "svg") { state.selected = null; applyHighlight(); } });
 
     state._graph = graph;
+    state._zoom = zoom;
+    state._svg = svg;
+    state._dims = { CW, CH };
     applyHighlight();
+}
+
+// "Fit" = reset the zoom transform; the viewBox already fits the whole canvas
+// into the viewport, so this returns to the full overview.
+function fitView(animate = true) {
+    if (!state._svg || !state._zoom) return;
+    (animate ? state._svg.transition().duration(300) : state._svg)
+        .call(state._zoom.transform, d3.zoomIdentity);
+}
+
+function zoomBy(factor) {
+    if (state._svg) state._svg.transition().duration(200).call(state._zoom.scaleBy, factor);
 }
 
 // Build adjacency for path tracing across the displayed graph.
