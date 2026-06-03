@@ -53,6 +53,8 @@
     .col-title small { font-weight: 400; }
     .col-sub { font-size: 11px; fill: #94a3b8; }
 
+    .domain-label { font-size: 30px; font-weight: 800; opacity: 0.16; text-transform: uppercase;
+        letter-spacing: 0.06em; pointer-events: none; }
     .node circle { cursor: pointer; transition: opacity 0.12s; }
     .node text { font-size: 10.5px; fill: #334155; pointer-events: none; paint-order: stroke;
         stroke: #f8fafc; stroke-width: 3.5px; stroke-linejoin: round;
@@ -210,12 +212,42 @@ function render() {
     links.forEach(l => { degree[l.source] = (degree[l.source] || 0) + 1; degree[l.target] = (degree[l.target] || 0) + 1; });
     nodes.forEach(n => n._deg = degree[n.id] || 0);
 
-    const CW = 1800, CH = 1200;
-    const tierX = t => t === "role" ? CW * 0.20 : t === "job" ? CW * 0.50 : CW * 0.80;
     const radius = n => n.tier === "role" ? 9 : 5 + Math.min(8, Math.sqrt(n._deg) * 1.7);
 
-    // Seed positions near each node's tier band so the layout settles cleanly.
-    nodes.forEach((n, i) => { n.x = tierX(n.tier) + (i % 7 - 3) * 12; n.y = CH / 2 + ((i * 53) % CH - CH / 2) * 0.7; });
+    // --- Domain-cluster layout. Each domain is an "island"; within an island
+    // the tiers stack top->bottom: roles on top, then jobs, then topics.
+    const byId = new Map(nodes.map(n => [n.id, n]));
+    nodes.forEach(n => { if (n.tier !== "role") n._domain = n.domain || "other"; });
+    // a role has no domain of its own — inherit the majority domain of its jobs
+    const roleDoms = {};
+    links.forEach(l => {
+        if (l.kind === "role-job") {
+            const job = byId.get(l.target);
+            if (job) (roleDoms[l.source] || (roleDoms[l.source] = [])).push(job.domain || "other");
+        }
+    });
+    const mode = arr => {
+        const c = {}; let best = "other", bn = 0;
+        arr.forEach(d => { c[d] = (c[d] || 0) + 1; if (c[d] > bn) { bn = c[d]; best = d; } });
+        return best;
+    };
+    nodes.forEach(n => { if (n.tier === "role") n._domain = roleDoms[n.id] ? mode(roleDoms[n.id]) : "other"; });
+
+    // place each domain island on a grid, biggest domains first
+    const domCount = {};
+    nodes.forEach(n => { domCount[n._domain] = (domCount[n._domain] || 0) + 1; });
+    const domains = Object.keys(domCount).sort((a, b) => domCount[b] - domCount[a]);
+    const cols = Math.ceil(Math.sqrt(domains.length));
+    const GX = 980, GY = 820, X0 = 520, Y0 = 470;
+    const center = {};
+    domains.forEach((d, i) => { center[d] = { x: X0 + (i % cols) * GX, y: Y0 + Math.floor(i / cols) * GY }; });
+    const tierDelta = { role: -135, job: 0, topic: 145 };  // top -> bottom
+    const CW = X0 * 2 + (cols - 1) * GX;
+    const CH = Y0 * 2 + Math.floor((domains.length - 1) / cols) * GY;
+
+    nodes.forEach(n => { n._tx = center[n._domain].x; n._ty = center[n._domain].y + tierDelta[n.tier]; });
+    // seed at the cluster target (small jitter) so the sim settles quickly
+    nodes.forEach((n, i) => { n.x = n._tx + (i % 9 - 4) * 16; n.y = n._ty + (i % 7 - 3) * 16; });
 
     // Measure each rendered label so collision can treat the node + its label
     // as one box (labels sit to the right of the circle, baseline-centered).
@@ -234,6 +266,16 @@ function render() {
         .attr("viewBox", `0 0 ${CW} ${CH}`)
         .attr("preserveAspectRatio", "xMidYMid meet");
     const g = svg.append("g").attr("class", "zoom-layer");
+
+    // faint domain titles behind each island
+    g.append("g").attr("class", "domain-labels")
+        .selectAll("text").data(domains).join("text")
+        .attr("class", "domain-label")
+        .attr("x", d => center[d].x)
+        .attr("y", d => center[d].y + tierDelta.role - 60)
+        .attr("text-anchor", "middle")
+        .attr("fill", d => DOMAIN_COLORS[d] || DOMAIN_COLORS.other)
+        .text(d => d);
 
     const link = g.append("g").attr("class", "links")
         .selectAll("line").data(links).join("line")
@@ -295,12 +337,13 @@ function render() {
     }
 
     const sim = d3.forceSimulation(nodes)
-        .force("link", d3.forceLink(links).id(d => d.id)
-            .distance(d => d.kind === "role-job" ? 95 : 78).strength(0.45))
-        .force("charge", d3.forceManyBody().strength(-180))
+        // weak link force — domain/tier gravity is the real organizer, links
+        // just add a little cohesion (and cross-domain edges stay visible).
+        .force("link", d3.forceLink(links).id(d => d.id).distance(70).strength(0.05))
+        .force("charge", d3.forceManyBody().strength(-150))
         .force("collide", labelCollide())
-        .force("x", d3.forceX(d => tierX(d.tier)).strength(0.10))
-        .force("y", d3.forceY(CH / 2).strength(0.04));
+        .force("x", d3.forceX(d => d._tx).strength(0.22))   // pull to domain island
+        .force("y", d3.forceY(d => d._ty).strength(0.30));  // stack tiers top->bottom
 
     function ticked() {
         link.attr("x1", d => d.source.x).attr("y1", d => d.source.y)
