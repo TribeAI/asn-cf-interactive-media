@@ -54,10 +54,17 @@
     .col-sub { font-size: 11px; fill: #94a3b8; }
 
     .node circle { cursor: pointer; transition: opacity 0.12s; }
-    .node text { font-size: 11px; fill: #334155; pointer-events: none; paint-order: stroke;
-        stroke: #f8fafc; stroke-width: 3px; stroke-linejoin: round; }
-    .node.faded circle, .node.faded text { opacity: 0.12; }
+    .node text { font-size: 10.5px; fill: #334155; pointer-events: none; paint-order: stroke;
+        stroke: #f8fafc; stroke-width: 3.5px; stroke-linejoin: round;
+        opacity: 0; transition: opacity 0.12s; }      /* labels hidden by default */
     .node.hub text { font-weight: 600; }
+    /* Label visibility: anchors (roles + hubs) always; everything else only
+       when zoomed in or when the node is part of the current selection. */
+    .node.lbl-always text { opacity: 1; }
+    .zoom-layer.labels-on .node text { opacity: 1; }
+    .node.show-label text { opacity: 1; }
+    .node.faded circle { opacity: 0.12; }
+    .node.faded text { opacity: 0 !important; }
     .link { fill: none; transition: opacity 0.12s; }
     .link.weak { stroke-dasharray: 3 3; }
     .link.faded { opacity: 0.04 !important; }
@@ -224,9 +231,12 @@ function render() {
         .attr("stroke-width", d => d.kind === "role-job" ? 2 : 1.3)
         .each(function (d) { d._el = this; });
 
+    // "anchor" labels (always shown): roles + well-connected hub topics/jobs.
     const node = g.append("g").attr("class", "nodes")
         .selectAll("g").data(nodes).join("g")
-        .attr("class", d => "node" + (d._deg >= 3 ? " hub" : ""))
+        .attr("class", d => "node"
+            + (d._deg >= 3 ? " hub" : "")
+            + (d.tier === "role" || d._deg >= 4 ? " lbl-always" : ""))
         .each(function (d) { d._el = this; })
         .call(d3.drag()
             .on("start", (e, d) => { if (!e.active) sim.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
@@ -247,11 +257,11 @@ function render() {
 
     const sim = d3.forceSimulation(nodes)
         .force("link", d3.forceLink(links).id(d => d.id)
-            .distance(d => d.kind === "role-job" ? 75 : 60).strength(0.55))
-        .force("charge", d3.forceManyBody().strength(-230))
-        .force("collide", d3.forceCollide(d => radius(d) + 20))
-        .force("x", d3.forceX(d => tierX(d.tier)).strength(0.14))
-        .force("y", d3.forceY(CH / 2).strength(0.05));
+            .distance(d => d.kind === "role-job" ? 95 : 78).strength(0.5))
+        .force("charge", d3.forceManyBody().strength(-340))
+        .force("collide", d3.forceCollide(d => radius(d) + 28))
+        .force("x", d3.forceX(d => tierX(d.tier)).strength(0.13))
+        .force("y", d3.forceY(CH / 2).strength(0.045));
 
     function ticked() {
         link.attr("x1", d => d.source.x).attr("y1", d => d.source.y)
@@ -276,7 +286,11 @@ function render() {
     const zoom = d3.zoom().scaleExtent([0.1, 6])
         .on("start", () => svg.classed("grabbing", true))
         .on("end", () => svg.classed("grabbing", false))
-        .on("zoom", (e) => g.attr("transform", e.transform));
+        .on("zoom", (e) => {
+            g.attr("transform", e.transform);
+            // reveal all labels once zoomed in enough to read them
+            g.classed("labels-on", e.transform.k >= 1.5);
+        });
     svg.call(zoom);
     svg.on("click", (e) => { if (e.target.tagName === "svg") { state.selected = null; applyHighlight(); } });
 
@@ -339,13 +353,18 @@ function applyHighlight() {
     const g = state._graph;
     if (!g) return;
     if (!state.selected) {
-        g.nodes.forEach(n => n._el && n._el.classList.remove("faded"));
+        g.nodes.forEach(n => n._el && n._el.classList.remove("faded", "show-label"));
         g.links.forEach(l => l._el && l._el.classList.remove("faded"));
         return;
     }
     const start = g.nodes.find(n => n.id === state.selected);
     const { keepNodes, keepLinks } = connectedSet(start);
-    g.nodes.forEach(n => n._el && n._el.classList.toggle("faded", !keepNodes.has(n.id)));
+    g.nodes.forEach(n => {
+        if (!n._el) return;
+        const kept = keepNodes.has(n.id);
+        n._el.classList.toggle("faded", !kept);
+        n._el.classList.toggle("show-label", kept);  // label every node on the path
+    });
     g.links.forEach(l => l._el && l._el.classList.toggle("faded", !keepLinks.has(l)));
 }
 
