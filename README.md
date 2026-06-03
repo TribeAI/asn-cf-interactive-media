@@ -11,7 +11,8 @@ Static visualizations and annotation tools for the ASN content freshness scoring
 | `/repro-report/ethnography.html` | Side-by-side claim comparison for sampled documents | self-contained |
 | `/annotation/` | Claim annotation tool: human QA interface for grading AI claim assessments | Tornado backend |
 | `/ontology-extraction/` | LinkedIn-skill-level topic extraction over MS Learn modules, Claude vs Qwen comparison | [asn-content-ontology](https://github.com/TribeAI/asn-content-ontology) |
-| `/jobs-to-be-done/` | Jobs-to-be-done (the action/outcome axis) + derived personas extracted per-module, with persona→job links | [asn-content-ontology](https://github.com/TribeAI/asn-content-ontology) |
+| `/ontology/` | Aggregate role → job-to-be-done → topic ontology graph (interactive Sankey) across 20 modules | [asn-content-ontology](https://github.com/TribeAI/asn-content-ontology) |
+| `/jobs-to-be-done/` | Per-module jobs-to-be-done (the action/outcome axis) + derived personas, with persona→job links | [asn-content-ontology](https://github.com/TribeAI/asn-content-ontology) |
 
 This repo is **the visualization server only** — it does not contain the extraction or scoring pipelines. Those live in sibling repos and produce the data files this repo serves. See [Fetching data](#fetching-data) for how to pull the latest outputs.
 

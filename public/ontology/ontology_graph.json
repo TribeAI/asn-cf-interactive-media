@@ -1,0 +1,1939 @@
+{
+  "meta": {
+    "layers": [
+      "role",
+      "job",
+      "topic"
+    ],
+    "n_roles": 24,
+    "n_jobs": 64,
+    "n_topics": 74,
+    "n_links": 133,
+    "thresholds": {
+      "strong": 0.65,
+      "weak": 0.45,
+      "merge_sim": 0.72
+    },
+    "embedding_model": "all-MiniLM-L6-v2"
+  },
+  "layers": [
+    "role",
+    "job",
+    "topic"
+  ],
+  "nodes": [
+    {
+      "id": "r:sustainability solution customizer",
+      "layer": "role",
+      "label": "Sustainability Solution Customizer"
+    },
+    {
+      "id": "r:process improvement analyst",
+      "layer": "role",
+      "label": "Process Improvement Analyst"
+    },
+    {
+      "id": "r:security operations analyst managing hybrid infrastructure",
+      "layer": "role",
+      "label": "Security Operations Analyst managing hybrid infrastructure"
+    },
+    {
+      "id": "r:aks platform engineer managing windows workloads",
+      "layer": "role",
+      "label": "AKS Platform Engineer managing Windows workloads"
+    },
+    {
+      "id": "r:microservice application developer",
+      "layer": "role",
+      "label": "Microservice Application Developer"
+    },
+    {
+      "id": "r:teams telephony administrator",
+      "layer": "role",
+      "label": "Teams Telephony Administrator"
+    },
+    {
+      "id": "r:.net maui mobile developers optimizing for offline low-bandwidth scenarios",
+      "layer": "role",
+      "label": ".NET MAUI Mobile Developers optimizing for offline/low-bandwidth scenarios"
+    },
+    {
+      "id": "r:data scientists building predictive baselines",
+      "layer": "role",
+      "label": "Data Scientists building predictive baselines"
+    },
+    {
+      "id": "r:healthcare it administrator configuring patient portals",
+      "layer": "role",
+      "label": "Healthcare IT Administrator configuring patient portals"
+    },
+    {
+      "id": "r:finance system administrator",
+      "layer": "role",
+      "label": "Finance System Administrator"
+    },
+    {
+      "id": "r:financial analyst",
+      "layer": "role",
+      "label": "Financial Analyst"
+    },
+    {
+      "id": "r:it administrator securing endpoint devices",
+      "layer": "role",
+      "label": "IT Administrator securing endpoint devices"
+    },
+    {
+      "id": "r:solution architects evaluating ai viability",
+      "layer": "role",
+      "label": "Solution Architects evaluating AI viability"
+    },
+    {
+      "id": "r:business decision-makers justifying ai investment",
+      "layer": "role",
+      "label": "Business decision-makers justifying AI investment"
+    },
+    {
+      "id": "r:ai application developer implementing responsible ai",
+      "layer": "role",
+      "label": "AI Application Developer implementing Responsible AI"
+    },
+    {
+      "id": "r:windows deployment technician",
+      "layer": "role",
+      "label": "Windows Deployment Technician"
+    },
+    {
+      "id": "r:devops engineer configuring release pipelines",
+      "layer": "role",
+      "label": "DevOps Engineer configuring release pipelines"
+    },
+    {
+      "id": "r:java backend developers building ai features",
+      "layer": "role",
+      "label": "Java Backend Developers building AI features"
+    },
+    {
+      "id": "r:cloud application deployers",
+      "layer": "role",
+      "label": "Cloud Application Deployers"
+    },
+    {
+      "id": "r:identity administrators managing hybrid or cloud-first devices",
+      "layer": "role",
+      "label": "Identity Administrators managing hybrid or cloud-first devices"
+    },
+    {
+      "id": "r:ai application developer integrating content understanding",
+      "layer": "role",
+      "label": "AI Application Developer integrating Content Understanding"
+    },
+    {
+      "id": "r:operations engineer establishing free monitoring",
+      "layer": "role",
+      "label": "Operations Engineer establishing free monitoring"
+    },
+    {
+      "id": "r:cloud operations learner",
+      "layer": "role",
+      "label": "Cloud Operations Learner"
+    },
+    {
+      "id": "r:legal and compliance professionals managing digital investigations",
+      "layer": "role",
+      "label": "Legal and Compliance Professionals managing digital investigations"
+    },
+    {
+      "id": "j:customize dashboards in microsoft sustainability manager using power bi extensions",
+      "layer": "job",
+      "label": "Customize dashboards in Microsoft Sustainability Manager using Power BI extensions",
+      "domain": "business-applications"
+    },
+    {
+      "id": "j:record and map existing business processes using process advisor",
+      "layer": "job",
+      "label": "Record and map existing business processes using Process Advisor",
+      "domain": "productivity-and-collaboration"
+    },
+    {
+      "id": "j:identify process bottlenecks and inefficiencies",
+      "layer": "job",
+      "label": "Identify process bottlenecks and inefficiencies",
+      "domain": "productivity-and-collaboration"
+    },
+    {
+      "id": "j:determine automation opportunities for business processes",
+      "layer": "job",
+      "label": "Determine automation opportunities for business processes",
+      "domain": "productivity-and-collaboration"
+    },
+    {
+      "id": "j:collect syslog data from on-premises linux hosts to microsoft sentinel",
+      "layer": "job",
+      "label": "Collect syslog data from on-premises Linux hosts to Microsoft Sentinel",
+      "domain": "security"
+    },
+    {
+      "id": "j:manage on-premises linux machines with azure arc",
+      "layer": "job",
+      "label": "Manage on-premises Linux machines with Azure Arc",
+      "domain": "cloud-infrastructure"
+    },
+    {
+      "id": "j:configure network connectivity for windows containers on aks",
+      "layer": "job",
+      "label": "Configure network connectivity for Windows containers on AKS",
+      "domain": "cloud-infrastructure"
+    },
+    {
+      "id": "j:define networking configurations for kubernetes environments",
+      "layer": "job",
+      "label": "Define networking configurations for Kubernetes environments",
+      "domain": "cloud-infrastructure"
+    },
+    {
+      "id": "j:manage load balancing and orchestration for containerized microservices",
+      "layer": "job",
+      "label": "Manage load balancing and orchestration for containerized microservices",
+      "domain": "cloud-infrastructure"
+    },
+    {
+      "id": "j:configure teams phone pstn connectivity",
+      "layer": "job",
+      "label": "Configure Teams Phone PSTN connectivity",
+      "domain": "productivity-and-collaboration"
+    },
+    {
+      "id": "j:assign phone numbers to teams users",
+      "layer": "job",
+      "label": "Assign phone numbers to Teams users",
+      "domain": "productivity-and-collaboration"
+    },
+    {
+      "id": "j:configure emergency calling locations",
+      "layer": "job",
+      "label": "Configure emergency calling locations",
+      "domain": "productivity-and-collaboration"
+    },
+    {
+      "id": "j:configure teams phone policies and features",
+      "layer": "job",
+      "label": "Configure Teams Phone policies and features",
+      "domain": "productivity-and-collaboration"
+    },
+    {
+      "id": "j:store relational data locally in a .net maui app using sqlite",
+      "layer": "job",
+      "label": "Store relational data locally in a .NET MAUI app using SQLite",
+      "domain": "development-tools"
+    },
+    {
+      "id": "j:cache remote data locally to improve application performance",
+      "layer": "job",
+      "label": "Cache remote data locally to improve application performance",
+      "domain": "development-tools"
+    },
+    {
+      "id": "j:design an app to download and save data once for local reuse",
+      "layer": "job",
+      "label": "Design an app to download and save data once for local reuse",
+      "domain": "development-tools"
+    },
+    {
+      "id": "j:build a regression model to predict numeric values",
+      "layer": "job",
+      "label": "Build a regression model to predict numeric values",
+      "domain": "ai-and-ml"
+    },
+    {
+      "id": "j:use regression for prediction with limited data",
+      "layer": "job",
+      "label": "Use regression for prediction with limited data",
+      "domain": "ai-and-ml"
+    },
+    {
+      "id": "j:establish a baseline using simple statistical techniques",
+      "layer": "job",
+      "label": "Establish a baseline using simple statistical techniques",
+      "domain": "ai-and-ml"
+    },
+    {
+      "id": "j:enable patient access to health data and scheduling via patient access portal",
+      "layer": "job",
+      "label": "Enable patient access to health data and scheduling via Patient Access portal",
+      "domain": "business-applications"
+    },
+    {
+      "id": "j:implement direct patient engagement through health bots and service centers",
+      "layer": "job",
+      "label": "Implement direct patient engagement through health bots and service centers",
+      "domain": "business-applications"
+    },
+    {
+      "id": "j:implement recurring contract billing in dynamics 365 finance",
+      "layer": "job",
+      "label": "Implement recurring contract billing in Dynamics 365 Finance",
+      "domain": "business-applications"
+    },
+    {
+      "id": "j:automate customer invoicing and renewals",
+      "layer": "job",
+      "label": "Automate customer invoicing and renewals",
+      "domain": "business-applications"
+    },
+    {
+      "id": "j:consolidate multiple billing schedules into single invoices",
+      "layer": "job",
+      "label": "Consolidate multiple billing schedules into single invoices",
+      "domain": "business-applications"
+    },
+    {
+      "id": "j:generate recurring revenue reports for forecasting",
+      "layer": "job",
+      "label": "Generate recurring revenue reports for forecasting",
+      "domain": "data-and-analytics"
+    },
+    {
+      "id": "j:protect data on removable or stolen storage media using drive encryption",
+      "layer": "job",
+      "label": "Protect data on removable or stolen storage media using drive encryption",
+      "domain": "security"
+    },
+    {
+      "id": "j:leverage trusted platform module tpm for hardware-based security",
+      "layer": "job",
+      "label": "Leverage Trusted Platform Module (TPM) for hardware-based security",
+      "domain": "security"
+    },
+    {
+      "id": "j:encrypt specific files and folders using encrypted file system efs",
+      "layer": "job",
+      "label": "Encrypt specific files and folders using Encrypted File System (EFS)",
+      "domain": "security"
+    },
+    {
+      "id": "j:assess costs benefits and roi of ai solutions",
+      "layer": "job",
+      "label": "Assess costs, benefits, and ROI of AI solutions",
+      "domain": "ai-and-ml"
+    },
+    {
+      "id": "j:decide whether to build buy or extend ai components",
+      "layer": "job",
+      "label": "Decide whether to build, buy, or extend AI components",
+      "domain": "ai-and-ml"
+    },
+    {
+      "id": "j:select roi criteria for ai-powered business solutions including tco",
+      "layer": "job",
+      "label": "Select ROI criteria for AI-powered business solutions including TCO",
+      "domain": "ai-and-ml"
+    },
+    {
+      "id": "j:justify and select ai-powered business solutions",
+      "layer": "job",
+      "label": "Justify and select AI-powered business solutions",
+      "domain": "ai-and-ml"
+    },
+    {
+      "id": "j:measure and mitigate risks for a generative ai app in azure ai foundry",
+      "layer": "job",
+      "label": "Measure and mitigate risks for a generative AI app in Azure AI Foundry",
+      "domain": "ai-and-ml"
+    },
+    {
+      "id": "j:build a customer support chatbot in azure ai foundry",
+      "layer": "job",
+      "label": "Build a customer support chatbot in Azure AI Foundry",
+      "domain": "ai-and-ml"
+    },
+    {
+      "id": "j:execute manual and ai-assisted evaluations for generative ai outputs",
+      "layer": "job",
+      "label": "Execute manual and AI-assisted evaluations for generative AI outputs",
+      "domain": "ai-and-ml"
+    },
+    {
+      "id": "j:configure content filters for generative ai applications",
+      "layer": "job",
+      "label": "Configure content filters for generative AI applications",
+      "domain": "ai-and-ml"
+    },
+    {
+      "id": "j:prepare data and system prompts for a generative ai application",
+      "layer": "job",
+      "label": "Prepare data and system prompts for a generative AI application",
+      "domain": "ai-and-ml"
+    },
+    {
+      "id": "j:select the appropriate windows client installation method for a deployment scenario",
+      "layer": "job",
+      "label": "Select the appropriate Windows client installation method for a deployment scenario",
+      "domain": "cloud-infrastructure"
+    },
+    {
+      "id": "j:describe windows client installation and deployment options",
+      "layer": "job",
+      "label": "Describe Windows client installation and deployment options",
+      "domain": "cloud-infrastructure"
+    },
+    {
+      "id": "j:configure windows client activation methods",
+      "layer": "job",
+      "label": "Configure Windows client activation methods",
+      "domain": "cloud-infrastructure"
+    },
+    {
+      "id": "j:evaluate factors for new machine deployment",
+      "layer": "job",
+      "label": "Evaluate factors for new machine deployment",
+      "domain": "cloud-infrastructure"
+    },
+    {
+      "id": "j:configure release pipeline components and artifact sources",
+      "layer": "job",
+      "label": "Configure release pipeline components and artifact sources",
+      "domain": "development-tools"
+    },
+    {
+      "id": "j:implement approval workflows for release gates",
+      "layer": "job",
+      "label": "Implement approval workflows for release gates",
+      "domain": "development-tools"
+    },
+    {
+      "id": "j:build an ai-powered application using spring ai and azure openai",
+      "layer": "job",
+      "label": "Build an AI-powered application using Spring AI and Azure OpenAI",
+      "domain": "ai-and-ml"
+    },
+    {
+      "id": "j:implement retrieval-augmented generation rag patterns in java",
+      "layer": "job",
+      "label": "Implement Retrieval-Augmented Generation (RAG) patterns in Java",
+      "domain": "ai-and-ml"
+    },
+    {
+      "id": "j:integrate vector embeddings and semantic search into java applications",
+      "layer": "job",
+      "label": "Integrate vector embeddings and semantic search into Java applications",
+      "domain": "ai-and-ml"
+    },
+    {
+      "id": "j:deploy ai agents to azure container apps with postgresql vector storage",
+      "layer": "job",
+      "label": "Deploy AI agents to Azure Container Apps with PostgreSQL vector storage",
+      "domain": "cloud-infrastructure"
+    },
+    {
+      "id": "j:join windows devices to microsoft entra id",
+      "layer": "job",
+      "label": "Join Windows devices to Microsoft Entra ID",
+      "domain": "identity-and-access"
+    },
+    {
+      "id": "j:manage devices joined to microsoft entra id",
+      "layer": "job",
+      "label": "Manage devices joined to Microsoft Entra ID",
+      "domain": "identity-and-access"
+    },
+    {
+      "id": "j:evaluate microsoft entra join prerequisites and limitations",
+      "layer": "job",
+      "label": "Evaluate Microsoft Entra join prerequisites and limitations",
+      "domain": "identity-and-access"
+    },
+    {
+      "id": "j:build an azure content understanding client application using python sdk or rest api",
+      "layer": "job",
+      "label": "Build an Azure Content Understanding client application using Python SDK or REST API",
+      "domain": "ai-and-ml"
+    },
+    {
+      "id": "j:submit multimodal content for analysis via azure content understanding",
+      "layer": "job",
+      "label": "Submit multimodal content for analysis via Azure Content Understanding",
+      "domain": "ai-and-ml"
+    },
+    {
+      "id": "j:establish a free monitoring baseline for azure platform incidents and maintenance",
+      "layer": "job",
+      "label": "Establish a free monitoring baseline for Azure platform incidents and maintenance",
+      "domain": "observability"
+    },
+    {
+      "id": "j:configure alerts for critical management operations such as resource deletion",
+      "layer": "job",
+      "label": "Configure alerts for critical management operations such as resource deletion",
+      "domain": "observability"
+    },
+    {
+      "id": "j:define notification recipients and methods using action groups",
+      "layer": "job",
+      "label": "Define notification recipients and methods using Action Groups",
+      "domain": "observability"
+    },
+    {
+      "id": "j:describe the purpose and capabilities of azure advisor",
+      "layer": "job",
+      "label": "Describe the purpose and capabilities of Azure Advisor",
+      "domain": "cloud-infrastructure"
+    },
+    {
+      "id": "j:describe the purpose and capabilities of azure service health",
+      "layer": "job",
+      "label": "Describe the purpose and capabilities of Azure Service Health",
+      "domain": "cloud-infrastructure"
+    },
+    {
+      "id": "j:describe the components and purpose of azure monitor",
+      "layer": "job",
+      "label": "Describe the components and purpose of Azure Monitor",
+      "domain": "observability"
+    },
+    {
+      "id": "j:establish a defensible ediscovery process across microsoft 365",
+      "layer": "job",
+      "label": "Establish a defensible eDiscovery process across Microsoft 365",
+      "domain": "security"
+    },
+    {
+      "id": "j:manage legal investigations by preserving and searching content",
+      "layer": "job",
+      "label": "Manage legal investigations by preserving and searching content",
+      "domain": "security"
+    },
+    {
+      "id": "j:control access to ediscovery workloads via role-based permissions",
+      "layer": "job",
+      "label": "Control access to eDiscovery workloads via role-based permissions",
+      "domain": "security"
+    },
+    {
+      "id": "j:configure azure monitor agent syslog data collection rules",
+      "layer": "job",
+      "label": "Configure Azure Monitor Agent Syslog Data Collection Rules",
+      "domain": "observability"
+    },
+    {
+      "id": "j:design automated release strategies for software deployments",
+      "layer": "job",
+      "label": "Design automated release strategies for software deployments",
+      "domain": "development-tools"
+    },
+    {
+      "id": "j:understand the core concepts and changes in the new ediscovery experience",
+      "layer": "job",
+      "label": "Understand the core concepts and changes in the new eDiscovery experience",
+      "domain": "security"
+    },
+    {
+      "id": "t:microsoft power platform development",
+      "layer": "topic",
+      "label": "Microsoft Power Platform Development",
+      "domain": "business-applications",
+      "merged_from": []
+    },
+    {
+      "id": "t:microsoft power bi",
+      "layer": "topic",
+      "label": "Microsoft Power BI",
+      "domain": "data-and-analytics",
+      "merged_from": []
+    },
+    {
+      "id": "t:esg reporting",
+      "layer": "topic",
+      "label": "ESG Reporting",
+      "domain": "business-applications",
+      "merged_from": []
+    },
+    {
+      "id": "t:process mining",
+      "layer": "topic",
+      "label": "Process Mining",
+      "domain": "productivity-and-collaboration",
+      "merged_from": []
+    },
+    {
+      "id": "t:power automate",
+      "layer": "topic",
+      "label": "Power Automate",
+      "domain": "productivity-and-collaboration",
+      "merged_from": []
+    },
+    {
+      "id": "t:business process optimization",
+      "layer": "topic",
+      "label": "Business Process Optimization",
+      "domain": "business-applications",
+      "merged_from": []
+    },
+    {
+      "id": "t:robotic process automation",
+      "layer": "topic",
+      "label": "Robotic Process Automation",
+      "domain": "productivity-and-collaboration",
+      "merged_from": []
+    },
+    {
+      "id": "t:microsoft sentinel",
+      "layer": "topic",
+      "label": "Microsoft Sentinel",
+      "domain": "security",
+      "merged_from": []
+    },
+    {
+      "id": "t:log management",
+      "layer": "topic",
+      "label": "Log Management",
+      "domain": "observability",
+      "merged_from": []
+    },
+    {
+      "id": "t:security operations",
+      "layer": "topic",
+      "label": "Security Operations",
+      "domain": "security",
+      "merged_from": []
+    },
+    {
+      "id": "t:azure arc",
+      "layer": "topic",
+      "label": "Azure Arc",
+      "domain": "cloud-infrastructure",
+      "merged_from": []
+    },
+    {
+      "id": "t:azure monitor",
+      "layer": "topic",
+      "label": "Azure Monitor",
+      "domain": "observability",
+      "merged_from": []
+    },
+    {
+      "id": "t:kubernetes",
+      "layer": "topic",
+      "label": "Kubernetes",
+      "domain": "cloud-infrastructure",
+      "merged_from": [
+        "Azure Container Apps",
+        "Azure Kubernetes Service",
+        "Containerization",
+        "Kubernetes",
+        "Windows Containers"
+      ]
+    },
+    {
+      "id": "t:container networking",
+      "layer": "topic",
+      "label": "Container Networking",
+      "domain": "networking",
+      "merged_from": []
+    },
+    {
+      "id": "t:microservices architecture",
+      "layer": "topic",
+      "label": "Microservices Architecture",
+      "domain": "development-tools",
+      "merged_from": []
+    },
+    {
+      "id": "t:microsoft teams administration",
+      "layer": "topic",
+      "label": "Microsoft Teams Administration",
+      "domain": "productivity-and-collaboration",
+      "merged_from": []
+    },
+    {
+      "id": "t:unified communications",
+      "layer": "topic",
+      "label": "Unified Communications",
+      "domain": "productivity-and-collaboration",
+      "merged_from": []
+    },
+    {
+      "id": "t:emergency calling",
+      "layer": "topic",
+      "label": "Emergency Calling",
+      "domain": "productivity-and-collaboration",
+      "merged_from": []
+    },
+    {
+      "id": "t:telephony policy management",
+      "layer": "topic",
+      "label": "Telephony Policy Management",
+      "domain": "productivity-and-collaboration",
+      "merged_from": []
+    },
+    {
+      "id": "t:audio conferencing",
+      "layer": "topic",
+      "label": "Audio Conferencing",
+      "domain": "productivity-and-collaboration",
+      "merged_from": []
+    },
+    {
+      "id": "t:.net maui",
+      "layer": "topic",
+      "label": ".NET MAUI",
+      "domain": "development-tools",
+      "merged_from": []
+    },
+    {
+      "id": "t:mobile application development",
+      "layer": "topic",
+      "label": "Mobile Application Development",
+      "domain": "development-tools",
+      "merged_from": []
+    },
+    {
+      "id": "t:sqlite",
+      "layer": "topic",
+      "label": "SQLite",
+      "domain": "development-tools",
+      "merged_from": []
+    },
+    {
+      "id": "t:embedded databases",
+      "layer": "topic",
+      "label": "Embedded Databases",
+      "domain": "development-tools",
+      "merged_from": []
+    },
+    {
+      "id": "t:data caching",
+      "layer": "topic",
+      "label": "Data Caching",
+      "domain": "development-tools",
+      "merged_from": []
+    },
+    {
+      "id": "t:regression analysis",
+      "layer": "topic",
+      "label": "Regression Analysis",
+      "domain": "data-and-analytics",
+      "merged_from": []
+    },
+    {
+      "id": "t:machine learning",
+      "layer": "topic",
+      "label": "Machine Learning",
+      "domain": "data-and-analytics",
+      "merged_from": []
+    },
+    {
+      "id": "t:predictive modeling",
+      "layer": "topic",
+      "label": "Predictive Modeling",
+      "domain": "data-and-analytics",
+      "merged_from": []
+    },
+    {
+      "id": "t:dynamics 365 finance",
+      "layer": "topic",
+      "label": "Dynamics 365 Finance",
+      "domain": "business-applications",
+      "merged_from": [
+        "Dynamics 365 Finance",
+        "Microsoft Dynamics 365"
+      ]
+    },
+    {
+      "id": "t:healthcare it solutions",
+      "layer": "topic",
+      "label": "Healthcare IT Solutions",
+      "domain": "business-applications",
+      "merged_from": []
+    },
+    {
+      "id": "t:chatbot development",
+      "layer": "topic",
+      "label": "Chatbot Development",
+      "domain": "ai-and-ml",
+      "merged_from": []
+    },
+    {
+      "id": "t:appointment scheduling",
+      "layer": "topic",
+      "label": "Appointment Scheduling",
+      "domain": "business-applications",
+      "merged_from": []
+    },
+    {
+      "id": "t:revenue operations",
+      "layer": "topic",
+      "label": "Revenue Operations",
+      "domain": "business-applications",
+      "merged_from": []
+    },
+    {
+      "id": "t:financial forecasting",
+      "layer": "topic",
+      "label": "Financial Forecasting",
+      "domain": "business-applications",
+      "merged_from": []
+    },
+    {
+      "id": "t:invoice consolidation",
+      "layer": "topic",
+      "label": "Invoice Consolidation",
+      "domain": "business-applications",
+      "merged_from": []
+    },
+    {
+      "id": "t:bitlocker",
+      "layer": "topic",
+      "label": "BitLocker",
+      "domain": "security",
+      "merged_from": []
+    },
+    {
+      "id": "t:trusted platform module",
+      "layer": "topic",
+      "label": "Trusted Platform Module",
+      "domain": "security",
+      "merged_from": []
+    },
+    {
+      "id": "t:encrypting file system",
+      "layer": "topic",
+      "label": "Encrypting File System",
+      "domain": "security",
+      "merged_from": []
+    },
+    {
+      "id": "t:data encryption",
+      "layer": "topic",
+      "label": "Data Encryption",
+      "domain": "security",
+      "merged_from": []
+    },
+    {
+      "id": "t:return on investment",
+      "layer": "topic",
+      "label": "Return on Investment",
+      "domain": "business-applications",
+      "merged_from": []
+    },
+    {
+      "id": "t:total cost of ownership",
+      "layer": "topic",
+      "label": "Total Cost of Ownership",
+      "domain": "business-applications",
+      "merged_from": []
+    },
+    {
+      "id": "t:cloud administration",
+      "layer": "topic",
+      "label": "Cloud Administration",
+      "domain": "cloud-infrastructure",
+      "merged_from": [
+        "Cloud Administration",
+        "Solution Architecture"
+      ]
+    },
+    {
+      "id": "t:build vs buy analysis",
+      "layer": "topic",
+      "label": "Build vs Buy Analysis",
+      "domain": "business-applications",
+      "merged_from": []
+    },
+    {
+      "id": "t:generative ai application development",
+      "layer": "topic",
+      "label": "Generative AI Application Development",
+      "domain": "ai-and-ml",
+      "merged_from": []
+    },
+    {
+      "id": "t:responsible ai",
+      "layer": "topic",
+      "label": "Responsible AI",
+      "domain": "ai-and-ml",
+      "merged_from": []
+    },
+    {
+      "id": "t:retrieval-augmented generation",
+      "layer": "topic",
+      "label": "Retrieval-Augmented Generation",
+      "domain": "ai-and-ml",
+      "merged_from": []
+    },
+    {
+      "id": "t:prompt engineering",
+      "layer": "topic",
+      "label": "Prompt Engineering",
+      "domain": "ai-and-ml",
+      "merged_from": []
+    },
+    {
+      "id": "t:ai evaluation",
+      "layer": "topic",
+      "label": "AI Evaluation",
+      "domain": "ai-and-ml",
+      "merged_from": []
+    },
+    {
+      "id": "t:content moderation",
+      "layer": "topic",
+      "label": "Content Moderation",
+      "domain": "ai-and-ml",
+      "merged_from": []
+    },
+    {
+      "id": "t:azure ai foundry",
+      "layer": "topic",
+      "label": "Azure AI Foundry",
+      "domain": "ai-and-ml",
+      "merged_from": [
+        "Azure AI Foundry",
+        "Azure AI Services",
+        "Azure OpenAI Service"
+      ]
+    },
+    {
+      "id": "t:windows client administration",
+      "layer": "topic",
+      "label": "Windows Client Administration",
+      "domain": "other",
+      "merged_from": []
+    },
+    {
+      "id": "t:operating system deployment",
+      "layer": "topic",
+      "label": "Operating System Deployment",
+      "domain": "other",
+      "merged_from": []
+    },
+    {
+      "id": "t:software licensing and activation",
+      "layer": "topic",
+      "label": "Software Licensing and Activation",
+      "domain": "other",
+      "merged_from": []
+    },
+    {
+      "id": "t:release management",
+      "layer": "topic",
+      "label": "Release Management",
+      "domain": "development-tools",
+      "merged_from": []
+    },
+    {
+      "id": "t:azure devops",
+      "layer": "topic",
+      "label": "Azure DevOps",
+      "domain": "development-tools",
+      "merged_from": []
+    },
+    {
+      "id": "t:continuous deployment",
+      "layer": "topic",
+      "label": "Continuous Deployment",
+      "domain": "development-tools",
+      "merged_from": []
+    },
+    {
+      "id": "t:quality assurance",
+      "layer": "topic",
+      "label": "Quality Assurance",
+      "domain": "development-tools",
+      "merged_from": []
+    },
+    {
+      "id": "t:spring framework",
+      "layer": "topic",
+      "label": "Spring Framework",
+      "domain": "development-tools",
+      "merged_from": []
+    },
+    {
+      "id": "t:vector databases",
+      "layer": "topic",
+      "label": "Vector Databases",
+      "domain": "data-and-analytics",
+      "merged_from": []
+    },
+    {
+      "id": "t:java development",
+      "layer": "topic",
+      "label": "Java Development",
+      "domain": "development-tools",
+      "merged_from": []
+    },
+    {
+      "id": "t:role-based access control",
+      "layer": "topic",
+      "label": "Role-Based Access Control",
+      "domain": "identity-and-access",
+      "merged_from": [
+        "Device Identity Management",
+        "Identity and Access Management",
+        "Role-Based Access Control"
+      ]
+    },
+    {
+      "id": "t:microsoft entra id",
+      "layer": "topic",
+      "label": "Microsoft Entra ID",
+      "domain": "identity-and-access",
+      "merged_from": []
+    },
+    {
+      "id": "t:multimodal ai",
+      "layer": "topic",
+      "label": "Multimodal AI",
+      "domain": "ai-and-ml",
+      "merged_from": []
+    },
+    {
+      "id": "t:python development",
+      "layer": "topic",
+      "label": "Python Development",
+      "domain": "development-tools",
+      "merged_from": []
+    },
+    {
+      "id": "t:rest api integration",
+      "layer": "topic",
+      "label": "REST API Integration",
+      "domain": "development-tools",
+      "merged_from": []
+    },
+    {
+      "id": "t:information extraction",
+      "layer": "topic",
+      "label": "Information Extraction",
+      "domain": "data-and-analytics",
+      "merged_from": []
+    },
+    {
+      "id": "t:incident management",
+      "layer": "topic",
+      "label": "Incident Management",
+      "domain": "cloud-infrastructure",
+      "merged_from": []
+    },
+    {
+      "id": "t:service health management",
+      "layer": "topic",
+      "label": "Service Health Management",
+      "domain": "observability",
+      "merged_from": []
+    },
+    {
+      "id": "t:application performance monitoring",
+      "layer": "topic",
+      "label": "Application Performance Monitoring",
+      "domain": "observability",
+      "merged_from": []
+    },
+    {
+      "id": "t:ediscovery",
+      "layer": "topic",
+      "label": "eDiscovery",
+      "domain": "business-applications",
+      "merged_from": []
+    },
+    {
+      "id": "t:microsoft purview",
+      "layer": "topic",
+      "label": "Microsoft Purview",
+      "domain": "business-applications",
+      "merged_from": []
+    },
+    {
+      "id": "t:legal hold management",
+      "layer": "topic",
+      "label": "Legal Hold Management",
+      "domain": "business-applications",
+      "merged_from": []
+    },
+    {
+      "id": "t:content search",
+      "layer": "topic",
+      "label": "Content Search",
+      "domain": "business-applications",
+      "merged_from": []
+    },
+    {
+      "id": "t:compliance management",
+      "layer": "topic",
+      "label": "Compliance Management",
+      "domain": "business-applications",
+      "merged_from": []
+    }
+  ],
+  "links": [
+    {
+      "source": "r:sustainability solution customizer",
+      "target": "j:customize dashboards in microsoft sustainability manager using power bi extensions",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:process improvement analyst",
+      "target": "j:record and map existing business processes using process advisor",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:process improvement analyst",
+      "target": "j:identify process bottlenecks and inefficiencies",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:process improvement analyst",
+      "target": "j:determine automation opportunities for business processes",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:security operations analyst managing hybrid infrastructure",
+      "target": "j:collect syslog data from on-premises linux hosts to microsoft sentinel",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:security operations analyst managing hybrid infrastructure",
+      "target": "j:manage on-premises linux machines with azure arc",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:aks platform engineer managing windows workloads",
+      "target": "j:configure network connectivity for windows containers on aks",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:aks platform engineer managing windows workloads",
+      "target": "j:define networking configurations for kubernetes environments",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:microservice application developer",
+      "target": "j:manage load balancing and orchestration for containerized microservices",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:teams telephony administrator",
+      "target": "j:configure teams phone pstn connectivity",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:teams telephony administrator",
+      "target": "j:assign phone numbers to teams users",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:teams telephony administrator",
+      "target": "j:configure emergency calling locations",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:teams telephony administrator",
+      "target": "j:configure teams phone policies and features",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:.net maui mobile developers optimizing for offline low-bandwidth scenarios",
+      "target": "j:store relational data locally in a .net maui app using sqlite",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:.net maui mobile developers optimizing for offline low-bandwidth scenarios",
+      "target": "j:cache remote data locally to improve application performance",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:.net maui mobile developers optimizing for offline low-bandwidth scenarios",
+      "target": "j:design an app to download and save data once for local reuse",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:data scientists building predictive baselines",
+      "target": "j:build a regression model to predict numeric values",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:data scientists building predictive baselines",
+      "target": "j:use regression for prediction with limited data",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:data scientists building predictive baselines",
+      "target": "j:establish a baseline using simple statistical techniques",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:healthcare it administrator configuring patient portals",
+      "target": "j:enable patient access to health data and scheduling via patient access portal",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:healthcare it administrator configuring patient portals",
+      "target": "j:implement direct patient engagement through health bots and service centers",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:finance system administrator",
+      "target": "j:implement recurring contract billing in dynamics 365 finance",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:finance system administrator",
+      "target": "j:automate customer invoicing and renewals",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:finance system administrator",
+      "target": "j:consolidate multiple billing schedules into single invoices",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:financial analyst",
+      "target": "j:generate recurring revenue reports for forecasting",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:it administrator securing endpoint devices",
+      "target": "j:protect data on removable or stolen storage media using drive encryption",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:it administrator securing endpoint devices",
+      "target": "j:leverage trusted platform module tpm for hardware-based security",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:it administrator securing endpoint devices",
+      "target": "j:encrypt specific files and folders using encrypted file system efs",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:solution architects evaluating ai viability",
+      "target": "j:assess costs benefits and roi of ai solutions",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:solution architects evaluating ai viability",
+      "target": "j:decide whether to build buy or extend ai components",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:solution architects evaluating ai viability",
+      "target": "j:select roi criteria for ai-powered business solutions including tco",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:business decision-makers justifying ai investment",
+      "target": "j:assess costs benefits and roi of ai solutions",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:business decision-makers justifying ai investment",
+      "target": "j:justify and select ai-powered business solutions",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:ai application developer implementing responsible ai",
+      "target": "j:measure and mitigate risks for a generative ai app in azure ai foundry",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:ai application developer implementing responsible ai",
+      "target": "j:build a customer support chatbot in azure ai foundry",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:ai application developer implementing responsible ai",
+      "target": "j:execute manual and ai-assisted evaluations for generative ai outputs",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:ai application developer implementing responsible ai",
+      "target": "j:configure content filters for generative ai applications",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:ai application developer implementing responsible ai",
+      "target": "j:prepare data and system prompts for a generative ai application",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:windows deployment technician",
+      "target": "j:select the appropriate windows client installation method for a deployment scenario",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:windows deployment technician",
+      "target": "j:describe windows client installation and deployment options",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:windows deployment technician",
+      "target": "j:configure windows client activation methods",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:windows deployment technician",
+      "target": "j:evaluate factors for new machine deployment",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:devops engineer configuring release pipelines",
+      "target": "j:configure release pipeline components and artifact sources",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:devops engineer configuring release pipelines",
+      "target": "j:implement approval workflows for release gates",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:java backend developers building ai features",
+      "target": "j:build an ai-powered application using spring ai and azure openai",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:java backend developers building ai features",
+      "target": "j:implement retrieval-augmented generation rag patterns in java",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:java backend developers building ai features",
+      "target": "j:integrate vector embeddings and semantic search into java applications",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:cloud application deployers",
+      "target": "j:deploy ai agents to azure container apps with postgresql vector storage",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:identity administrators managing hybrid or cloud-first devices",
+      "target": "j:join windows devices to microsoft entra id",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:identity administrators managing hybrid or cloud-first devices",
+      "target": "j:manage devices joined to microsoft entra id",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:identity administrators managing hybrid or cloud-first devices",
+      "target": "j:evaluate microsoft entra join prerequisites and limitations",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:ai application developer integrating content understanding",
+      "target": "j:build an azure content understanding client application using python sdk or rest api",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:ai application developer integrating content understanding",
+      "target": "j:submit multimodal content for analysis via azure content understanding",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:operations engineer establishing free monitoring",
+      "target": "j:establish a free monitoring baseline for azure platform incidents and maintenance",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:operations engineer establishing free monitoring",
+      "target": "j:configure alerts for critical management operations such as resource deletion",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:operations engineer establishing free monitoring",
+      "target": "j:define notification recipients and methods using action groups",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:cloud operations learner",
+      "target": "j:describe the purpose and capabilities of azure advisor",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:cloud operations learner",
+      "target": "j:describe the purpose and capabilities of azure service health",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:cloud operations learner",
+      "target": "j:describe the components and purpose of azure monitor",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:legal and compliance professionals managing digital investigations",
+      "target": "j:establish a defensible ediscovery process across microsoft 365",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:legal and compliance professionals managing digital investigations",
+      "target": "j:manage legal investigations by preserving and searching content",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "r:legal and compliance professionals managing digital investigations",
+      "target": "j:control access to ediscovery workloads via role-based permissions",
+      "value": 1,
+      "kind": "role-job"
+    },
+    {
+      "source": "j:customize dashboards in microsoft sustainability manager using power bi extensions",
+      "target": "t:microsoft power bi",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:record and map existing business processes using process advisor",
+      "target": "t:power automate",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:record and map existing business processes using process advisor",
+      "target": "t:process mining",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:identify process bottlenecks and inefficiencies",
+      "target": "t:business process optimization",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:determine automation opportunities for business processes",
+      "target": "t:process mining",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "j:collect syslog data from on-premises linux hosts to microsoft sentinel",
+      "target": "t:azure monitor",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "j:configure azure monitor agent syslog data collection rules",
+      "target": "t:azure monitor",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:manage on-premises linux machines with azure arc",
+      "target": "t:azure arc",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:define networking configurations for kubernetes environments",
+      "target": "t:kubernetes",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:configure network connectivity for windows containers on aks",
+      "target": "t:kubernetes",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "j:manage load balancing and orchestration for containerized microservices",
+      "target": "t:container networking",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:configure teams phone pstn connectivity",
+      "target": "t:microsoft teams administration",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "j:assign phone numbers to teams users",
+      "target": "t:microsoft teams administration",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "j:configure emergency calling locations",
+      "target": "t:emergency calling",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:configure teams phone policies and features",
+      "target": "t:microsoft teams administration",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:configure teams phone policies and features",
+      "target": "t:telephony policy management",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:store relational data locally in a .net maui app using sqlite",
+      "target": "t:sqlite",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "j:cache remote data locally to improve application performance",
+      "target": "t:data caching",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:design an app to download and save data once for local reuse",
+      "target": "t:data caching",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:build a regression model to predict numeric values",
+      "target": "t:regression analysis",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:use regression for prediction with limited data",
+      "target": "t:machine learning",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "j:establish a baseline using simple statistical techniques",
+      "target": "t:machine learning",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "j:enable patient access to health data and scheduling via patient access portal",
+      "target": "t:healthcare it solutions",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "j:implement direct patient engagement through health bots and service centers",
+      "target": "t:chatbot development",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:implement recurring contract billing in dynamics 365 finance",
+      "target": "t:dynamics 365 finance",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:automate customer invoicing and renewals",
+      "target": "t:revenue operations",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:generate recurring revenue reports for forecasting",
+      "target": "t:financial forecasting",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:consolidate multiple billing schedules into single invoices",
+      "target": "t:invoice consolidation",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:protect data on removable or stolen storage media using drive encryption",
+      "target": "t:bitlocker",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:protect data on removable or stolen storage media using drive encryption",
+      "target": "t:encrypting file system",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:leverage trusted platform module tpm for hardware-based security",
+      "target": "t:trusted platform module",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:encrypt specific files and folders using encrypted file system efs",
+      "target": "t:encrypting file system",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:assess costs benefits and roi of ai solutions",
+      "target": "t:cloud administration",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "j:decide whether to build buy or extend ai components",
+      "target": "t:build vs buy analysis",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "j:select roi criteria for ai-powered business solutions including tco",
+      "target": "t:return on investment",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "j:justify and select ai-powered business solutions",
+      "target": "t:cloud administration",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "j:measure and mitigate risks for a generative ai app in azure ai foundry",
+      "target": "t:azure ai foundry",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:build a customer support chatbot in azure ai foundry",
+      "target": "t:azure ai foundry",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "j:execute manual and ai-assisted evaluations for generative ai outputs",
+      "target": "t:ai evaluation",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:configure content filters for generative ai applications",
+      "target": "t:content moderation",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:prepare data and system prompts for a generative ai application",
+      "target": "t:generative ai application development",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:prepare data and system prompts for a generative ai application",
+      "target": "t:prompt engineering",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:select the appropriate windows client installation method for a deployment scenario",
+      "target": "t:windows client administration",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "j:describe windows client installation and deployment options",
+      "target": "t:windows client administration",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:describe windows client installation and deployment options",
+      "target": "t:operating system deployment",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:configure windows client activation methods",
+      "target": "t:windows client administration",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:evaluate factors for new machine deployment",
+      "target": "t:operating system deployment",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:design automated release strategies for software deployments",
+      "target": "t:release management",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:design automated release strategies for software deployments",
+      "target": "t:continuous deployment",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:configure release pipeline components and artifact sources",
+      "target": "t:release management",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:implement approval workflows for release gates",
+      "target": "t:release management",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:implement approval workflows for release gates",
+      "target": "t:quality assurance",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:build an ai-powered application using spring ai and azure openai",
+      "target": "t:azure ai foundry",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:implement retrieval-augmented generation rag patterns in java",
+      "target": "t:spring framework",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "j:deploy ai agents to azure container apps with postgresql vector storage",
+      "target": "t:kubernetes",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "j:integrate vector embeddings and semantic search into java applications",
+      "target": "t:vector databases",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:join windows devices to microsoft entra id",
+      "target": "t:microsoft entra id",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:manage devices joined to microsoft entra id",
+      "target": "t:microsoft entra id",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:evaluate microsoft entra join prerequisites and limitations",
+      "target": "t:microsoft entra id",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "j:build an azure content understanding client application using python sdk or rest api",
+      "target": "t:azure ai foundry",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:submit multimodal content for analysis via azure content understanding",
+      "target": "t:azure ai foundry",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:establish a free monitoring baseline for azure platform incidents and maintenance",
+      "target": "t:azure monitor",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:configure alerts for critical management operations such as resource deletion",
+      "target": "t:incident management",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "j:define notification recipients and methods using action groups",
+      "target": "t:cloud administration",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "j:describe the purpose and capabilities of azure advisor",
+      "target": "t:cloud administration",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "j:describe the purpose and capabilities of azure service health",
+      "target": "t:service health management",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "j:describe the components and purpose of azure monitor",
+      "target": "t:azure monitor",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:establish a defensible ediscovery process across microsoft 365",
+      "target": "t:ediscovery",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:manage legal investigations by preserving and searching content",
+      "target": "t:legal hold management",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "j:control access to ediscovery workloads via role-based permissions",
+      "target": "t:ediscovery",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "j:understand the core concepts and changes in the new ediscovery experience",
+      "target": "t:ediscovery",
+      "value": 1,
+      "kind": "job-topic",
+      "strength": "strong"
+    }
+  ]
+}

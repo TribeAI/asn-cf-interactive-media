@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Content Ontology — Roles → Jobs → Topics</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f1f5f9; color: #334155; }
+
+    .top-bar { background: #1e293b; color: white; padding: 16px 24px; position: sticky; top: 0; z-index: 100; }
+    .top-bar .crumbs { font-size: 0.75em; color: #94a3b8; margin-bottom: 6px; }
+    .top-bar .crumbs a { color: #cbd5e1; text-decoration: none; }
+    .top-bar .crumbs a:hover { text-decoration: underline; }
+    .top-bar h1 { font-size: 1.2em; font-weight: 600; }
+    .top-bar .subtitle { font-size: 0.85em; color: #94a3b8; margin-top: 4px; max-width: 980px; }
+    .top-bar .agg-stats { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; font-size: 0.8em; color: #cbd5e1; }
+    .top-bar .agg-stats b { color: white; }
+    .top-bar .agg-stats .agg-chip { background: #334155; padding: 3px 9px; border-radius: 12px; }
+    .top-bar .agg-stats .agg-chip.role { background: #6d28d9; color: white; }
+    .top-bar .agg-stats .agg-chip.job { background: #0f766e; color: white; }
+    .top-bar .agg-stats .agg-chip.topic { background: #b45309; color: white; }
+
+    .scope-note { background: #1e3a5f; color: #cbd5e1; padding: 8px 24px; font-size: 0.78em; border-top: 1px solid #334155; }
+    .scope-note b { color: #fff; }
+
+    .controls { background: white; border-bottom: 1px solid #e2e8f0; padding: 10px 24px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; font-size: 0.82em; }
+    .controls label { display: flex; align-items: center; gap: 6px; color: #475569; cursor: pointer; }
+    .controls .hint { color: #94a3b8; font-size: 0.95em; }
+    .controls button { font-family: inherit; font-size: 0.95em; padding: 4px 12px; border: 1px solid #cbd5e1; border-radius: 6px; background: white; color: #475569; cursor: pointer; }
+    .controls button:hover { background: #f8fafc; }
+
+    .col-headers { display: flex; justify-content: space-between; padding: 12px 40px 0; max-width: 1400px; margin: 0 auto; }
+    .col-head { font-weight: 700; font-size: 0.9em; }
+    .col-head.role { color: #6d28d9; }
+    .col-head.job { color: #0f766e; }
+    .col-head.topic { color: #b45309; }
+    .col-head span { display: block; font-weight: 400; font-size: 0.78em; color: #94a3b8; }
+
+    #chart-wrap { padding: 8px 24px 40px; max-width: 1400px; margin: 0 auto; }
+    svg { width: 100%; height: auto; display: block; }
+
+    .node rect { cursor: pointer; stroke-width: 0; rx: 2; transition: opacity 0.12s; }
+    .node text { font-size: 11px; fill: #334155; pointer-events: none; }
+    .node.faded rect, .node.faded text { opacity: 0.18; }
+    .link { fill: none; transition: opacity 0.12s; }
+    .link.weak { stroke-dasharray: 3 3; }
+    .link.faded { opacity: 0.06 !important; }
+
+    .tooltip {
+        position: fixed; pointer-events: none; z-index: 200;
+        background: #1e293b; color: #f1f5f9; padding: 7px 10px; border-radius: 6px;
+        font-size: 0.78em; max-width: 320px; line-height: 1.4; opacity: 0;
+        transition: opacity 0.1s; box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+    .tooltip .t-layer { font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.7; }
+    .tooltip .t-merged { color: #cbd5e1; font-style: italic; margin-top: 3px; }
+
+    .legend { padding: 10px 24px; background: white; border-top: 1px solid #e2e8f0; display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.78em; align-items: center; }
+    .legend .swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; vertical-align: middle; margin-right: 4px; }
+    .empty { padding: 60px; text-align: center; color: #94a3b8; }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="crumbs"><a href="/">ASN Content Freshness</a> <span>›</span> <span>Content Ontology</span></div>
+    <h1>Content Ontology — Roles → Jobs to be Done → Topics</h1>
+    <div class="subtitle">A content-derived ontology over 20 MS Learn modules, linking three layers: derived <b>roles</b> (personas) → the <b>jobs to be done</b> they pursue → the <b>topics</b> those jobs draw on. Topics come from the v3 topic extractor and are joined to jobs by semantic similarity; near-duplicate topics are merged into shared hubs. Click any node to trace its full path through the ontology.</div>
+    <div class="agg-stats" id="agg-stats"></div>
+</div>
+
+<div class="scope-note">
+    <b>Scope:</b> "Roles" here are content-derived persona clusters, not Microsoft's frozen ASN role taxonomy. <b>Topics</b> is the layer Tribe owns; roles and Viva Skills are owned, frozen taxonomies shown only as context.
+</div>
+
+<div class="controls">
+    <label><input type="checkbox" id="toggle-weak" checked> show weak job↔topic links</label>
+    <button id="reset-btn">Reset highlight</button>
+    <span class="hint">Click a node to isolate its connected paths · hover for detail</span>
+</div>
+
+<div class="col-headers">
+    <div class="col-head role">Roles <span>derived personas</span></div>
+    <div class="col-head job">Jobs to be Done <span>goals / outcomes</span></div>
+    <div class="col-head topic">Topics <span>v3 taxonomy (merged)</span></div>
+</div>
+
+<div id="chart-wrap"><div class="empty">Loading ontology…</div></div>
+
+<div class="legend" id="legend"></div>
+<div class="tooltip" id="tooltip"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+<script>
+const DATA_FILE = "ontology_graph.json";
+
+const DOMAIN_COLORS = {
+    "cloud-infrastructure": "#0ea5e9", "identity-and-access": "#6366f1",
+    "data-and-analytics": "#14b8a6", "ai-and-ml": "#a855f7", "security": "#ef4444",
+    "productivity-and-collaboration": "#f59e0b", "development-tools": "#64748b",
+    "business-applications": "#ec4899", "networking": "#22c55e",
+    "observability": "#06b6d4", "other": "#94a3b8",
+};
+const ROLE_COLOR = "#7c3aed";
+
+const state = { graph: null, showWeak: true, selected: null };
+
+// NOTE: d3-sankey overwrites node.layer with a numeric column index, so we
+// carry our semantic layer as `tier` and key everything off that.
+function nodeColor(n) {
+    if (n.tier === "role") return ROLE_COLOR;
+    return DOMAIN_COLORS[n.domain] || DOMAIN_COLORS.other;
+}
+
+async function init() {
+    try {
+        state.graph = await fetch(DATA_FILE).then(r => {
+            if (!r.ok) throw new Error(DATA_FILE + " " + r.status);
+            return r.json();
+        });
+        renderAggStats();
+        renderLegend();
+        render();
+        document.getElementById("toggle-weak").addEventListener("change", (e) => {
+            state.showWeak = e.target.checked; render();
+        });
+        document.getElementById("reset-btn").addEventListener("click", () => {
+            state.selected = null; applyHighlight();
+        });
+    } catch (err) {
+        document.getElementById("chart-wrap").innerHTML =
+            `<div class="empty">Failed to load ontology: ${escapeHtml(err.message)}</div>`;
+        console.error(err);
+    }
+}
+
+function renderAggStats() {
+    const m = state.graph.meta;
+    document.getElementById("agg-stats").innerHTML = `
+        <span class="agg-chip role"><b>${m.n_roles}</b> roles</span>
+        <span class="agg-chip job"><b>${m.n_jobs}</b> jobs to be done</span>
+        <span class="agg-chip topic"><b>${m.n_topics}</b> topics</span>
+        <span class="agg-chip"><b>${m.n_links}</b> links</span>
+        <span style="color:#94a3b8;">20 modules · Qwen3.6-35B · topics joined @ cos≥${m.thresholds.strong}</span>
+    `;
+}
+
+function renderLegend() {
+    const domains = Object.keys(DOMAIN_COLORS);
+    document.getElementById("legend").innerHTML =
+        `<span style="font-weight:600;color:#334155;">Roles</span>
+         <span><span class="swatch" style="background:${ROLE_COLOR}"></span>persona</span>
+         <span style="font-weight:600;color:#334155;margin-left:8px;">Jobs / Topics by domain:</span>` +
+        domains.map(d => `<span><span class="swatch" style="background:${DOMAIN_COLORS[d]}"></span>${d}</span>`).join("") +
+        `<span style="margin-left:8px;color:#94a3b8;">— dashed link = weak (0.45–0.65) job↔topic match</span>`;
+}
+
+function render() {
+    const wrap = document.getElementById("chart-wrap");
+    wrap.innerHTML = "";
+
+    const links = state.graph.links.filter(l =>
+        state.showWeak || !(l.kind === "job-topic" && l.strength === "weak"));
+    // keep only nodes that still have an edge
+    const usedIds = new Set();
+    links.forEach(l => { usedIds.add(l.source); usedIds.add(l.target); });
+    const nodes = state.graph.nodes
+        .filter(n => usedIds.has(n.id))
+        .map(n => ({ ...n, tier: n.layer }));  // preserve semantic layer; sankey clobbers .layer
+
+    const idToNode = new Map(nodes.map(n => [n.id, n]));
+    const sankeyLinks = links
+        .filter(l => idToNode.has(l.source) && idToNode.has(l.target))
+        .map(l => ({ ...l }));
+
+    const perLayerMax = Math.max(
+        nodes.filter(n => n.tier === "role").length,
+        nodes.filter(n => n.tier === "job").length,
+        nodes.filter(n => n.tier === "topic").length,
+    );
+    // Guard against a tiny/zero clientWidth at first paint (would blow up the
+    // viewBox aspect ratio and render giant nodes). Floor at 900.
+    const width = Math.max(900, Math.min(1352, wrap.clientWidth || 1320));
+    const height = Math.max(560, perLayerMax * 18 + 40);
+
+    const sankey = d3.sankey()
+        .nodeId(d => d.id)
+        .nodeWidth(13)
+        .nodePadding(7)
+        .nodeAlign(d3.sankeyLeft)
+        .extent([[8, 8], [width - 8, height - 8]]);
+
+    let graph;
+    try {
+        graph = sankey({ nodes, links: sankeyLinks });
+    } catch (e) {
+        wrap.innerHTML = `<div class="empty">Layout error: ${escapeHtml(e.message)}</div>`;
+        return;
+    }
+
+    const svg = d3.select(wrap).append("svg")
+        .attr("viewBox", `0 0 ${width} ${height}`)
+        .attr("preserveAspectRatio", "xMinYMin meet");
+
+    // links
+    svg.append("g").attr("class", "links")
+        .selectAll("path")
+        .data(graph.links)
+        .join("path")
+        .attr("class", d => "link" + (d.strength === "weak" ? " weak" : ""))
+        .attr("d", d3.sankeyLinkHorizontal())
+        .attr("stroke", d => nodeColor(d.source))
+        .attr("stroke-opacity", 0.32)
+        .attr("stroke-width", d => Math.max(1, d.width))
+        .each(function (d) { d._el = this; });
+
+    // nodes
+    const node = svg.append("g").attr("class", "nodes")
+        .selectAll("g")
+        .data(graph.nodes)
+        .join("g")
+        .attr("class", "node")
+        .each(function (d) { d._el = this; });
+
+    node.append("rect")
+        .attr("x", d => d.x0)
+        .attr("y", d => d.y0)
+        .attr("height", d => Math.max(1, d.y1 - d.y0))
+        .attr("width", d => d.x1 - d.x0)
+        .attr("fill", nodeColor)
+        .on("click", (e, d) => { e.stopPropagation(); toggleSelect(d); })
+        .on("mousemove", (e, d) => showTip(e, d))
+        .on("mouseleave", hideTip);
+
+    node.append("text")
+        .attr("x", d => d.tier === "topic" ? d.x0 - 6 : d.x1 + 6)
+        .attr("y", d => (d.y0 + d.y1) / 2)
+        .attr("dy", "0.35em")
+        .attr("text-anchor", d => d.tier === "topic" ? "end" : "start")
+        .text(d => {
+            const max = d.tier === "job" ? 46 : 34;
+            return d.label.length > max ? d.label.slice(0, max) + "…" : d.label;
+        })
+        // hide labels for tiny nodes when very dense
+        .style("display", d => (d.y1 - d.y0) < 6 ? "none" : null);
+
+    svg.on("click", () => { state.selected = null; applyHighlight(); });
+
+    state._graph = graph;
+    applyHighlight();
+}
+
+// Build adjacency for path tracing across the displayed graph.
+function connectedSet(startNode) {
+    const g = state._graph;
+    const out = new Map(), inc = new Map();
+    g.links.forEach(l => {
+        const s = l.source.id, t = l.target.id;
+        (out.get(s) || out.set(s, []).get(s)).push(l);
+        (inc.get(t) || inc.set(t, []).get(t)).push(l);
+    });
+    const keepNodes = new Set([startNode.id]);
+    const keepLinks = new Set();
+    // downstream
+    let stack = [startNode.id];
+    while (stack.length) {
+        const id = stack.pop();
+        (out.get(id) || []).forEach(l => {
+            keepLinks.add(l); if (!keepNodes.has(l.target.id)) { keepNodes.add(l.target.id); stack.push(l.target.id); }
+        });
+    }
+    // upstream
+    stack = [startNode.id];
+    while (stack.length) {
+        const id = stack.pop();
+        (inc.get(id) || []).forEach(l => {
+            keepLinks.add(l); if (!keepNodes.has(l.source.id)) { keepNodes.add(l.source.id); stack.push(l.source.id); }
+        });
+    }
+    return { keepNodes, keepLinks };
+}
+
+function toggleSelect(d) {
+    state.selected = (state.selected === d.id) ? null : d.id;
+    applyHighlight();
+}
+
+function applyHighlight() {
+    const g = state._graph;
+    if (!g) return;
+    if (!state.selected) {
+        g.nodes.forEach(n => n._el && n._el.classList.remove("faded"));
+        g.links.forEach(l => l._el && l._el.classList.remove("faded"));
+        return;
+    }
+    const start = g.nodes.find(n => n.id === state.selected);
+    const { keepNodes, keepLinks } = connectedSet(start);
+    g.nodes.forEach(n => n._el && n._el.classList.toggle("faded", !keepNodes.has(n.id)));
+    g.links.forEach(l => l._el && l._el.classList.toggle("faded", !keepLinks.has(l)));
+}
+
+function showTip(e, d) {
+    const tip = document.getElementById("tooltip");
+    const merged = (d.merged_from && d.merged_from.length)
+        ? `<div class="t-merged">merges: ${d.merged_from.map(escapeHtml).join(", ")}</div>` : "";
+    const dom = d.domain ? ` · ${escapeHtml(d.domain)}` : "";
+    tip.innerHTML = `<div class="t-layer">${d.tier}${dom}</div>${escapeHtml(d.label)}${merged}`;
+    tip.style.opacity = "1";
+    tip.style.left = Math.min(e.clientX + 14, window.innerWidth - 330) + "px";
+    tip.style.top = (e.clientY + 14) + "px";
+}
+function hideTip() { document.getElementById("tooltip").style.opacity = "0"; }
+
+function escapeHtml(s) {
+    if (s == null) return "";
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
+init();
+</script>
+</body>
+</html>

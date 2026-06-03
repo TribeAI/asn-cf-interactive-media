@@ -26,6 +26,12 @@ ONTOLOGY_TARGET     := public/ontology-extraction
 JTBD_SAMPLE_DIR := $(ONTOLOGY_REPO)/extractions/raw/sample-2026-05-28/jtbd-mlx-zeroshot
 JTBD_TARGET     := public/jobs-to-be-done
 
+# Aggregate role -> job -> topic ontology graph (built by build_ontology_graph.py
+# from the jtbd + v3-topics extractions). Self-contained JSON consumed by the
+# /ontology/ Sankey viz.
+ONTGRAPH_SAMPLE_DIR := $(ONTOLOGY_REPO)/extractions/raw/sample-2026-05-28
+ONTGRAPH_TARGET     := public/ontology
+
 # Files copied from the ontology repo. The names on the right (target) are
 # what the viz HTML expects; the names on the left (source) are the
 # canonical names in the ontology repo's per-variant subdirs.
@@ -39,7 +45,10 @@ ONTOLOGY_FILES := \
 JTBD_FILES := \
 	$(JTBD_TARGET)/jtbd.jsonl
 
-.PHONY: help data data-ontology data-jtbd data-refresh serve clean check-ontology-repo
+ONTGRAPH_FILES := \
+	$(ONTGRAPH_TARGET)/ontology_graph.json
+
+.PHONY: help data data-ontology data-jtbd data-ontology-graph data-refresh serve clean check-ontology-repo
 
 help:
 	@echo "Targets:"
@@ -51,13 +60,16 @@ help:
 	@echo "Variables:"
 	@echo "  ONTOLOGY_REPO       Path to asn-content-ontology checkout (default: ../asn-content-ontology)."
 
-data: data-ontology data-jtbd
+data: data-ontology data-jtbd data-ontology-graph
 
 data-ontology: check-ontology-repo $(ONTOLOGY_FILES)
 	@echo "ontology-extraction: data pulled from $(ONTOLOGY_SAMPLE_DIR)"
 
 data-jtbd: check-ontology-repo $(JTBD_FILES)
 	@echo "jobs-to-be-done: data pulled from $(JTBD_SAMPLE_DIR)"
+
+data-ontology-graph: check-ontology-repo $(ONTGRAPH_FILES)
+	@echo "ontology: graph pulled from $(ONTGRAPH_SAMPLE_DIR)"
 
 check-ontology-repo:
 	@test -d "$(ONTOLOGY_REPO)" || { \
@@ -106,16 +118,24 @@ $(JTBD_TARGET)/jtbd.jsonl: $(JTBD_SAMPLE_DIR)/jtbd.jsonl
 	@mkdir -p $(@D)
 	cp $< $@
 
+$(ONTGRAPH_TARGET)/ontology_graph.json: $(ONTGRAPH_SAMPLE_DIR)/ontology_graph.json
+	@mkdir -p $(@D)
+	cp $< $@
+
 # Regenerate the source data in the ontology repo, then pull. Most callers
 # just want `make data`; this target is for cases where you've updated the
 # extraction prompts / matching script and need the artifacts rebuilt first.
 data-refresh: check-ontology-repo
 	cd $(ONTOLOGY_REPO) && uv run python scripts/build_topic_matches.py
 	cd $(ONTOLOGY_REPO) && uv run python scripts/build_viz_modules.py
+	cd $(ONTOLOGY_REPO) && uv run python scripts/build_ontology_graph.py \
+		--jtbd $(JTBD_SAMPLE_DIR)/jtbd.jsonl \
+		--topics $(ONTGRAPH_SAMPLE_DIR)/topics-mlx/topics.jsonl \
+		--out $(ONTGRAPH_SAMPLE_DIR)
 	$(MAKE) data
 
 serve:
 	python3 -m http.server -d public 8000
 
 clean:
-	rm -f $(ONTOLOGY_FILES) $(JTBD_FILES)
+	rm -f $(ONTOLOGY_FILES) $(JTBD_FILES) $(ONTGRAPH_FILES)
