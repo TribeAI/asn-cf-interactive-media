@@ -53,13 +53,14 @@
     .col-title small { font-weight: 400; }
     .col-sub { font-size: 11px; fill: #94a3b8; }
 
-    .node rect { cursor: pointer; stroke-width: 0; transition: opacity 0.12s; }
-    .node text { font-size: 12px; fill: #334155; pointer-events: none; paint-order: stroke;
+    .node circle { cursor: pointer; transition: opacity 0.12s; }
+    .node text { font-size: 11px; fill: #334155; pointer-events: none; paint-order: stroke;
         stroke: #f8fafc; stroke-width: 3px; stroke-linejoin: round; }
-    .node.faded rect, .node.faded text { opacity: 0.16; }
+    .node.faded circle, .node.faded text { opacity: 0.12; }
+    .node.hub text { font-weight: 600; }
     .link { fill: none; transition: opacity 0.12s; }
     .link.weak { stroke-dasharray: 3 3; }
-    .link.faded { opacity: 0.05 !important; }
+    .link.faded { opacity: 0.04 !important; }
 
     .zoom-controls { position: absolute; top: 12px; right: 16px; display: flex; flex-direction: column; gap: 6px; z-index: 5; }
     .zoom-controls button { width: 34px; height: 34px; border: 1px solid #cbd5e1; background: white; border-radius: 7px; font-size: 1.1em; cursor: pointer; color: #475569; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
@@ -96,7 +97,7 @@
 <div class="controls">
     <label><input type="checkbox" id="toggle-weak" checked> show weak job↔topic links</label>
     <button id="reset-btn">Reset highlight</button>
-    <span class="hint">Drag to pan · scroll to zoom · click a node to isolate its paths · hover for detail</span>
+    <span class="hint">Drag nodes to rearrange · drag background to pan · scroll to zoom · click a node to isolate its connections · hover for detail</span>
 </div>
 
 <div id="chart-wrap">
@@ -112,7 +113,6 @@
 <div class="tooltip" id="tooltip"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
 <script>
 const DATA_FILE = "ontology_graph.json";
 
@@ -184,124 +184,106 @@ function renderLegend() {
 function render() {
     const wrap = document.getElementById("chart-wrap");
     wrap.querySelectorAll("svg.canvas, .empty").forEach(el => el.remove());
+    if (state._sim) { state._sim.stop(); state._sim = null; }
 
-    const links = state.graph.links.filter(l =>
+    const rawLinks = state.graph.links.filter(l =>
         state.showWeak || !(l.kind === "job-topic" && l.strength === "weak"));
     const usedIds = new Set();
-    links.forEach(l => { usedIds.add(l.source); usedIds.add(l.target); });
+    rawLinks.forEach(l => { usedIds.add(l.source); usedIds.add(l.target); });
     const nodes = state.graph.nodes
         .filter(n => usedIds.has(n.id))
-        .map(n => ({ ...n, tier: n.layer }));  // preserve semantic layer; sankey clobbers .layer
+        .map(n => ({ ...n, tier: n.layer }));  // preserve semantic layer
+    const idset = new Set(nodes.map(n => n.id));
+    const links = rawLinks
+        .filter(l => idset.has(l.source) && idset.has(l.target))
+        .map(l => ({ ...l }));  // forceLink replaces source/target with node objs
 
-    const idToNode = new Map(nodes.map(n => [n.id, n]));
-    const sankeyLinks = links
-        .filter(l => idToNode.has(l.source) && idToNode.has(l.target))
-        .map(l => ({ ...l }));
+    // degree → node sizing + "hub" emphasis
+    const degree = {};
+    links.forEach(l => { degree[l.source] = (degree[l.source] || 0) + 1; degree[l.target] = (degree[l.target] || 0) + 1; });
+    nodes.forEach(n => n._deg = degree[n.id] || 0);
 
-    const perLayerMax = Math.max(
-        nodes.filter(n => n.tier === "role").length,
-        nodes.filter(n => n.tier === "job").length,
-        nodes.filter(n => n.tier === "topic").length,
-    );
+    const CW = 1800, CH = 1200;
+    const tierX = t => t === "role" ? CW * 0.20 : t === "job" ? CW * 0.50 : CW * 0.80;
+    const radius = n => n.tier === "role" ? 9 : 5 + Math.min(8, Math.sqrt(n._deg) * 1.7);
 
-    // A large internal canvas with generous spacing — you pan/zoom around it
-    // instead of squashing everything into the viewport. ROW px per node row.
-    const M = { left: 230, right: 300, top: 64, bottom: 40 };
-    const ROW = 50;          // vertical pitch per node row — drives breathing room
-    const CW = 1760;
-    const CH = Math.max(820, perLayerMax * ROW + M.top + M.bottom);
+    // Seed positions near each node's tier band so the layout settles cleanly.
+    nodes.forEach((n, i) => { n.x = tierX(n.tier) + (i % 7 - 3) * 12; n.y = CH / 2 + ((i * 53) % CH - CH / 2) * 0.7; });
 
-    const sankey = d3.sankey()
-        .nodeId(d => d.id)
-        .nodeWidth(16)
-        .nodePadding(26)     // gap between stacked nodes in a column
-        .nodeAlign(d3.sankeyLeft)
-        .extent([[M.left, M.top], [CW - M.right, CH - M.bottom]]);
-
-    let graph;
-    try {
-        graph = sankey({ nodes, links: sankeyLinks });
-    } catch (e) {
-        const d = document.createElement("div");
-        d.className = "empty"; d.textContent = "Layout error: " + e.message;
-        wrap.appendChild(d); return;
-    }
-
-    // viewBox = the full internal canvas, so the browser auto-fits the whole
-    // graph into the viewport (letterboxed) regardless of pixel size — robust
-    // to first-paint zero-width. d3-zoom then layers zoom-in / pan on top.
     const svg = d3.select(wrap).append("svg")
         .attr("class", "canvas")
         .attr("viewBox", `0 0 ${CW} ${CH}`)
         .attr("preserveAspectRatio", "xMidYMid meet");
     const g = svg.append("g").attr("class", "zoom-layer");
 
-    // column bands + headers (inside the zoom layer so they track the graph)
-    const cols = [
-        { tier: "role",  title: "Roles", sub: "derived personas", color: "#6d28d9" },
-        { tier: "job",   title: "Jobs to be Done", sub: "goals / outcomes", color: "#0f766e" },
-        { tier: "topic", title: "Topics", sub: "v3 taxonomy (merged)", color: "#b45309" },
-    ];
-    cols.forEach(c => {
-        const cn = graph.nodes.filter(n => n.tier === c.tier);
-        if (!cn.length) return;
-        const x0 = Math.min(...cn.map(n => n.x0));
-        const x1 = Math.max(...cn.map(n => n.x1));
-        const cx = (x0 + x1) / 2;
-        g.append("rect").attr("class", "col-band")
-            .attr("x", x0 - 14).attr("y", M.top - 10)
-            .attr("width", (x1 - x0) + 28).attr("height", CH - M.top - M.bottom + 14).attr("rx", 8);
-        g.append("text").attr("class", "col-title").attr("x", cx).attr("y", 30)
-            .attr("text-anchor", "middle").attr("fill", c.color).text(c.title);
-        g.append("text").attr("class", "col-sub").attr("x", cx).attr("y", 47)
-            .attr("text-anchor", "middle").text(c.sub);
-    });
-
-    // links
-    g.append("g").attr("class", "links")
-        .selectAll("path").data(graph.links).join("path")
+    const link = g.append("g").attr("class", "links")
+        .selectAll("line").data(links).join("line")
         .attr("class", d => "link" + (d.strength === "weak" ? " weak" : ""))
-        .attr("d", d3.sankeyLinkHorizontal())
-        .attr("stroke", d => nodeColor(d.source))
-        .attr("stroke-opacity", 0.34)
-        .attr("stroke-width", d => Math.max(1.2, d.width))
+        .attr("stroke", "#94a3b8")
+        .attr("stroke-opacity", 0.45)
+        .attr("stroke-width", d => d.kind === "role-job" ? 2 : 1.3)
         .each(function (d) { d._el = this; });
 
-    // nodes
     const node = g.append("g").attr("class", "nodes")
-        .selectAll("g").data(graph.nodes).join("g")
-        .attr("class", "node").each(function (d) { d._el = this; });
+        .selectAll("g").data(nodes).join("g")
+        .attr("class", d => "node" + (d._deg >= 3 ? " hub" : ""))
+        .each(function (d) { d._el = this; })
+        .call(d3.drag()
+            .on("start", (e, d) => { if (!e.active) sim.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+            .on("drag", (e, d) => { d.fx = e.x; d.fy = e.y; })
+            .on("end", (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; }));
 
-    node.append("rect")
-        .attr("x", d => d.x0).attr("y", d => d.y0)
-        .attr("height", d => Math.max(2, d.y1 - d.y0))
-        .attr("width", d => d.x1 - d.x0).attr("rx", 2)
+    node.append("circle")
+        .attr("r", radius)
         .attr("fill", nodeColor)
+        .attr("stroke", "#ffffff").attr("stroke-width", 1.5)
         .on("click", (e, d) => { e.stopPropagation(); toggleSelect(d); })
         .on("mousemove", (e, d) => showTip(e, d))
         .on("mouseleave", hideTip);
 
-    // roles label into the left margin; jobs + topics label to the right of
-    // their node (jobs land in the middle gap, topics in the right margin).
     node.append("text")
-        .attr("x", d => d.tier === "role" ? d.x0 - 8 : d.x1 + 8)
-        .attr("y", d => (d.y0 + d.y1) / 2).attr("dy", "0.35em")
-        .attr("text-anchor", d => d.tier === "role" ? "end" : "start")
-        .text(d => d.label.length > 58 ? d.label.slice(0, 58) + "…" : d.label)
-        .style("display", d => (d.y1 - d.y0) < 4 ? "none" : null);
+        .attr("x", d => radius(d) + 4).attr("dy", "0.32em")
+        .text(d => d.label.length > 42 ? d.label.slice(0, 42) + "…" : d.label);
 
-    // pan + zoom
-    const zoom = d3.zoom().scaleExtent([0.15, 5])
-        .translateExtent([[-300, -300], [CW + 300, CH + 300]])
+    const sim = d3.forceSimulation(nodes)
+        .force("link", d3.forceLink(links).id(d => d.id)
+            .distance(d => d.kind === "role-job" ? 75 : 60).strength(0.55))
+        .force("charge", d3.forceManyBody().strength(-230))
+        .force("collide", d3.forceCollide(d => radius(d) + 20))
+        .force("x", d3.forceX(d => tierX(d.tier)).strength(0.14))
+        .force("y", d3.forceY(CH / 2).strength(0.05));
+
+    function ticked() {
+        link.attr("x1", d => d.source.x).attr("y1", d => d.source.y)
+            .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
+        node.attr("transform", d => `translate(${d.x},${d.y})`);
+    }
+    sim.on("tick", ticked);
+    // warm up synchronously so the first paint is already settled
+    sim.alpha(1);
+    for (let i = 0; i < 260; i++) sim.tick();
+    ticked();
+    sim.alphaTarget(0).alpha(0.02);
+
+    // Frame the viewBox to the actual node cloud (labels extend rightward), so
+    // the fit-overview shows every node regardless of how the force spread it.
+    const xs = nodes.map(n => n.x), ys = nodes.map(n => n.y);
+    const padL = 90, padR = 320, padY = 80;
+    const minX = Math.min(...xs) - padL, maxX = Math.max(...xs) + padR;
+    const minY = Math.min(...ys) - padY, maxY = Math.max(...ys) + padY;
+    svg.attr("viewBox", `${minX} ${minY} ${maxX - minX} ${maxY - minY}`);
+
+    const zoom = d3.zoom().scaleExtent([0.1, 6])
         .on("start", () => svg.classed("grabbing", true))
         .on("end", () => svg.classed("grabbing", false))
         .on("zoom", (e) => g.attr("transform", e.transform));
     svg.call(zoom);
     svg.on("click", (e) => { if (e.target.tagName === "svg") { state.selected = null; applyHighlight(); } });
 
-    state._graph = graph;
+    state._graph = { nodes, links };
     state._zoom = zoom;
     state._svg = svg;
+    state._sim = sim;
     state._dims = { CW, CH };
     applyHighlight();
 }
