@@ -217,6 +217,18 @@ function render() {
     // Seed positions near each node's tier band so the layout settles cleanly.
     nodes.forEach((n, i) => { n.x = tierX(n.tier) + (i % 7 - 3) * 12; n.y = CH / 2 + ((i * 53) % CH - CH / 2) * 0.7; });
 
+    // Measure each rendered label so collision can treat the node + its label
+    // as one box (labels sit to the right of the circle, baseline-centered).
+    const _meas = document.createElement("canvas").getContext("2d");
+    _meas.font = '10.5px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    nodes.forEach(n => {
+        n._label = n.label.length > 42 ? n.label.slice(0, 42) + "…" : n.label;
+        const r = radius(n);
+        const w = _meas.measureText(n._label).width;
+        const h = Math.max(2 * r + 4, 16);
+        n._box = { l: -(r + 2), r: r + 4 + w + 4, t: -h / 2, b: h / 2 };
+    });
+
     const svg = d3.select(wrap).append("svg")
         .attr("class", "canvas")
         .attr("viewBox", `0 0 ${CW} ${CH}`)
@@ -253,15 +265,42 @@ function render() {
 
     node.append("text")
         .attr("x", d => radius(d) + 4).attr("dy", "0.32em")
-        .text(d => d.label.length > 42 ? d.label.slice(0, 42) + "…" : d.label);
+        .text(d => d._label);
+
+    // Label-aware collision: resolve overlap of node+label boxes along the
+    // axis of least penetration each tick. O(n^2) but n is small.
+    function labelCollide() {
+        const pad = 6, k = 0.5;
+        function force() {
+            for (let i = 0; i < nodes.length; i++) {
+                const a = nodes[i], ab = a._box;
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const b = nodes[j], bb = b._box;
+                    const ox = Math.min(a.x + ab.r, b.x + bb.r) - Math.max(a.x + ab.l, b.x + bb.l);
+                    const oy = Math.min(a.y + ab.b, b.y + bb.b) - Math.max(a.y + ab.t, b.y + bb.t);
+                    if (ox > 0 && oy > 0) {
+                        if (ox < oy) {
+                            const s = (ox + pad) * k / 2, dir = a.x <= b.x ? 1 : -1;
+                            a.x -= dir * s; b.x += dir * s;
+                        } else {
+                            const s = (oy + pad) * k / 2, dir = a.y <= b.y ? 1 : -1;
+                            a.y -= dir * s; b.y += dir * s;
+                        }
+                    }
+                }
+            }
+        }
+        force.initialize = () => {};
+        return force;
+    }
 
     const sim = d3.forceSimulation(nodes)
         .force("link", d3.forceLink(links).id(d => d.id)
-            .distance(d => d.kind === "role-job" ? 95 : 78).strength(0.5))
-        .force("charge", d3.forceManyBody().strength(-340))
-        .force("collide", d3.forceCollide(d => radius(d) + 28))
-        .force("x", d3.forceX(d => tierX(d.tier)).strength(0.13))
-        .force("y", d3.forceY(CH / 2).strength(0.045));
+            .distance(d => d.kind === "role-job" ? 95 : 78).strength(0.45))
+        .force("charge", d3.forceManyBody().strength(-180))
+        .force("collide", labelCollide())
+        .force("x", d3.forceX(d => tierX(d.tier)).strength(0.10))
+        .force("y", d3.forceY(CH / 2).strength(0.04));
 
     function ticked() {
         link.attr("x1", d => d.source.x).attr("y1", d => d.source.y)
@@ -271,7 +310,7 @@ function render() {
     sim.on("tick", ticked);
     // warm up synchronously so the first paint is already settled
     sim.alpha(1);
-    for (let i = 0; i < 260; i++) sim.tick();
+    for (let i = 0; i < 420; i++) sim.tick();
     ticked();
     sim.alphaTarget(0).alpha(0.02);
 
