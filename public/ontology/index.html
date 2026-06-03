@@ -206,15 +206,15 @@ function render() {
 
     // A large internal canvas with generous spacing — you pan/zoom around it
     // instead of squashing everything into the viewport. ROW px per node row.
-    const M = { left: 215, right: 285, top: 58, bottom: 30 };
-    const ROW = 30;
-    const CW = 1660;
-    const CH = Math.max(720, perLayerMax * ROW + M.top + M.bottom);
+    const M = { left: 230, right: 300, top: 64, bottom: 40 };
+    const ROW = 50;          // vertical pitch per node row — drives breathing room
+    const CW = 1760;
+    const CH = Math.max(820, perLayerMax * ROW + M.top + M.bottom);
 
     const sankey = d3.sankey()
         .nodeId(d => d.id)
-        .nodeWidth(15)
-        .nodePadding(13)
+        .nodeWidth(16)
+        .nodePadding(26)     // gap between stacked nodes in a column
         .nodeAlign(d3.sankeyLeft)
         .extent([[M.left, M.top], [CW - M.right, CH - M.bottom]]);
 
