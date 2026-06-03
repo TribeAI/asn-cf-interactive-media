@@ -7,7 +7,7 @@
 #
 # Today, two viz pages have external data inputs:
 #   - ontology-extraction → asn-content-ontology (topics: Claude vs Qwen)
-#   - skills-roles        → asn-content-ontology (skills + roles, axes 2 & 3)
+#   - jobs-to-be-done     → asn-content-ontology (JTBD axis + derived personas)
 #
 # As more viz pages are added, extend the `data` target to fan out to them.
 
@@ -20,11 +20,11 @@ ONTOLOGY_REPO ?= ../asn-content-ontology
 ONTOLOGY_SAMPLE_DIR := $(ONTOLOGY_REPO)/extractions/raw/sample-2026-05-19
 ONTOLOGY_TARGET     := public/ontology-extraction
 
-# Skills + roles extraction sample (axes 2 & 3 of the Topic/Skill/Role
-# ontology). Self-contained jsonl — each line carries module metadata plus the
-# extracted skills[] and roles[] (with role->skill canonical_name links).
-SKILLSROLES_SAMPLE_DIR := $(ONTOLOGY_REPO)/extractions/raw/sample-2026-05-28/skills-roles-mlx-zeroshot
-SKILLSROLES_TARGET     := public/skills-roles
+# Jobs-to-be-done extraction sample (axis 2 of the content ontology).
+# Self-contained jsonl — each line carries module metadata plus the extracted
+# jobs_to_be_done[] and personas[] (with persona->job canonical_name links).
+JTBD_SAMPLE_DIR := $(ONTOLOGY_REPO)/extractions/raw/sample-2026-05-28/jtbd-mlx-zeroshot
+JTBD_TARGET     := public/jobs-to-be-done
 
 # Files copied from the ontology repo. The names on the right (target) are
 # what the viz HTML expects; the names on the left (source) are the
@@ -36,10 +36,10 @@ ONTOLOGY_FILES := \
 	$(ONTOLOGY_TARGET)/topic_matches.json         \
 	$(ONTOLOGY_TARGET)/modules.json
 
-SKILLSROLES_FILES := \
-	$(SKILLSROLES_TARGET)/skills_roles.jsonl
+JTBD_FILES := \
+	$(JTBD_TARGET)/jtbd.jsonl
 
-.PHONY: help data data-ontology data-skills-roles data-refresh serve clean check-ontology-repo
+.PHONY: help data data-ontology data-jtbd data-refresh serve clean check-ontology-repo
 
 help:
 	@echo "Targets:"
@@ -51,13 +51,13 @@ help:
 	@echo "Variables:"
 	@echo "  ONTOLOGY_REPO       Path to asn-content-ontology checkout (default: ../asn-content-ontology)."
 
-data: data-ontology data-skills-roles
+data: data-ontology data-jtbd
 
 data-ontology: check-ontology-repo $(ONTOLOGY_FILES)
 	@echo "ontology-extraction: data pulled from $(ONTOLOGY_SAMPLE_DIR)"
 
-data-skills-roles: check-ontology-repo $(SKILLSROLES_FILES)
-	@echo "skills-roles: data pulled from $(SKILLSROLES_SAMPLE_DIR)"
+data-jtbd: check-ontology-repo $(JTBD_FILES)
+	@echo "jobs-to-be-done: data pulled from $(JTBD_SAMPLE_DIR)"
 
 check-ontology-repo:
 	@test -d "$(ONTOLOGY_REPO)" || { \
@@ -71,8 +71,8 @@ check-ontology-repo:
 		echo "       Did you point ONTOLOGY_REPO at the right checkout?"; \
 		exit 1; \
 	}
-	@test -d "$(SKILLSROLES_SAMPLE_DIR)" || { \
-		echo "ERROR: skills-roles sample dir not found: $(SKILLSROLES_SAMPLE_DIR)"; \
+	@test -d "$(JTBD_SAMPLE_DIR)" || { \
+		echo "ERROR: jobs-to-be-done sample dir not found: $(JTBD_SAMPLE_DIR)"; \
 		echo "       Did you point ONTOLOGY_REPO at the right checkout?"; \
 		exit 1; \
 	}
@@ -100,9 +100,9 @@ $(ONTOLOGY_TARGET)/modules.json: $(ONTOLOGY_SAMPLE_DIR)/modules.json
 	@mkdir -p $(@D)
 	cp $< $@
 
-# skills-roles is a single self-contained jsonl (no separate matches/modules
+# jobs-to-be-done is a single self-contained jsonl (no separate matches/modules
 # files — module metadata is embedded per line), so it's a straight copy.
-$(SKILLSROLES_TARGET)/skills_roles.jsonl: $(SKILLSROLES_SAMPLE_DIR)/skills_roles.jsonl
+$(JTBD_TARGET)/jtbd.jsonl: $(JTBD_SAMPLE_DIR)/jtbd.jsonl
 	@mkdir -p $(@D)
 	cp $< $@
 
@@ -118,4 +118,4 @@ serve:
 	python3 -m http.server -d public 8000
 
 clean:
-	rm -f $(ONTOLOGY_FILES) $(SKILLSROLES_FILES)
+	rm -f $(ONTOLOGY_FILES) $(JTBD_FILES)
