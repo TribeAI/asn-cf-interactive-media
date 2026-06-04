@@ -20,6 +20,9 @@
     .top-bar .agg-stats .agg-chip.role { background: #6d28d9; color: white; }
     .top-bar .agg-stats .agg-chip.job { background: #0f766e; color: white; }
     .top-bar .agg-stats .agg-chip.topic { background: #b45309; color: white; }
+    .top-bar .agg-stats button.agg-chip { font: inherit; border: none; cursor: pointer; }
+    .top-bar .agg-stats .agg-chip.toggle.on { box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.55); }
+    .top-bar .agg-stats .agg-chip.toggle.off { opacity: 0.4; filter: saturate(0.45); }
 
     .scope-note { background: #1e3a5f; color: #cbd5e1; padding: 8px 24px; font-size: 0.78em; border-top: 1px solid #334155; }
     .scope-note b { color: #fff; }
@@ -134,7 +137,8 @@ const DOMAIN_COLORS = {
 };
 const ROLE_COLOR = "#7c3aed";
 
-const state = { graph: null, showWeak: true, selected: null };
+const state = { graph: null, showWeak: true, selected: null,
+    tierFilter: { role: true, job: true, topic: true } };
 
 // NOTE: d3-sankey overwrites node.layer with a numeric column index, so we
 // carry our semantic layer as `tier` and key everything off that.
@@ -149,6 +153,7 @@ async function init() {
             if (!r.ok) throw new Error(DATA_FILE + " " + r.status);
             return r.json();
         });
+        computeDomainModel();
         renderAggStats();
         renderLegend();
         render();
@@ -169,15 +174,61 @@ async function init() {
     }
 }
 
+// Stable domain assignment + island grid, computed once from the FULL graph
+// (so clusters don't move when a tier is filtered out).
+function computeDomainModel() {
+    const nodes = state.graph.nodes;
+    const dom = {};
+    nodes.forEach(n => { if (n.layer !== "role") dom[n.id] = n.domain || "other"; });
+    const roleDoms = {};
+    state.graph.links.forEach(l => {
+        if (l.kind === "role-job") {
+            const jd = dom[l.target] || "other";
+            (roleDoms[l.source] || (roleDoms[l.source] = [])).push(jd);
+        }
+    });
+    const mode = arr => {
+        const c = {}; let best = "other", bn = 0;
+        arr.forEach(d => { c[d] = (c[d] || 0) + 1; if (c[d] > bn) { bn = c[d]; best = d; } });
+        return best;
+    };
+    nodes.forEach(n => { if (n.layer === "role") dom[n.id] = roleDoms[n.id] ? mode(roleDoms[n.id]) : "other"; });
+
+    const cnt = {};
+    nodes.forEach(n => { cnt[dom[n.id]] = (cnt[dom[n.id]] || 0) + 1; });
+    const domains = Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a]);
+    const cols = Math.ceil(Math.sqrt(domains.length));
+    const GX = 980, GY = 820, X0 = 520, Y0 = 470;
+    const center = {};
+    domains.forEach((d, i) => { center[d] = { x: X0 + (i % cols) * GX, y: Y0 + Math.floor(i / cols) * GY }; });
+
+    state._domainOf = dom;
+    state._domains = domains;
+    state._center = center;
+    state._tierDelta = { role: -135, job: 0, topic: 145 };  // top -> bottom
+    state._CW = X0 * 2 + (cols - 1) * GX;
+    state._CH = Y0 * 2 + Math.floor((domains.length - 1) / cols) * GY;
+}
+
 function renderAggStats() {
-    const m = state.graph.meta;
-    document.getElementById("agg-stats").innerHTML = `
-        <span class="agg-chip role"><b>${m.n_roles}</b> roles</span>
-        <span class="agg-chip job"><b>${m.n_jobs}</b> jobs to be done</span>
-        <span class="agg-chip topic"><b>${m.n_topics}</b> topics</span>
-        <span class="agg-chip"><b>${m.n_links}</b> links</span>
-        <span style="color:#94a3b8;">20 modules · Qwen3.6-35B · topics joined @ cos≥${m.thresholds.strong}</span>
-    `;
+    const m = state.graph.meta, f = state.tierFilter;
+    const chip = (tier, cls, label) =>
+        `<button class="agg-chip ${cls} toggle ${f[tier] ? "on" : "off"}" data-tier="${tier}" title="Show only / hide ${tier} nodes">${label}</button>`;
+    document.getElementById("agg-stats").innerHTML =
+        chip("role", "role", `<b>${m.n_roles}</b> roles`) +
+        chip("job", "job", `<b>${m.n_jobs}</b> jobs to be done`) +
+        chip("topic", "topic", `<b>${m.n_topics}</b> topics`) +
+        `<span class="agg-chip"><b>${m.n_links}</b> links</span>` +
+        `<span style="color:#94a3b8;">click a count to filter · 20 modules · Qwen3.6-35B · topics joined @ cos≥${m.thresholds.strong}</span>`;
+    document.querySelectorAll("#agg-stats .toggle").forEach(b => b.addEventListener("click", () => {
+        const t = b.dataset.tier;
+        const onCount = Object.values(state.tierFilter).filter(Boolean).length;
+        if (state.tierFilter[t] && onCount === 1) return;  // keep at least one tier visible
+        state.tierFilter[t] = !state.tierFilter[t];
+        state.selected = null;
+        renderAggStats();
+        render();
+    }));
 }
 
 function renderLegend() {
@@ -195,16 +246,25 @@ function render() {
     wrap.querySelectorAll("svg.canvas, .empty").forEach(el => el.remove());
     if (state._sim) { state._sim.stop(); state._sim = null; }
 
-    const rawLinks = state.graph.links.filter(l =>
-        state.showWeak || !(l.kind === "job-topic" && l.strength === "weak"));
-    const usedIds = new Set();
-    rawLinks.forEach(l => { usedIds.add(l.source); usedIds.add(l.target); });
+    const tf = state.tierFilter;
+    const center = state._center, domainOf = state._domainOf, tierDelta = state._tierDelta;
+    const CW = state._CW, CH = state._CH;
+
+    // nodes that have at least one (weak-aware) link in the FULL graph — drops
+    // globally-isolated nodes; computed before the tier filter so single-tier
+    // views still show that tier's full connected set.
+    const weakOk = l => state.showWeak || !(l.kind === "job-topic" && l.strength === "weak");
+    const linkedIds = new Set();
+    state.graph.links.forEach(l => { if (weakOk(l)) { linkedIds.add(l.source); linkedIds.add(l.target); } });
+
+    // visible nodes by tier filter; domain comes from the stable full-graph
+    // model so clusters stay put when a tier is hidden.
     const nodes = state.graph.nodes
-        .filter(n => usedIds.has(n.id))
-        .map(n => ({ ...n, tier: n.layer }));  // preserve semantic layer
+        .filter(n => tf[n.layer] && linkedIds.has(n.id))
+        .map(n => ({ ...n, tier: n.layer, _domain: domainOf[n.id] }));
     const idset = new Set(nodes.map(n => n.id));
-    const links = rawLinks
-        .filter(l => idset.has(l.source) && idset.has(l.target))
+    const links = state.graph.links
+        .filter(l => weakOk(l) && idset.has(l.source) && idset.has(l.target))
         .map(l => ({ ...l }));  // forceLink replaces source/target with node objs
 
     // degree → node sizing + "hub" emphasis
@@ -214,41 +274,11 @@ function render() {
 
     const radius = n => n.tier === "role" ? 9 : 5 + Math.min(8, Math.sqrt(n._deg) * 1.7);
 
-    // --- Domain-cluster layout. Each domain is an "island"; within an island
-    // the tiers stack top->bottom: roles on top, then jobs, then topics.
-    const byId = new Map(nodes.map(n => [n.id, n]));
-    nodes.forEach(n => { if (n.tier !== "role") n._domain = n.domain || "other"; });
-    // a role has no domain of its own — inherit the majority domain of its jobs
-    const roleDoms = {};
-    links.forEach(l => {
-        if (l.kind === "role-job") {
-            const job = byId.get(l.target);
-            if (job) (roleDoms[l.source] || (roleDoms[l.source] = [])).push(job.domain || "other");
-        }
-    });
-    const mode = arr => {
-        const c = {}; let best = "other", bn = 0;
-        arr.forEach(d => { c[d] = (c[d] || 0) + 1; if (c[d] > bn) { bn = c[d]; best = d; } });
-        return best;
-    };
-    nodes.forEach(n => { if (n.tier === "role") n._domain = roleDoms[n.id] ? mode(roleDoms[n.id]) : "other"; });
-
-    // place each domain island on a grid, biggest domains first
-    const domCount = {};
-    nodes.forEach(n => { domCount[n._domain] = (domCount[n._domain] || 0) + 1; });
-    const domains = Object.keys(domCount).sort((a, b) => domCount[b] - domCount[a]);
-    const cols = Math.ceil(Math.sqrt(domains.length));
-    const GX = 980, GY = 820, X0 = 520, Y0 = 470;
-    const center = {};
-    domains.forEach((d, i) => { center[d] = { x: X0 + (i % cols) * GX, y: Y0 + Math.floor(i / cols) * GY }; });
-    const tierDelta = { role: -135, job: 0, topic: 145 };  // top -> bottom
-    const CW = X0 * 2 + (cols - 1) * GX;
-    const CH = Y0 * 2 + Math.floor((domains.length - 1) / cols) * GY;
-
     // Blend each node's gravity target across its OWN domain + the DISTINCT
     // domains of its neighbours, so a node that bridges clusters is pulled to
     // the midpoint between them (a real spanning node) instead of staying glued
     // to one cluster with a long tether. Single-domain nodes stay in place.
+    const byId = new Map(nodes.map(n => [n.id, n]));
     const nbrDoms = {};
     links.forEach(l => {
         const sd = byId.get(l.source)._domain, td = byId.get(l.target)._domain;
@@ -265,6 +295,8 @@ function render() {
         n._ty = sy / sw + tierDelta[n.tier];
         n._spanning = Object.keys(w).length > 1;  // bridges >1 domain
     });
+    // domains with at least one visible node (for the faint island titles)
+    const visDomains = state._domains.filter(d => nodes.some(n => n._domain === d));
     // seed at the (blended) target with small jitter so the sim settles quickly
     nodes.forEach((n, i) => { n.x = n._tx + (i % 9 - 4) * 16; n.y = n._ty + (i % 7 - 3) * 16; });
 
@@ -288,7 +320,7 @@ function render() {
 
     // faint domain titles behind each island
     g.append("g").attr("class", "domain-labels")
-        .selectAll("text").data(domains).join("text")
+        .selectAll("text").data(visDomains).join("text")
         .attr("class", "domain-label")
         .attr("x", d => center[d].x)
         .attr("y", d => center[d].y + tierDelta.role - 60)
