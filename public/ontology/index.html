@@ -98,7 +98,7 @@
 <div class="top-bar">
     <div class="crumbs"><a href="/">ASN Content Freshness</a> <span>›</span> <span>Content Ontology</span></div>
     <h1>Content Ontology — Roles → Jobs to be Done → Topics</h1>
-    <div class="subtitle">A content-derived ontology over 20 MS Learn modules, linking three layers: derived <b>roles</b> (personas) → the <b>jobs to be done</b> they pursue → the <b>topics</b> those jobs draw on. Topics come from the v3 topic extractor and are joined to jobs by semantic similarity; near-duplicate topics are merged into shared hubs. Click any node to trace its full path through the ontology.</div>
+    <div class="subtitle">A content-derived ontology over the full MS Learn module corpus, linking three layers: derived <b>roles</b> (personas) → the <b>jobs to be done</b> they pursue → the <b>topics</b> those jobs draw on. Topics come from the v3 topic extractor (Sonnet 4.6, full-corpus batch) and are joined to jobs by semantic similarity; near-duplicate topics and jobs are merged into shared hubs, and nodes below the module-coverage floor are hidden to keep the graph readable. Click any node to trace its full path. See also the <a href="/ontology/gaps/" style="color:#7dd3fc">coverage &amp; gaps view</a>.</div>
     <div class="agg-stats" id="agg-stats"></div>
 </div>
 
@@ -219,7 +219,7 @@ function renderAggStats() {
         chip("job", "job", `<b>${m.n_jobs}</b> jobs to be done`) +
         chip("topic", "topic", `<b>${m.n_topics}</b> topics`) +
         `<span class="agg-chip"><b>${m.n_links}</b> links</span>` +
-        `<span style="color:#94a3b8;">click a count to filter · 20 modules · Qwen3.6-35B · topics joined @ cos≥${m.thresholds.strong}</span>`;
+        `<span style="color:#94a3b8;">click a count to filter · ${(m.n_modules || 20).toLocaleString()} modules · Sonnet 4.6 · topics joined @ cos≥${m.thresholds.strong}${m.floors ? ` · floors r≥${m.floors.min_role_modules}/j≥${m.floors.min_job_modules}/t≥${m.floors.min_topic_modules}` : ""}</span>`;
     document.querySelectorAll("#agg-stats .toggle").forEach(b => b.addEventListener("click", () => {
         const t = b.dataset.tier;
         const onCount = Object.values(state.tierFilter).filter(Boolean).length;
@@ -402,9 +402,11 @@ function render() {
         node.attr("transform", d => `translate(${d.x},${d.y})`);
     }
     sim.on("tick", ticked);
-    // warm up synchronously so the first paint is already settled
+    // warm up synchronously so the first paint is already settled; fewer
+    // ticks at full-corpus scale — labelCollide is O(n^2) per tick.
     sim.alpha(1);
-    for (let i = 0; i < 420; i++) sim.tick();
+    const warmup = nodes.length > 400 ? 140 : 420;
+    for (let i = 0; i < warmup; i++) sim.tick();
     ticked();
     sim.alphaTarget(0).alpha(0.02);
 
@@ -506,7 +508,8 @@ function showTip(e, d) {
     const merged = (d.merged_from && d.merged_from.length)
         ? `<div class="t-merged">merges: ${d.merged_from.map(escapeHtml).join(", ")}</div>` : "";
     const dom = d.domain ? ` · ${escapeHtml(d.domain)}` : "";
-    tip.innerHTML = `<div class="t-layer">${d.tier}${dom}</div>${escapeHtml(d.label)}${merged}`;
+    const cov = d.module_count ? ` · <b>${d.module_count}</b> modules` : "";
+    tip.innerHTML = `<div class="t-layer">${d.tier}${dom}${cov}</div>${escapeHtml(d.label)}${merged}`;
     tip.style.opacity = "1";
     tip.style.left = Math.min(e.clientX + 14, window.innerWidth - 330) + "px";
     tip.style.top = (e.clientY + 14) + "px";
