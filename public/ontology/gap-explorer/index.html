@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gap Explorer — MS Learn catalogue gaps vs the field</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f1f5f9; color: #334155; }
+
+    .top-bar { background: #1e293b; color: white; padding: 16px 24px; }
+    .top-bar .crumbs { font-size: 0.75em; color: #94a3b8; margin-bottom: 6px; }
+    .top-bar .crumbs a { color: #cbd5e1; text-decoration: none; }
+    .top-bar .crumbs a:hover { text-decoration: underline; }
+    .top-bar h1 { font-size: 1.2em; font-weight: 600; }
+    .top-bar .subtitle { font-size: 0.85em; color: #94a3b8; margin-top: 4px; max-width: 1100px; line-height: 1.45; }
+    .top-bar .subtitle a { color: #7dd3fc; }
+
+    /* headline severity summary */
+    .headline { background: #0f172a; padding: 14px 24px; display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+    .headline .sev-chip { display: flex; align-items: baseline; gap: 7px; background: #1e293b; border-radius: 8px; padding: 8px 14px; }
+    .headline .sev-chip b { font-size: 1.35em; color: white; }
+    .headline .sev-chip span { font-size: 0.78em; color: #94a3b8; }
+    .headline .sev-chip .dot { width: 10px; height: 10px; border-radius: 3px; align-self: center; }
+    .headline .lede { font-size: 0.8em; color: #94a3b8; max-width: 420px; line-height: 1.4; margin-left: auto; }
+
+    .section { max-width: 1180px; margin: 22px auto; padding: 0 24px; }
+    .section > h2 { font-size: 1.05em; color: #1e293b; margin-bottom: 4px; }
+    .section > .sec-sub { font-size: 0.82em; color: #64748b; margin-bottom: 12px; max-width: 1000px; line-height: 1.45; }
+
+    details { border-radius: 8px; }
+    summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 10px; }
+    summary::-webkit-details-marker { display: none; }
+    summary .tri { color: #94a3b8; font-size: 0.7em; width: 12px; flex-shrink: 0; transition: transform 0.12s; }
+    details[open] > summary .tri { transform: rotate(90deg); }
+
+    /* vocabulary group */
+    details.vocab { background: white; border: 1px solid #e2e8f0; margin-bottom: 12px; }
+    details.vocab > summary { padding: 13px 16px; flex-wrap: wrap; }
+    details.vocab > summary h3 { font-size: 0.95em; color: #1e293b; }
+    details.vocab > summary .v-sub { width: 100%; padding-left: 22px; font-size: 0.76em; color: #94a3b8; font-weight: 400; }
+    .sev-mini { display: flex; gap: 6px; margin-left: auto; }
+    .sev-mini span { font-size: 0.72em; padding: 2px 8px; border-radius: 10px; color: white; }
+
+    /* term row */
+    details.term { border-top: 1px solid #f1f5f9; }
+    details.term > summary { padding: 8px 16px; }
+    details.term > summary:hover { background: #f8fafc; }
+    .badge { font-size: 0.68em; font-weight: 700; letter-spacing: 0.04em; padding: 2px 8px; border-radius: 10px; color: white; width: 72px; text-align: center; flex-shrink: 0; }
+    .badge.missing { background: #b91c1c; }
+    .badge.thin { background: #ef4444; }
+    .badge.partial { background: #f59e0b; }
+    .badge.covered { background: #16a34a; }
+    .term-name { font-size: 0.88em; color: #334155; min-width: 250px; }
+    .term-bar { flex: 1; max-width: 380px; background: #f1f5f9; height: 14px; border-radius: 4px; overflow: hidden; }
+    .term-bar i { display: block; height: 100%; border-radius: 4px; }
+    .term-count { font-size: 0.8em; color: #64748b; font-variant-numeric: tabular-nums; width: 86px; text-align: right; }
+
+    /* matched clusters drill-down */
+    .matches { padding: 4px 16px 12px 44px; }
+    .matches .none { font-size: 0.8em; color: #94a3b8; font-style: italic; padding: 4px 0; }
+    details.cluster { margin: 3px 0; }
+    details.cluster > summary { padding: 5px 8px; border-radius: 6px; }
+    details.cluster > summary:hover { background: #f8fafc; }
+    .c-dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
+    .c-label { font-size: 0.84em; color: #334155; font-weight: 600; }
+    .c-meta { font-size: 0.76em; color: #94a3b8; }
+    .c-body { padding: 4px 8px 8px 31px; font-size: 0.8em; }
+    .c-members { color: #64748b; margin-bottom: 8px; line-height: 1.5; }
+    .c-members b { color: #475569; }
+    .ex-row { padding: 5px 8px; border-left: 2px solid #e2e8f0; margin-bottom: 6px; }
+    .ex-row .ex-mod { color: #334155; font-weight: 600; }
+    .ex-row .ex-src { color: #94a3b8; font-size: 0.9em; margin-left: 6px; }
+    .ex-row .ex-quote { color: #64748b; font-style: italic; margin-top: 2px; line-height: 1.4; }
+
+    /* section B: domain groups */
+    details.domain { background: white; border: 1px solid #e2e8f0; margin-bottom: 10px; }
+    details.domain > summary { padding: 11px 16px; }
+    details.domain > summary .d-name { font-size: 0.9em; font-weight: 600; }
+    details.domain > summary .d-meta { font-size: 0.78em; color: #94a3b8; margin-left: auto; }
+    .legend { padding: 12px 24px 34px; max-width: 1180px; margin: 0 auto; font-size: 0.75em; color: #94a3b8; line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="crumbs"><a href="/">ASN Content Freshness</a> <span>›</span> <a href="/ontology/">Content Ontology</a> <span>›</span> <span>Gap Explorer</span></div>
+    <h1>Gap Explorer — where the MS Learn catalogue is thin</h1>
+    <div class="subtitle">
+        A foldable, gaps-first view of the full-corpus extraction. Section 1 tests the catalogue against the
+        field's vocabularies (from the ASN taxonomy competitive research); section 2 surfaces thin areas inside
+        the catalogue itself. Every number drills down to the matched topics, their merged names, and real
+        example modules with evidence quotes — so each claimed gap can be audited in two clicks.
+        Companion views: <a href="/ontology/gaps/">coverage map</a> · <a href="/ontology/">ontology graph</a>.
+    </div>
+</div>
+
+<div class="headline" id="headline"></div>
+
+<div class="section">
+    <h2>1 · Gaps vs the field</h2>
+    <div class="sec-sub">
+        Each group is one external vocabulary; rows are sorted gaps-first by MS Learn module coverage.
+        Open a term to see exactly which extracted topics were counted (with match similarity), then open a
+        topic to see its merged names and example modules with their evidence quotes.
+    </div>
+    <div id="vocab-groups"></div>
+</div>
+
+<div class="section">
+    <h2>2 · Thin areas inside the catalogue</h2>
+    <div class="sec-sub">
+        Topics taught by 4 or fewer modules, grouped by domain (domains with the most thin topics first).
+        Some are legitimately niche; dense pockets of related thin topics mark areas the catalogue has only
+        begun to cover.
+    </div>
+    <div id="domain-groups"></div>
+</div>
+
+<div class="legend" id="legend"></div>
+
+<script>
+const DATA_FILE = "topic_coverage.json";
+
+const DOMAIN_COLORS = {
+    "cloud-infrastructure": "#0ea5e9", "identity-and-access": "#6366f1",
+    "data-and-analytics": "#14b8a6", "ai-and-ml": "#a855f7", "security": "#ef4444",
+    "productivity-and-collaboration": "#f59e0b", "development-tools": "#64748b",
+    "business-applications": "#ec4899", "networking": "#22c55e",
+    "observability": "#06b6d4", "other": "#94a3b8",
+};
+
+// Severity thresholds on MS module coverage (3,418-module corpus).
+const SEVERITY = [
+    { key: "missing", label: "MISSING", test: c => c === 0,  color: "#b91c1c", desc: "no extracted topic matches" },
+    { key: "thin",    label: "THIN",    test: c => c <= 25,  color: "#ef4444", desc: "1–25 modules" },
+    { key: "partial", label: "PARTIAL", test: c => c <= 99,  color: "#f59e0b", desc: "26–99 modules" },
+    { key: "covered", label: "COVERED", test: c => true,     color: "#16a34a", desc: "100+ modules" },
+];
+const sev = c => SEVERITY.find(s => s.test(c));
+
+const VOCAB_TITLES = {
+    datacamp_ai_topics: ["DataCamp — AI topic vocabulary", "Exact (API capture). The strongest external topic vocabulary per the comp research."],
+    udemy_goal_labels: ["Udemy — goal labels", "Directional (landing-page read). Outcome-first goals — the front-door framing the research recommends."],
+    frontier_no_external_source: ["Microsoft frontier — topics no external taxonomy names", "The ~12% slice ASN must define itself. Low coverage here means the catalogue lags Microsoft's own strategy."],
+    openai_skill_stages: ["OpenAI Academy — skill-stage ladder", "Exact (API capture). Awareness → Use Cases → Builder → Deployment."],
+    anthropic_ai_fluency: ["Anthropic Academy — AI Fluency frame", "Exact (API capture). Delegation · Description · Discernment · Diligence."],
+};
+
+let DATA = null, clusterByLabel = {};
+
+async function init() {
+    DATA = await fetch(DATA_FILE).then(r => { if (!r.ok) throw new Error(DATA_FILE + " " + r.status); return r.json(); });
+    DATA.topics.forEach(t => clusterByLabel[t.label] = t);
+    renderHeadline();
+    renderVocabGroups();
+    renderDomainGroups();
+    renderLegend();
+}
+
+function allTerms() {
+    return Object.values(DATA.competitors).flat();
+}
+
+function renderHeadline() {
+    const counts = { missing: 0, thin: 0, partial: 0, covered: 0 };
+    allTerms().forEach(r => counts[sev(r.ms_module_coverage).key]++);
+    const total = allTerms().length;
+    document.getElementById("headline").innerHTML =
+        SEVERITY.map(s =>
+            `<div class="sev-chip"><span class="dot" style="background:${s.color}"></span><b>${counts[s.key]}</b><span>${s.label.toLowerCase()}<br>${s.desc}</span></div>`
+        ).join("") +
+        `<div class="lede">Of <b style="color:white">${total}</b> field-vocabulary terms tested against the
+         ${DATA.meta.n_modules.toLocaleString()}-module catalogue, <b style="color:white">${counts.missing + counts.thin}</b>
+         are missing or thin — the candidate gaps. Open a row to audit before trusting it.</div>`;
+}
+
+function sevSummaryChips(rows) {
+    const counts = { missing: 0, thin: 0, partial: 0, covered: 0 };
+    rows.forEach(r => counts[sev(r.ms_module_coverage).key]++);
+    return SEVERITY
+        .filter(s => counts[s.key])
+        .map(s => `<span style="background:${s.color}">${counts[s.key]} ${s.key}</span>`)
+        .join("");
+}
+
+function renderVocabGroups() {
+    const root = document.getElementById("vocab-groups");
+    root.innerHTML = Object.entries(DATA.competitors).map(([vocab, rows]) => {
+        const [title, sub] = VOCAB_TITLES[vocab] || [vocab, ""];
+        const sorted = [...rows].sort((a, b) => a.ms_module_coverage - b.ms_module_coverage);
+        const max = Math.max(...rows.map(r => r.ms_module_coverage), 1);
+        return `<details class="vocab" open>
+            <summary><span class="tri">▶</span><h3>${esc(title)}</h3><div class="sev-mini">${sevSummaryChips(rows)}</div>
+                <div class="v-sub">${esc(sub)}</div></summary>
+            ${sorted.map(r => termRow(r, max)).join("")}
+        </details>`;
+    }).join("");
+    wireClusterBodies(root);
+}
+
+function termRow(r, max) {
+    const s = sev(r.ms_module_coverage);
+    const pct = Math.max(100 * r.ms_module_coverage / max, 1);
+    const inner = r.matches.length
+        ? r.matches.map(m => clusterDetails(m.topic, `sim ${m.sim}`)).join("")
+        : `<div class="none">No extracted topic matches at cos ≥ ${DATA.meta.competitor_match_sim}
+           (best similarity anywhere: ${r.best_sim}). Either a true catalogue gap or a vocabulary mismatch — judge by the term.</div>`;
+    return `<details class="term">
+        <summary><span class="tri">▶</span><span class="badge ${s.key}">${s.label}</span>
+            <span class="term-name">${esc(r.term)}</span>
+            <span class="term-bar"><i style="width:${pct}%;background:${s.color}"></i></span>
+            <span class="term-count">${r.ms_module_coverage.toLocaleString()} modules</span></summary>
+        <div class="matches">${inner}</div>
+    </details>`;
+}
+
+function clusterDetails(label, extraMeta) {
+    const t = clusterByLabel[label];
+    if (!t) return "";
+    return `<details class="cluster" data-label="${esc(label)}">
+        <summary><span class="tri">▶</span><span class="c-dot" style="background:${DOMAIN_COLORS[t.domain] || "#94a3b8"}"></span>
+            <span class="c-label">${esc(t.label)}</span>
+            <span class="c-meta">${t.module_count} modules · ${esc(t.domain)}${extraMeta ? " · " + esc(extraMeta) : ""}</span></summary>
+        <div class="c-body" data-pending="1"></div>
+    </details>`;
+}
+
+// Example modules render lazily on first open (keeps initial DOM small).
+function wireClusterBodies(root) {
+    root.querySelectorAll("details.cluster").forEach(d => {
+        d.addEventListener("toggle", () => {
+            if (!d.open) return;
+            const body = d.querySelector(".c-body");
+            if (!body || !body.dataset.pending) return;
+            delete body.dataset.pending;
+            const t = clusterByLabel[d.dataset.label];
+            const members = t.members.length > 1
+                ? `<div class="c-members"><b>merged names:</b> ${t.members.map(esc).join(" · ")}</div>` : "";
+            body.innerHTML = members + (t.example_modules || []).map(ex =>
+                `<div class="ex-row"><span class="ex-mod">${esc(ex.module)}</span><span class="ex-src">${esc(ex.source_id)}</span>
+                 <div class="ex-quote">“${esc(ex.evidence)}”</div></div>`).join("") +
+                (t.module_count > (t.example_modules || []).length
+                    ? `<div style="color:#94a3b8">… and ${t.module_count - t.example_modules.length} more modules.</div>` : "");
+        });
+    });
+}
+
+function renderDomainGroups() {
+    const THIN_MAX = 4;
+    const thin = DATA.topics.filter(t => t.module_count <= THIN_MAX);
+    const byDomain = {};
+    thin.forEach(t => (byDomain[t.domain] || (byDomain[t.domain] = [])).push(t));
+    const totalByDomain = {};
+    DATA.topics.forEach(t => totalByDomain[t.domain] = (totalByDomain[t.domain] || 0) + 1);
+
+    const root = document.getElementById("domain-groups");
+    root.innerHTML = Object.entries(byDomain)
+        .sort((a, b) => b[1].length - a[1].length)
+        .map(([dom, ts]) => `<details class="domain">
+            <summary><span class="tri">▶</span><span class="c-dot" style="background:${DOMAIN_COLORS[dom] || "#94a3b8"}"></span>
+                <span class="d-name">${esc(dom)}</span>
+                <span class="d-meta">${ts.length} thin of ${totalByDomain[dom]} topics</span></summary>
+            ${ts.sort((a, b) => a.module_count - b.module_count || a.label.localeCompare(b.label))
+                .map(t => clusterDetails(t.label, `${t.mention_count} mentions`)).join("")}
+        </details>`).join("");
+    wireClusterBodies(root);
+}
+
+function renderLegend() {
+    const m = DATA.meta;
+    document.getElementById("legend").innerHTML =
+        `Severity thresholds (MS module coverage): ` +
+        SEVERITY.map(s => `<b style="color:${s.color}">${s.label.toLowerCase()}</b> = ${s.desc}`).join(" · ") +
+        `.<br>Coverage counts come from embedding matches (cos ≥ ${m.competitor_match_sim}, ${esc(m.embedding_model)})
+         between each vocabulary term and the ${m.n_clusters.toLocaleString()} extracted topic clusters
+         (${m.n_mentions.toLocaleString()} skill mentions, Sonnet 4.6 batch extraction, merge cos ≥ ${m.merge_sim}).
+         Vocabularies: ${esc(m.competitor_vocab_source)}. Broad terms aggregate loosely-related clusters —
+         audit the drill-down before quoting a number.`;
+}
+
+function esc(s) {
+    if (s == null) return "";
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
+init().catch(err => {
+    document.body.insertAdjacentHTML("beforeend", `<div style="padding:40px;color:#b91c1c">Failed to load: ${esc(err.message)}</div>`);
+    console.error(err);
+});
+</script>
+</body>
+</html>

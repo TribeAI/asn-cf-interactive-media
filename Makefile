@@ -56,7 +56,8 @@ ONTGRAPH_FILES := \
 	$(ONTGRAPH_TARGET)/ontology_graph.json
 
 COVERAGE_FILES := \
-	$(COVERAGE_TARGET)/topic_coverage.json
+	$(COVERAGE_TARGET)/topic_coverage.json \
+	public/ontology/gap-explorer/topic_coverage.json
 
 .PHONY: help data data-ontology data-jtbd data-ontology-graph data-coverage data-refresh serve clean check-ontology-repo
 
@@ -136,6 +137,10 @@ $(ONTGRAPH_TARGET)/ontology_graph.json: $(ONTGRAPH_SAMPLE_DIR)/ontology_graph.js
 	cp $< $@
 
 $(COVERAGE_TARGET)/topic_coverage.json: $(COVERAGE_SAMPLE_DIR)/topic_coverage.json
+	@mkdir -p $(@D)
+	cp $< $@
+
+public/ontology/gap-explorer/topic_coverage.json: $(COVERAGE_SAMPLE_DIR)/topic_coverage.json
 	@mkdir -p $(@D)
 	cp $< $@
 
