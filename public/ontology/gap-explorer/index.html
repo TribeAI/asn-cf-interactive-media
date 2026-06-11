@@ -269,15 +269,15 @@ const THIN_MAX = 4; // per-topic "thin" badge threshold inside the catalogue
 const GAP_DESC = {
     missing: "no ASN modules",
     thin: "< 50% of the field",
-    partial: "50–100% of the field",
-    covered: "matches or leads the field",
+    partial: "50–80% of the field",
+    covered: "within 20% of the field (or ahead)",
 };
 const SEV_RANK = { missing: 0, thin: 1, partial: 2, covered: 3 };
 function termSev(r) {
     if (r.ps_count != null && r.ps_count > 0) {
         if (r.ms_module_coverage === 0) return sevByKey("missing");
         const ratio = r.ms_module_coverage / r.ps_count;
-        if (ratio >= 1) return sevByKey("covered");
+        if (ratio >= 0.8) return sevByKey("covered");  // within 20% of the field
         if (ratio >= 0.5) return sevByKey("partial");
         return sevByKey("thin");
     }
