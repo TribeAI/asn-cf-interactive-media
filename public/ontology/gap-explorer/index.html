@@ -66,6 +66,9 @@
     .hh-nums { font-size: 0.85em; color: #64748b; font-variant-numeric: tabular-nums; width: 150px; text-align: right; flex-shrink: 0; }
     .hh-nums b.ps { color: #7c3aed; }
 
+    /* AI/ML topic tag */
+    .ai-tag { font-size: 0.62em; font-weight: 800; letter-spacing: 0.06em; color: white; background: linear-gradient(135deg,#a855f7,#7c3aed); border-radius: 5px; padding: 2px 6px; margin-left: 7px; vertical-align: middle; flex-shrink: 0; }
+
     /* source provenance block + exactness chips */
     .prov-block { margin: 4px 12px 10px; padding: 10px 14px; background: #f8fafc; border-left: 3px solid #94a3b8; font-size: 0.78em; color: #64748b; line-height: 1.6; }
     .prov-block b { color: #475569; }
@@ -158,9 +161,10 @@
     <div class="sec-sub">
         A direct, absolute comparison: each topic shows how many <b>Pluralsight courses</b> teach it
         versus how many <b>ASN modules</b> do (the high-fidelity source — Pluralsight's full catalog,
-        extracted the same way as ours). Sorted by least ASN coverage first — the thinnest areas lead.
-        The curated field vocabularies (DataCamp, Udemy, OpenAI, Anthropic, frontier) follow below. Open
-        a topic to see every matched ASN cluster and its source modules with evidence.
+        extracted the same way as ours). Sorted by gap size — where ASN trails Pluralsight most, first;
+        topics where ASN already matches or leads the field are covered and sink to the bottom. The
+        curated field vocabularies (DataCamp, Udemy, OpenAI, Anthropic, frontier) follow below. Open a
+        topic to see every matched ASN cluster and its source modules with evidence.
     </div>
     <div class="controls">
         <button data-expand="#vocab-groups">Expand all</button>
@@ -255,7 +259,30 @@ const SEVERITY = [
     { key: "covered", label: "COVERED", test: c => true,     color: "#16a34a", desc: "100+ modules" },
 ];
 const sev = c => SEVERITY.find(s => s.test(c));
+const sevByKey = k => SEVERITY.find(s => s.key === k);
 const THIN_MAX = 4; // per-topic "thin" badge threshold inside the catalogue
+
+// Gap-based severity for a Pluralsight head-to-head term: grade ASN by how
+// much of the field's coverage it has (ASN modules ÷ Pluralsight courses), so
+// a small slice of a big field reads as a severe gap regardless of absolute
+// count. Curated vocabs (no course count) fall back to absolute coverage.
+// Gap-severity descriptions for the gaps-tab headline (override absolute desc).
+const GAP_DESC = {
+    missing: "ASN has < 10% of the field",
+    thin: "10–50% of the field",
+    partial: "50–100% of the field",
+    covered: "matches or leads the field",
+};
+function termSev(r) {
+    if (r.ps_count != null && r.ps_count > 0) {
+        const ratio = r.ms_module_coverage / r.ps_count;
+        if (ratio >= 1) return sevByKey("covered");
+        if (ratio >= 0.5) return sevByKey("partial");
+        if (ratio >= 0.1) return sevByKey("thin");
+        return sevByKey("missing");
+    }
+    return sev(r.ms_module_coverage);
+}
 
 const VOCAB_TITLES = {
     pluralsight_topics: ["Pluralsight — derived course topics (high-fidelity comparison)", "Exact catalog scrape (2026-05-19, Kevin Wang) + Sonnet topic extraction over all 6,289 course titles; terms with ≥ 20 Pluralsight courses, sorted gaps-first. Full vocabulary on the Sources tab."],
@@ -384,15 +411,15 @@ function renderHeadline() {
     const m = DATA.meta;
     if (activeTab === "gaps") {
         const counts = { missing: 0, thin: 0, partial: 0, covered: 0 };
-        allTerms().forEach(r => counts[sev(r.ms_module_coverage).key]++);
+        allTerms().forEach(r => counts[termSev(r).key]++);
         const total = allTerms().length;
         el.innerHTML = SEVERITY.map(s =>
-            `<div class="sev-chip"><span class="dot" style="background:${s.color}"></span><b>${counts[s.key]}</b><span>${s.label.toLowerCase()}<br>${s.desc}</span></div>`
+            `<div class="sev-chip"><span class="dot" style="background:${s.color}"></span><b>${counts[s.key]}</b><span>${s.label.toLowerCase()}<br>${GAP_DESC[s.key]}</span></div>`
         ).join("") +
         `<div class="lede">Of <b style="color:white">${total}</b> field topics compared against the
          ${m.n_modules.toLocaleString()}-module ASN catalogue, <b style="color:white">${counts.missing + counts.thin}</b>
-         are taught by ≤ 25 ASN modules — the candidate gaps. Counts below are absolute module coverage
-         (sum across matched clusters); open a topic to audit the evidence.</div>`;
+         are thin or missing — the candidate gaps. A topic where ASN already matches or leads the field
+         counts as covered. Open a topic to audit the evidence.</div>`;
     } else if (activeTab === "topics") {
         const thin = DATA.topics.filter(t => t.module_count <= THIN_MAX).length;
         const chips = [
@@ -513,6 +540,18 @@ function moduleRow(t, p) {
 
 /* ---------- tab 1: gaps vs the field — flat Pluralsight head-to-head ---------- */
 
+// A field topic is "AI" if its closest ASN cluster sits in the ai-and-ml
+// domain, or its name matches an AI keyword (catches AI topics whose nearest
+// cluster is tagged elsewhere, e.g. Azure AI Services, Google Gemini).
+const AI_KW = /\b(ai|llm|ml|mlops|genai|rag|nlp|gpt|gemini)\b|machine learning|deep learning|generative|prompt|neural|transformer|embedding|large language|artificial intelligence|agentic|computer vision|vector (database|store)|hugging face|fine.?tun|langchain|chatbot|model (training|deployment|eval)/i;
+function isAITopic(r) {
+    const ms = [...(r.matches || [])].sort((a, b) => b.module_count - a.module_count || b.sim - a.sim);
+    const best = ms[0] && clusterByLabel[ms[0].topic];
+    if (best && best.domain === "ai-and-ml") return true;
+    return AI_KW.test(r.term);
+}
+const AI_BADGE = `<span class="ai-tag" title="AI / ML topic">AI</span>`;
+
 // Absolute head-to-head: each field topic shows its source-side count
 // (Pluralsight courses) vs ASN's module coverage (sum across all matched
 // clusters, corpus-wide). Sorted by the deficit so the real gaps surface.
@@ -520,8 +559,9 @@ function renderVocabGroups() {
     const root = document.getElementById("vocab-groups");
     const ps = (DATA.competitors.pluralsight_topics || [])
         .map(r => ({ ...r, gap: (r.ps_count || 0) - r.ms_module_coverage }))
-        // least ASN coverage first; within a tie, the bigger Pluralsight presence leads.
-        .sort((a, b) => a.ms_module_coverage - b.ms_module_coverage || (b.ps_count || 0) - (a.ps_count || 0));
+        // biggest gap first (how far ASN trails Pluralsight); ASN-ahead topics
+        // (negative gap) sink to the bottom. Bigger Pluralsight presence breaks ties.
+        .sort((a, b) => b.gap - a.gap || (b.ps_count || 0) - (a.ps_count || 0));
     const psMax = Math.max(...ps.map(r => r.ps_count || 0), 1);
 
     const other = Object.entries(DATA.competitors)
@@ -531,7 +571,7 @@ function renderVocabGroups() {
     root.innerHTML =
         `<details class="group" open>
             <summary><span class="tri">▶</span><h3>Pluralsight head-to-head — courses vs ASN modules</h3>
-                <span class="g-meta">${ps.length} topics · least ASN coverage first</span></summary>
+                <span class="g-meta">${ps.length} topics · biggest gap first</span></summary>
             <div class="hh-head">
                 <span class="hh-spacer"></span><span class="hh-ps">Pluralsight courses</span><span class="hh-ms">ASN modules</span></div>
             ${ps.map(r => headToHeadRow(r, psMax)).join("")}
@@ -556,11 +596,11 @@ function renderVocabGroups() {
 // Pluralsight head-to-head row: two absolute numbers, ASN-coverage badge.
 function headToHeadRow(r, psMax) {
     const M = r.ms_module_coverage;
-    const s = sev(M);
+    const s = termSev(r);
     const psPct = Math.max(100 * (r.ps_count || 0) / psMax, 2);
     return `<details class="term">
         <summary><span class="tri">▶</span><span class="badge ${s.key}">${s.label}</span>
-            <span class="term-name">${esc(r.term)}</span>
+            <span class="term-name">${esc(r.term)}${isAITopic(r) ? AI_BADGE : ""}</span>
             <span class="hh-bars"><i class="hh-ps-bar" style="width:${psPct}%"></i></span>
             <span class="hh-nums"><b class="ps">${(r.ps_count || 0).toLocaleString()}</b> PS · <b class="ms" style="color:${s.color}">${M.toLocaleString()}</b> ASN</span></summary>
         <div class="matches">${matchBody(r)}</div>
@@ -570,11 +610,11 @@ function headToHeadRow(r, psMax) {
 // Curated-vocab row (no PS course count): just ASN module coverage.
 function curatedRow(r, max, vocab) {
     const M = r.ms_module_coverage;
-    const s = sev(M);
+    const s = termSev(r);
     const pct = Math.max(100 * M / max, 1);
     return `<details class="term">
         <summary><span class="tri">▶</span><span class="badge ${s.key}">${s.label}</span>
-            <span class="term-name">${esc(r.term)}</span>
+            <span class="term-name">${esc(r.term)}${isAITopic(r) ? AI_BADGE : ""}</span>
             <span class="term-bar"><i style="width:${pct}%;background:${s.color}"></i></span>
             <span class="term-count">${M.toLocaleString()} ASN modules</span></summary>
         <div class="matches">${matchBody(r, vocab)}</div>
