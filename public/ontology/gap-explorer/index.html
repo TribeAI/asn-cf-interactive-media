@@ -574,10 +574,21 @@ function termRow(r, cov, max, vocab, area) {
     const s = sev(cov);
     const pct = Math.max(100 * cov / max, 1);
     const [title] = VOCAB_TITLES[vocab] || [vocab, ""];
+    // Pluralsight terms come from Kevin Wang's scrape, not Annas's comp research.
+    const sourceAttr = vocab === "pluralsight_topics"
+        ? "Pluralsight catalog scrape (2026-05-19, Kevin Wang) + Sonnet topic extraction over course titles"
+        : DATA.meta.competitor_vocab_source;
+    const n = r.matches.length;
+    // coverage is a SUM over the matched clusters' module counts — spell that
+    // out so a near-identical single match (e.g. "NLP" sim 1.0, 41 modules)
+    // isn't mistaken for the whole term total (here 46 across 4 clusters).
+    const sumNote = n > 1
+        ? ` Its <b>${cov.toLocaleString()} in-area / ${r.ms_module_coverage.toLocaleString()} corpus</b> coverage is the SUM across these ${n} clusters, not any single one.`
+        : "";
     const provLine = `<div class="prov-line"><b>term provenance:</b> ${esc(title)} —
-        ${esc(DATA.meta.competitor_vocab_source)}. Matched ${r.matches.length} extracted
-        topic${r.matches.length === 1 ? "" : "s"} at cos ≥ ${DATA.meta.competitor_match_sim}
-        (exhaustive, no cap); coverage scored on <b>${esc(area)}</b> modules only.</div>`;
+        ${esc(sourceAttr)}. Matched ${n} extracted
+        topic${n === 1 ? "" : "s"} at cos ≥ ${DATA.meta.competitor_match_sim}
+        (exhaustive, no cap); coverage scored on <b>${esc(area)}</b> modules only.${sumNote}</div>`;
     const matches = r.matches
         .map(m => ({ m, n: (topicAreaCounts[m.topic] || {})[area] || 0 }))
         .sort((a, b) => b.n - a.n || b.m.sim - a.m.sim);
