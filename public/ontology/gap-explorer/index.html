@@ -16,17 +16,28 @@
     .top-bar .subtitle { font-size: 0.85em; color: #94a3b8; margin-top: 4px; max-width: 1100px; line-height: 1.45; }
     .top-bar .subtitle a { color: #7dd3fc; }
 
+    /* tab chrome */
+    .tabs { background: #0f172a; padding: 0 24px; display: flex; gap: 4px; }
+    .tabs button { background: none; border: none; color: #94a3b8; font-size: 0.88em; font-weight: 600; padding: 12px 18px; cursor: pointer; border-bottom: 3px solid transparent; }
+    .tabs button:hover { color: #e2e8f0; }
+    .tabs button.active { color: white; border-bottom-color: #38bdf8; }
+
     /* headline severity summary */
-    .headline { background: #0f172a; padding: 14px 24px; display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+    .headline { background: #0f172a; padding: 14px 24px; display: flex; gap: 14px; flex-wrap: wrap; align-items: center; border-top: 1px solid #1e293b; }
     .headline .sev-chip { display: flex; align-items: baseline; gap: 7px; background: #1e293b; border-radius: 8px; padding: 8px 14px; }
     .headline .sev-chip b { font-size: 1.35em; color: white; }
     .headline .sev-chip span { font-size: 0.78em; color: #94a3b8; }
     .headline .sev-chip .dot { width: 10px; height: 10px; border-radius: 3px; align-self: center; }
-    .headline .lede { font-size: 0.8em; color: #94a3b8; max-width: 420px; line-height: 1.4; margin-left: auto; }
+    .headline .lede { font-size: 0.8em; color: #94a3b8; max-width: 460px; line-height: 1.4; margin-left: auto; }
 
     .section { max-width: 1180px; margin: 22px auto; padding: 0 24px; }
     .section > h2 { font-size: 1.05em; color: #1e293b; margin-bottom: 4px; }
     .section > .sec-sub { font-size: 0.82em; color: #64748b; margin-bottom: 12px; max-width: 1000px; line-height: 1.45; }
+    .controls { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+    .controls button { font-size: 0.78em; padding: 5px 12px; border-radius: 6px; border: 1px solid #cbd5e1; background: white; color: #475569; cursor: pointer; }
+    .controls button:hover { background: #f8fafc; border-color: #94a3b8; }
+    .controls label { font-size: 0.78em; color: #475569; display: flex; align-items: center; gap: 5px; cursor: pointer; }
+    .controls .note { font-size: 0.74em; color: #94a3b8; margin-left: auto; }
 
     details { border-radius: 8px; }
     summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 10px; }
@@ -34,13 +45,37 @@
     summary .tri { color: #94a3b8; font-size: 0.7em; width: 12px; flex-shrink: 0; transition: transform 0.12s; }
     details[open] > summary .tri { transform: rotate(90deg); }
 
-    /* vocabulary group */
-    details.vocab { background: white; border: 1px solid #e2e8f0; margin-bottom: 12px; }
-    details.vocab > summary { padding: 13px 16px; flex-wrap: wrap; }
-    details.vocab > summary h3 { font-size: 0.95em; color: #1e293b; }
-    details.vocab > summary .v-sub { width: 100%; padding-left: 22px; font-size: 0.76em; color: #94a3b8; font-weight: 400; }
+    /* vocabulary / domain / role group */
+    details.group { background: white; border: 1px solid #e2e8f0; margin-bottom: 12px; }
+    details.group > summary { padding: 13px 16px; flex-wrap: wrap; }
+    details.group > summary h3 { font-size: 0.95em; color: #1e293b; }
+    details.group > summary .v-sub { width: 100%; padding-left: 22px; font-size: 0.76em; color: #94a3b8; font-weight: 400; }
     .sev-mini { display: flex; gap: 6px; margin-left: auto; }
     .sev-mini span { font-size: 0.72em; padding: 2px 8px; border-radius: 10px; color: white; }
+    .g-meta { font-size: 0.78em; color: #94a3b8; margin-left: auto; font-weight: 400; }
+    .g-bar { width: 160px; background: #f1f5f9; height: 12px; border-radius: 4px; overflow: hidden; flex-shrink: 0; }
+    .g-bar i { display: block; height: 100%; border-radius: 4px; background: #6366f1; }
+
+    /* source provenance block + exactness chips */
+    .prov-block { margin: 4px 12px 10px; padding: 10px 14px; background: #f8fafc; border-left: 3px solid #94a3b8; font-size: 0.78em; color: #64748b; line-height: 1.6; }
+    .prov-block b { color: #475569; }
+    .exact-chip { font-size: 0.7em; font-weight: 700; padding: 2px 9px; border-radius: 10px; color: white; flex-shrink: 0; }
+    .exact-chip.exact { background: #16a34a; }
+    .exact-chip.directional { background: #f59e0b; }
+    .exact-chip.analytical { background: #64748b; }
+    .exact-chip.derived { background: #7c3aed; }
+    .t-detail { font-size: 0.76em; color: #94a3b8; flex-shrink: 0; }
+    .ps-course { padding: 4px 8px; border-left: 2px solid #ddd6fe; margin-bottom: 4px; font-size: 0.95em; }
+    .ps-course a { color: #334155; font-weight: 600; text-decoration: none; }
+    .ps-course a:hover { color: #0369a1; text-decoration: underline; }
+    .ps-course .via { color: #7c3aed; font-size: 0.9em; margin-left: 6px; }
+
+    /* nested vocabulary group inside a solution-area group */
+    details.vocab { background: #f8fafc; border: 1px solid #e2e8f0; margin: 8px 12px; }
+    details.vocab > summary { padding: 10px 14px; flex-wrap: wrap; }
+    details.vocab > summary h4 { font-size: 0.88em; color: #1e293b; }
+    details.vocab > summary .v-sub { width: 100%; padding-left: 22px; font-size: 0.74em; color: #94a3b8; font-weight: 400; }
+    details.vocab details.term { background: white; }
 
     /* term row */
     details.term { border-top: 1px solid #f1f5f9; }
@@ -54,11 +89,12 @@
     .term-name { font-size: 0.88em; color: #334155; min-width: 250px; }
     .term-bar { flex: 1; max-width: 380px; background: #f1f5f9; height: 14px; border-radius: 4px; overflow: hidden; }
     .term-bar i { display: block; height: 100%; border-radius: 4px; }
-    .term-count { font-size: 0.8em; color: #64748b; font-variant-numeric: tabular-nums; width: 86px; text-align: right; }
+    .term-count { font-size: 0.8em; color: #64748b; font-variant-numeric: tabular-nums; width: 170px; text-align: right; flex-shrink: 0; }
 
     /* matched clusters drill-down */
     .matches { padding: 4px 16px 12px 44px; }
-    .matches .none { font-size: 0.8em; color: #94a3b8; font-style: italic; padding: 4px 0; }
+    .matches .prov-line, .none { font-size: 0.78em; color: #94a3b8; padding: 4px 0 6px; line-height: 1.45; }
+    .matches .none { font-style: italic; }
     details.cluster { margin: 3px 0; }
     details.cluster > summary { padding: 5px 8px; border-radius: 6px; }
     details.cluster > summary:hover { background: #f8fafc; }
@@ -66,19 +102,21 @@
     .c-label { font-size: 0.84em; color: #334155; font-weight: 600; }
     .c-meta { font-size: 0.76em; color: #94a3b8; }
     .c-body { padding: 4px 8px 8px 31px; font-size: 0.8em; }
-    .c-members { color: #64748b; margin-bottom: 8px; line-height: 1.5; }
-    .c-members b { color: #475569; }
+    .c-members { color: #64748b; margin-bottom: 6px; line-height: 1.5; }
+    .c-members b, .c-roles b, .mod-head b { color: #475569; }
+    .c-roles { color: #64748b; margin-bottom: 8px; line-height: 1.8; }
+    .role-chip { display: inline-block; background: #eef2ff; color: #4338ca; border-radius: 9px; padding: 1px 8px; font-size: 0.92em; margin-right: 4px; white-space: nowrap; }
+    .mod-head { color: #64748b; margin: 8px 0 6px; }
     .ex-row { padding: 5px 8px; border-left: 2px solid #e2e8f0; margin-bottom: 6px; }
-    .ex-row .ex-mod { color: #334155; font-weight: 600; }
+    .ex-row .ex-mod { color: #334155; font-weight: 600; text-decoration: none; }
+    .ex-row a.ex-mod:hover { text-decoration: underline; color: #0369a1; }
     .ex-row .ex-src { color: #94a3b8; font-size: 0.9em; margin-left: 6px; }
+    .ex-row .ex-via { color: #7c3aed; font-size: 0.9em; margin-left: 6px; }
+    .ex-row .ex-roles { color: #94a3b8; font-size: 0.85em; margin-top: 2px; }
     .ex-row .ex-quote { color: #64748b; font-style: italic; margin-top: 2px; line-height: 1.4; }
 
-    /* section B: domain groups */
-    details.domain { background: white; border: 1px solid #e2e8f0; margin-bottom: 10px; }
-    details.domain > summary { padding: 11px 16px; }
-    details.domain > summary .d-name { font-size: 0.9em; font-weight: 600; }
-    details.domain > summary .d-meta { font-size: 0.78em; color: #94a3b8; margin-left: auto; }
     .legend { padding: 12px 24px 34px; max-width: 1180px; margin: 0 auto; font-size: 0.75em; color: #94a3b8; line-height: 1.6; }
+    .hidden { display: none; }
 </style>
 </head>
 <body>
@@ -87,34 +125,102 @@
     <div class="crumbs"><a href="/">ASN Content Freshness</a> <span>›</span> <a href="/ontology/">Content Ontology</a> <span>›</span> <span>Gap Explorer</span></div>
     <h1>Gap Explorer — where the MS Learn catalogue is thin</h1>
     <div class="subtitle">
-        A foldable, gaps-first view of the full-corpus extraction. Section 1 tests the catalogue against the
-        field's vocabularies (from the ASN taxonomy competitive research); section 2 surfaces thin areas inside
-        the catalogue itself. Every number drills down to the matched topics, their merged names, and real
-        example modules with evidence quotes — so each claimed gap can be audited in two clicks.
+        A foldable, exhaustive view of the full-corpus extraction with exact provenance: every number
+        drills down to the complete list of source modules — each linked to MS Learn, tagged with its
+        official ASN roles and Microsoft solution area, and carrying the surface form and evidence
+        quote it was extracted from.
         Companion views: <a href="/ontology/gaps/">coverage map</a> · <a href="/ontology/">ontology graph</a>.
     </div>
 </div>
 
+<div class="tabs" id="tabs">
+    <button data-tab="gaps">Gaps vs the field</button>
+    <button data-tab="topics">Catalogue topics</button>
+    <button data-tab="roles">ASN roles</button>
+    <button data-tab="areas">Solution areas</button>
+    <button data-tab="sources">Sources</button>
+</div>
+
 <div class="headline" id="headline"></div>
 
-<div class="section">
-    <h2>1 · Gaps vs the field</h2>
+<div class="section tab-pane" id="pane-gaps">
+    <h2>Gaps vs the field — by solution area</h2>
     <div class="sec-sub">
-        Each group is one external vocabulary; rows are sorted gaps-first by MS Learn module coverage.
-        Open a term to see exactly which extracted topics were counted (with match similarity), then open a
-        topic to see its merged names and example modules with their evidence quotes.
+        Top level is Microsoft's published solution areas; inside each, the external vocabularies and
+        their terms, scored on that area's modules only (corpus-wide count kept alongside). Open a term
+        to see its provenance (which vocabulary it comes from and how it was captured) and every
+        extracted topic it matched; open a topic to audit the area's own modules with evidence.
+    </div>
+    <div class="controls">
+        <button data-expand="#vocab-groups">Expand all</button>
+        <button data-expand-deep="#vocab-groups">Expand everything</button>
+        <button data-collapse="#pane-gaps">Collapse all</button>
     </div>
     <div id="vocab-groups"></div>
 </div>
 
-<div class="section">
-    <h2>2 · Thin areas inside the catalogue</h2>
+<div class="section tab-pane" id="pane-topics">
+    <h2>Catalogue topics — all extracted clusters</h2>
     <div class="sec-sub">
-        Topics taught by 4 or fewer modules, grouped by domain (domains with the most thin topics first).
-        Some are legitimately niche; dense pockets of related thin topics mark areas the catalogue has only
-        begun to cover.
+        Every topic cluster in the extraction, grouped by domain — nothing sampled, nothing hidden.
+        Open a topic for its full provenance: all source modules with ASN role tags and evidence quotes.
+        Topics taught by ≤ 4 modules carry a <b>thin</b> badge; dense pockets of related thin topics mark
+        areas the catalogue has only begun to cover.
+    </div>
+    <div class="controls">
+        <button data-expand="#domain-groups">Expand domains</button>
+        <button data-expand-deep="#domain-groups">Expand everything</button>
+        <button data-collapse="#pane-topics">Collapse all</button>
+        <label><input type="checkbox" id="thin-only"> thin topics only (≤ 4 modules)</label>
+        <span class="note" id="topics-note"></span>
     </div>
     <div id="domain-groups"></div>
+</div>
+
+<div class="section tab-pane" id="pane-roles">
+    <h2>ASN roles — coverage by official role taxonomy</h2>
+    <div class="sec-sub">
+        The official ASN role tags (from the catalog metadata, joined per module — not Tribe-derived),
+        sorted by how many corpus modules carry each tag. Open a role to see every topic taught to it,
+        sorted by coverage; open a topic to audit the role's own modules with evidence. Thin tails inside
+        a role are role-specific gap candidates.
+    </div>
+    <div class="controls">
+        <button data-expand="#role-groups">Expand all roles</button>
+        <button data-collapse="#pane-roles">Collapse all</button>
+    </div>
+    <div id="role-groups"></div>
+</div>
+
+<div class="section tab-pane" id="pane-areas">
+    <h2>Solution areas — coverage by Microsoft's 7 published areas</h2>
+    <div class="sec-sub">
+        Microsoft's published solution-area themes (one per learning object, joined per module — not
+        Tribe-derived), sorted by corpus module count. Open an area to see every topic taught inside it,
+        sorted by coverage; open a topic to audit the area's own modules with evidence. Thin tails inside
+        an area are area-specific gap candidates.
+    </div>
+    <div class="controls">
+        <button data-expand="#area-groups">Expand all areas</button>
+        <button data-collapse="#pane-areas">Collapse all</button>
+    </div>
+    <div id="area-groups"></div>
+</div>
+
+<div class="section tab-pane" id="pane-sources">
+    <h2>Sources — external taxonomies with capture provenance</h2>
+    <div class="sec-sub">
+        Each external source's own vocabulary, rendered in its native shape, with first-class provenance:
+        who captured it, how, when, and whether it's exact or directional. Every term is matched against
+        the MS topic clusters (same embedding methodology as the gaps tab); open a term for its per-area
+        coverage, its matched topics, and — for Pluralsight-derived topics — the source courses it came from.
+    </div>
+    <div class="controls">
+        <button data-expand="#source-groups">Expand all</button>
+        <button data-collapse="#pane-sources">Collapse all</button>
+        <span class="note" id="sources-note"></span>
+    </div>
+    <div id="source-groups"></div>
 </div>
 
 <div class="legend" id="legend"></div>
@@ -138,6 +244,7 @@ const SEVERITY = [
     { key: "covered", label: "COVERED", test: c => true,     color: "#16a34a", desc: "100+ modules" },
 ];
 const sev = c => SEVERITY.find(s => s.test(c));
+const THIN_MAX = 4; // per-topic "thin" badge threshold inside the catalogue
 
 const VOCAB_TITLES = {
     datacamp_ai_topics: ["DataCamp — AI topic vocabulary", "Exact (API capture). The strongest external topic vocabulary per the comp research."],
@@ -147,78 +254,169 @@ const VOCAB_TITLES = {
     anthropic_ai_fluency: ["Anthropic Academy — AI Fluency frame", "Exact (API capture). Delegation · Description · Discernment · Diligence."],
 };
 
-let DATA = null, clusterByLabel = {};
+const ROLE_LABEL_OVERRIDES = {
+    "ai-engineer": "AI Engineer", "ai-edge-engineer": "AI Edge Engineer",
+    "devops-engineer": "DevOps Engineer", "k-12-educator": "K-12 Educator",
+    "ip-admin": "Information Protection Admin", "identity-access-admin": "Identity & Access Admin",
+    "higher-ed-educator": "Higher-Ed Educator", "it-professional": "IT Professional",
+};
+function roleLabel(slug) {
+    if (ROLE_LABEL_OVERRIDES[slug]) return ROLE_LABEL_OVERRIDES[slug];
+    return slug.split("-").map(w => {
+        if (w === "ai") return "AI"; if (w === "it") return "IT"; if (w === "hr") return "HR";
+        return w.charAt(0).toUpperCase() + w.slice(1);
+    }).join(" ");
+}
+
+const EXT_FILE = "external_coverage.json";
+
+let DATA = null, EXT = null, clusterByLabel = {};
+let topicRoleCounts = {};   // topic label -> {roleSlug: moduleCount}
+let roleTopics = {};        // roleSlug -> [{label, count}] sorted desc
+let topicAreaCounts = {};   // topic label -> {areaName: moduleCount}
+let areaTopics = {};        // areaName -> [{label, count}] sorted desc
+let activeTab = "gaps";
 
 async function init() {
     DATA = await fetch(DATA_FILE).then(r => { if (!r.ok) throw new Error(DATA_FILE + " " + r.status); return r.json(); });
+    EXT = await fetch(EXT_FILE).then(r => r.ok ? r.json() : null).catch(() => null);
     DATA.topics.forEach(t => clusterByLabel[t.label] = t);
-    renderHeadline();
+    buildFacetIndexes();
     renderVocabGroups();
-    renderDomainGroups();
+    renderDomainGroups(false);
+    renderRoleGroups();
+    renderAreaGroups();
+    renderSources();
     renderLegend();
+    wireTabs();
+    wireControls();
+    const want = location.hash.replace("#", "");
+    switchTab(["gaps", "topics", "roles", "areas", "sources"].includes(want) ? want : "gaps");
+}
+
+function countModulesWhere(pred) {
+    return Object.values(DATA.modules).filter(pred).length;
+}
+
+function moduleRoles(sid) {
+    const mod = DATA.modules[sid];
+    return (mod && mod.roles && mod.roles.length) ? mod.roles : ["(untagged)"];
+}
+function moduleArea(sid) {
+    const mod = DATA.modules[sid];
+    return (mod && mod.area) ? mod.area : "(unassigned)";
+}
+
+function buildFacetIndexes() {
+    const roleAcc = {}, areaAcc = {}; // facet value -> {label: count}
+    DATA.topics.forEach(t => {
+        const rc = {}, ac = {};
+        t.provenance.forEach(p => {
+            moduleRoles(p.sid).forEach(r => rc[r] = (rc[r] || 0) + 1);
+            const a = moduleArea(p.sid);
+            ac[a] = (ac[a] || 0) + 1;
+        });
+        topicRoleCounts[t.label] = rc;
+        topicAreaCounts[t.label] = ac;
+        Object.entries(rc).forEach(([r, n]) => (roleAcc[r] || (roleAcc[r] = {}))[t.label] = n);
+        Object.entries(ac).forEach(([a, n]) => (areaAcc[a] || (areaAcc[a] = {}))[t.label] = n);
+    });
+    const toSorted = acc => Object.fromEntries(Object.entries(acc).map(([k, m]) => [k,
+        Object.entries(m).map(([label, count]) => ({ label, count }))
+            .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label))]));
+    roleTopics = toSorted(roleAcc);
+    areaTopics = toSorted(areaAcc);
 }
 
 function allTerms() {
     return Object.values(DATA.competitors).flat();
 }
 
+/* ---------- tabs & headline ---------- */
+
+function wireTabs() {
+    document.querySelectorAll("#tabs button").forEach(b =>
+        b.addEventListener("click", () => switchTab(b.dataset.tab)));
+}
+
+function switchTab(tab) {
+    activeTab = tab;
+    location.hash = tab;
+    document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
+    document.querySelectorAll(".tab-pane").forEach(p => p.classList.toggle("hidden", p.id !== "pane-" + tab));
+    renderHeadline();
+}
+
 function renderHeadline() {
-    const counts = { missing: 0, thin: 0, partial: 0, covered: 0 };
-    allTerms().forEach(r => counts[sev(r.ms_module_coverage).key]++);
-    const total = allTerms().length;
-    document.getElementById("headline").innerHTML =
-        SEVERITY.map(s =>
+    const el = document.getElementById("headline");
+    const m = DATA.meta;
+    if (activeTab === "gaps") {
+        const counts = { missing: 0, thin: 0, partial: 0, covered: 0 };
+        allTerms().forEach(r => counts[sev(r.ms_module_coverage).key]++);
+        const total = allTerms().length;
+        el.innerHTML = SEVERITY.map(s =>
             `<div class="sev-chip"><span class="dot" style="background:${s.color}"></span><b>${counts[s.key]}</b><span>${s.label.toLowerCase()}<br>${s.desc}</span></div>`
         ).join("") +
-        `<div class="lede">Of <b style="color:white">${total}</b> field-vocabulary terms tested against the
-         ${DATA.meta.n_modules.toLocaleString()}-module catalogue, <b style="color:white">${counts.missing + counts.thin}</b>
-         are missing or thin — the candidate gaps. Open a row to audit before trusting it.</div>`;
+        `<div class="lede">Corpus-wide: of <b style="color:white">${total}</b> field-vocabulary terms tested against the
+         ${m.n_modules.toLocaleString()}-module catalogue, <b style="color:white">${counts.missing + counts.thin}</b>
+         are missing or thin. Below, the same terms are re-scored inside each solution area —
+         open an area to see where its specific gaps are.</div>`;
+    } else if (activeTab === "topics") {
+        const thin = DATA.topics.filter(t => t.module_count <= THIN_MAX).length;
+        const chips = [
+            [m.n_clusters.toLocaleString(), "topic clusters"],
+            [m.n_mentions.toLocaleString(), "extracted mentions"],
+            [m.n_modules.toLocaleString(), "source modules"],
+            [thin.toLocaleString(), `thin topics (≤ ${THIN_MAX} modules)`],
+        ];
+        el.innerHTML = chips.map(([b, s]) => `<div class="sev-chip"><b>${b}</b><span>${s}</span></div>`).join("") +
+        `<div class="lede">The complete extracted topic inventory with exact provenance — every topic
+         lists all of its source modules, none sampled.</div>`;
+    } else if (activeTab === "roles") {
+        const chips = [
+            [m.n_roles, "official ASN roles"],
+            [m.n_modules_with_roles.toLocaleString(), "modules with role tags"],
+            [countModulesWhere(mod => !mod.roles || !mod.roles.length).toLocaleString(),
+             "mentioned modules untagged (newer than catalog snapshot)"],
+        ];
+        el.innerHTML = chips.map(([b, s]) => `<div class="sev-chip"><b>${b}</b><span>${s}</span></div>`).join("") +
+        `<div class="lede">Role tags come from the ASN catalog metadata itself
+         (${esc(shortPath(m.catalog_source))}) — Microsoft's own taxonomy, joined per module. We display it;
+         we don't redefine it.</div>`;
+    } else if (activeTab === "areas") {
+        const chips = [
+            [m.n_areas, "published solution areas"],
+            [m.n_modules_with_area.toLocaleString(), "modules with an area"],
+            [countModulesWhere(mod => !mod.area).toLocaleString(), "mentioned modules unassigned"],
+        ];
+        el.innerHTML = chips.map(([b, s]) => `<div class="sev-chip"><b>${b}</b><span>${s}</span></div>`).join("") +
+        `<div class="lede">Solution areas come from Microsoft's published themes
+         (${esc(shortPath(m.themes_source))}, one area per learning object), joined per module by source_id.
+         We display them; we don't redefine them.</div>`;
+    } else {
+        if (!EXT) { el.innerHTML = `<div class="lede">external_coverage.json not found — run
+            build_external_coverage.py and make data-coverage.</div>`; return; }
+        const e = EXT.meta;
+        const chips = [
+            [e.n_sources, "external sources"],
+            [e.n_terms.toLocaleString(), "vocabulary terms matched"],
+            [e.n_ms_clusters.toLocaleString(), "MS topic clusters tested against"],
+        ];
+        el.innerHTML = chips.map(([b, s]) => `<div class="sev-chip"><b>${b}</b><span>${s}</span></div>`).join("") +
+        `<div class="lede">Each source carries its capture provenance — who pulled it, how, and whether
+         it's exact or directional. Pluralsight is the high-fidelity comparison (full site metadata,
+         Kevin Wang's 2026-05-19 scrape).</div>`;
+    }
 }
 
-function sevSummaryChips(rows) {
-    const counts = { missing: 0, thin: 0, partial: 0, covered: 0 };
-    rows.forEach(r => counts[sev(r.ms_module_coverage).key]++);
-    return SEVERITY
-        .filter(s => counts[s.key])
-        .map(s => `<span style="background:${s.color}">${counts[s.key]} ${s.key}</span>`)
-        .join("");
-}
+/* ---------- shared cluster drill-down with exhaustive provenance ---------- */
 
-function renderVocabGroups() {
-    const root = document.getElementById("vocab-groups");
-    root.innerHTML = Object.entries(DATA.competitors).map(([vocab, rows]) => {
-        const [title, sub] = VOCAB_TITLES[vocab] || [vocab, ""];
-        const sorted = [...rows].sort((a, b) => a.ms_module_coverage - b.ms_module_coverage);
-        const max = Math.max(...rows.map(r => r.ms_module_coverage), 1);
-        return `<details class="vocab" open>
-            <summary><span class="tri">▶</span><h3>${esc(title)}</h3><div class="sev-mini">${sevSummaryChips(rows)}</div>
-                <div class="v-sub">${esc(sub)}</div></summary>
-            ${sorted.map(r => termRow(r, max)).join("")}
-        </details>`;
-    }).join("");
-    wireClusterBodies(root);
-}
-
-function termRow(r, max) {
-    const s = sev(r.ms_module_coverage);
-    const pct = Math.max(100 * r.ms_module_coverage / max, 1);
-    const inner = r.matches.length
-        ? r.matches.map(m => clusterDetails(m.topic, `sim ${m.sim}`)).join("")
-        : `<div class="none">No extracted topic matches at cos ≥ ${DATA.meta.competitor_match_sim}
-           (best similarity anywhere: ${r.best_sim}). Either a true catalogue gap or a vocabulary mismatch — judge by the term.</div>`;
-    return `<details class="term">
-        <summary><span class="tri">▶</span><span class="badge ${s.key}">${s.label}</span>
-            <span class="term-name">${esc(r.term)}</span>
-            <span class="term-bar"><i style="width:${pct}%;background:${s.color}"></i></span>
-            <span class="term-count">${r.ms_module_coverage.toLocaleString()} modules</span></summary>
-        <div class="matches">${inner}</div>
-    </details>`;
-}
-
-function clusterDetails(label, extraMeta) {
+function clusterDetails(label, extraMeta, filterRole, filterArea) {
     const t = clusterByLabel[label];
     if (!t) return "";
-    return `<details class="cluster" data-label="${esc(label)}">
+    const filters = (filterRole ? ` data-role="${esc(filterRole)}"` : "")
+        + (filterArea ? ` data-area="${esc(filterArea)}"` : "");
+    return `<details class="cluster" data-label="${esc(label)}"${filters}>
         <summary><span class="tri">▶</span><span class="c-dot" style="background:${DOMAIN_COLORS[t.domain] || "#94a3b8"}"></span>
             <span class="c-label">${esc(t.label)}</span>
             <span class="c-meta">${t.module_count} modules · ${esc(t.domain)}${extraMeta ? " · " + esc(extraMeta) : ""}</span></summary>
@@ -226,7 +424,7 @@ function clusterDetails(label, extraMeta) {
     </details>`;
 }
 
-// Example modules render lazily on first open (keeps initial DOM small).
+// Full provenance renders lazily on first open (keeps initial DOM small).
 function wireClusterBodies(root) {
     root.querySelectorAll("details.cluster").forEach(d => {
         d.addEventListener("toggle", () => {
@@ -234,38 +432,412 @@ function wireClusterBodies(root) {
             const body = d.querySelector(".c-body");
             if (!body || !body.dataset.pending) return;
             delete body.dataset.pending;
-            const t = clusterByLabel[d.dataset.label];
-            const members = t.members.length > 1
-                ? `<div class="c-members"><b>merged names:</b> ${t.members.map(esc).join(" · ")}</div>` : "";
-            body.innerHTML = members + (t.example_modules || []).map(ex =>
-                `<div class="ex-row"><span class="ex-mod">${esc(ex.module)}</span><span class="ex-src">${esc(ex.source_id)}</span>
-                 <div class="ex-quote">“${esc(ex.evidence)}”</div></div>`).join("") +
-                (t.module_count > (t.example_modules || []).length
-                    ? `<div style="color:#94a3b8">… and ${t.module_count - t.example_modules.length} more modules.</div>` : "");
+            body.innerHTML = clusterBody(clusterByLabel[d.dataset.label],
+                d.dataset.role || null, d.dataset.area || null);
         });
     });
 }
 
-function renderDomainGroups() {
-    const THIN_MAX = 4;
-    const thin = DATA.topics.filter(t => t.module_count <= THIN_MAX);
+function facetChips(counts, labelFn) {
+    return Object.entries(counts).sort((a, b) => b[1] - a[1])
+        .map(([k, n]) => `<span class="role-chip">${esc(labelFn(k))} × ${n}</span>`).join(" ");
+}
+
+function clusterBody(t, filterRole, filterArea) {
+    const members = t.members.length > 1
+        ? `<div class="c-members"><b>merged names:</b> ${t.members.map(esc).join(" · ")}</div>` : "";
+    const areaChips = facetChips(topicAreaCounts[t.label] || {}, a => a);
+    const areasLine = areaChips ? `<div class="c-roles"><b>solution areas across its modules:</b> ${areaChips}</div>` : "";
+    const roleChips = facetChips(topicRoleCounts[t.label] || {}, roleLabel);
+    const rolesLine = roleChips ? `<div class="c-roles"><b>ASN roles across its modules:</b> ${roleChips}</div>` : "";
+
+    let prov = t.provenance;
+    let head;
+    if (filterRole) {
+        prov = prov.filter(p => moduleRoles(p.sid).includes(filterRole));
+        head = `<div class="mod-head"><b>${prov.length}</b> of ${t.module_count} modules tagged
+                <b>${esc(roleLabel(filterRole))}</b> — full provenance:</div>`;
+    } else if (filterArea) {
+        prov = prov.filter(p => moduleArea(p.sid) === filterArea);
+        head = `<div class="mod-head"><b>${prov.length}</b> of ${t.module_count} modules in
+                <b>${esc(filterArea)}</b> — full provenance:</div>`;
+    } else {
+        head = `<div class="mod-head"><b>${prov.length}</b> source modules — full provenance:</div>`;
+    }
+    const rows = prov.length
+        ? prov.map(p => moduleRow(t, p)).join("")
+        : `<div class="none">None of this topic's ${t.module_count} modules fall in this slice —
+           the match exists corpus-wide, not here.</div>`;
+    return members + areasLine + rolesLine + head + rows;
+}
+
+function moduleRow(t, p) {
+    const mod = DATA.modules[p.sid] || { name: p.sid, url: "", roles: [], area: "" };
+    const name = mod.url
+        ? `<a class="ex-mod" href="${esc(mod.url)}" target="_blank" rel="noopener">${esc(mod.name)}</a>`
+        : `<span class="ex-mod">${esc(mod.name)}</span>`;
+    const via = p.via.some(v => v !== t.label)
+        ? `<span class="ex-via">via “${p.via.map(esc).join("” · “")}”</span>` : "";
+    const area = mod.area ? `area: ${esc(mod.area)} · ` : "area: — · ";
+    const roles = mod.roles && mod.roles.length
+        ? `roles: ${mod.roles.map(r => esc(roleLabel(r))).join(" · ")}`
+        : `roles: — (module newer than catalog snapshot)`;
+    return `<div class="ex-row">${name}<span class="ex-src">${esc(p.sid)}</span>${via}
+        <div class="ex-roles">${area}${roles}</div><div class="ex-quote">“${esc(p.evidence)}”</div></div>`;
+}
+
+/* ---------- tab 1: gaps vs the field ---------- */
+
+// Area-scoped coverage for a field term: sum of the term's matched clusters'
+// module counts inside one solution area (same sum-over-matches methodology
+// as the corpus-wide ms_module_coverage).
+function termAreaCoverage(r, area) {
+    return r.matches.reduce((s, m) => s + ((topicAreaCounts[m.topic] || {})[area] || 0), 0);
+}
+
+function renderVocabGroups() {
+    const root = document.getElementById("vocab-groups");
+    const areas = [...DATA.solution_areas];
+    const unassigned = countModulesWhere(mod => !mod.area);
+    if (unassigned > 0) areas.push({ name: "(unassigned)", module_count: unassigned });
+
+    root.innerHTML = areas.map(a => {
+        const covs = allTerms().map(r => termAreaCoverage(r, a.name));
+        const chips = SEVERITY
+            .map(s => [s, covs.filter(c => sev(c).key === s.key).length])
+            .filter(([, n]) => n)
+            .map(([s, n]) => `<span style="background:${s.color}">${n} ${s.key}</span>`).join("");
+        return `<details class="group gap-area" data-area="${esc(a.name)}">
+            <summary><span class="tri">▶</span><h3>${esc(a.name)}</h3>
+                <div class="sev-mini">${chips}</div>
+                <span class="g-meta">${a.module_count.toLocaleString()} modules</span></summary>
+            <div class="ga-body" data-pending="1"></div>
+        </details>`;
+    }).join("");
+
+    // each area body (vocabularies -> terms) renders lazily on first open
+    root.querySelectorAll("details.gap-area").forEach(d => {
+        d.addEventListener("toggle", () => {
+            if (!d.open) return;
+            const body = d.querySelector(".ga-body");
+            if (!body || !body.dataset.pending) return;
+            delete body.dataset.pending;
+            body.innerHTML = areaGapBody(d.dataset.area);
+            wireClusterBodies(body);
+        });
+    });
+}
+
+function areaGapBody(area) {
+    return Object.entries(DATA.competitors).map(([vocab, rows]) => {
+        const [title, sub] = VOCAB_TITLES[vocab] || [vocab, ""];
+        const scored = rows.map(r => ({ r, cov: termAreaCoverage(r, area) }))
+            .sort((a, b) => a.cov - b.cov || a.r.ms_module_coverage - b.r.ms_module_coverage);
+        const max = Math.max(...scored.map(x => x.cov), 1);
+        const chips = SEVERITY
+            .map(s => [s, scored.filter(x => sev(x.cov).key === s.key).length])
+            .filter(([, n]) => n)
+            .map(([s, n]) => `<span style="background:${s.color}">${n} ${s.key}</span>`).join("");
+        return `<details class="vocab" open>
+            <summary><span class="tri">▶</span><h4>${esc(title)}</h4><div class="sev-mini">${chips}</div>
+                <div class="v-sub">${esc(sub)}</div></summary>
+            ${scored.map(x => termRow(x.r, x.cov, max, vocab, area)).join("")}
+        </details>`;
+    }).join("");
+}
+
+function termRow(r, cov, max, vocab, area) {
+    const s = sev(cov);
+    const pct = Math.max(100 * cov / max, 1);
+    const [title] = VOCAB_TITLES[vocab] || [vocab, ""];
+    const provLine = `<div class="prov-line"><b>term provenance:</b> ${esc(title)} —
+        ${esc(DATA.meta.competitor_vocab_source)}. Matched ${r.matches.length} extracted
+        topic${r.matches.length === 1 ? "" : "s"} at cos ≥ ${DATA.meta.competitor_match_sim}
+        (exhaustive, no cap); coverage scored on <b>${esc(area)}</b> modules only.</div>`;
+    const matches = r.matches
+        .map(m => ({ m, n: (topicAreaCounts[m.topic] || {})[area] || 0 }))
+        .sort((a, b) => b.n - a.n || b.m.sim - a.m.sim);
+    const inner = matches.length
+        ? provLine + matches.map(({ m, n }) =>
+            clusterDetails(m.topic, `${n} in this area · sim ${m.sim}`, null, area)).join("")
+        : provLine + `<div class="none">No extracted topic matches at cos ≥ ${DATA.meta.competitor_match_sim}
+           (best similarity anywhere: ${r.best_sim}). Either a true catalogue gap or a vocabulary mismatch — judge by the term.</div>`;
+    return `<details class="term">
+        <summary><span class="tri">▶</span><span class="badge ${s.key}">${s.label}</span>
+            <span class="term-name">${esc(r.term)}</span>
+            <span class="term-bar"><i style="width:${pct}%;background:${s.color}"></i></span>
+            <span class="term-count">${cov.toLocaleString()} in area · ${r.ms_module_coverage.toLocaleString()} corpus</span></summary>
+        <div class="matches">${inner}</div>
+    </details>`;
+}
+
+/* ---------- tab 2: all catalogue topics by domain ---------- */
+
+function renderDomainGroups(thinOnly) {
+    const topics = thinOnly ? DATA.topics.filter(t => t.module_count <= THIN_MAX) : DATA.topics;
     const byDomain = {};
-    thin.forEach(t => (byDomain[t.domain] || (byDomain[t.domain] = [])).push(t));
-    const totalByDomain = {};
-    DATA.topics.forEach(t => totalByDomain[t.domain] = (totalByDomain[t.domain] || 0) + 1);
+    topics.forEach(t => (byDomain[t.domain] || (byDomain[t.domain] = [])).push(t));
+
+    document.getElementById("topics-note").textContent =
+        `${topics.length.toLocaleString()} topics shown across ${Object.keys(byDomain).length} domains`;
 
     const root = document.getElementById("domain-groups");
     root.innerHTML = Object.entries(byDomain)
         .sort((a, b) => b[1].length - a[1].length)
-        .map(([dom, ts]) => `<details class="domain">
+        .map(([dom, ts]) => {
+            const thin = ts.filter(t => t.module_count <= THIN_MAX).length;
+            const mods = ts.reduce((a, t) => a + t.module_count, 0);
+            return `<details class="group">
             <summary><span class="tri">▶</span><span class="c-dot" style="background:${DOMAIN_COLORS[dom] || "#94a3b8"}"></span>
-                <span class="d-name">${esc(dom)}</span>
-                <span class="d-meta">${ts.length} thin of ${totalByDomain[dom]} topics</span></summary>
-            ${ts.sort((a, b) => a.module_count - b.module_count || a.label.localeCompare(b.label))
-                .map(t => clusterDetails(t.label, `${t.mention_count} mentions`)).join("")}
-        </details>`).join("");
+                <h3>${esc(dom)}</h3>
+                <span class="g-meta">${ts.length.toLocaleString()} topics · ${thin} thin · ${mods.toLocaleString()} module-mentions</span></summary>
+            ${ts.sort((a, b) => b.module_count - a.module_count || a.label.localeCompare(b.label))
+                .map(t => clusterDetails(t.label,
+                    `${t.mention_count} mentions${t.module_count <= THIN_MAX ? " · THIN" : ""}`)).join("")}
+        </details>`;
+        }).join("");
     wireClusterBodies(root);
 }
+
+/* ---------- tab 3: ASN roles ---------- */
+
+function renderRoleGroups() {
+    const root = document.getElementById("role-groups");
+    const rows = [...DATA.roles];
+    const untaggedCount = countModulesWhere(mod => !mod.roles || !mod.roles.length);
+    if (untaggedCount > 0) rows.push({ slug: "(untagged)", module_count: untaggedCount });
+    const max = Math.max(...rows.map(r => r.module_count), 1);
+
+    root.innerHTML = rows.map(r => {
+        const topics = roleTopics[r.slug] || [];
+        const thin = topics.filter(x => (clusterByLabel[x.label] || {}).module_count <= THIN_MAX).length;
+        return `<details class="group role" data-role="${esc(r.slug)}">
+            <summary><span class="tri">▶</span>
+                <h3>${esc(roleLabel(r.slug))}</h3>
+                <span class="g-bar"><i style="width:${Math.max(100 * r.module_count / max, 1)}%"></i></span>
+                <span class="g-meta">${r.module_count.toLocaleString()} modules · ${topics.length.toLocaleString()} topics · ${thin} globally-thin</span></summary>
+            <div class="role-body" data-pending="1"></div>
+        </details>`;
+    }).join("");
+
+    // role bodies render lazily — each can hold hundreds of topic rows
+    root.querySelectorAll("details.role").forEach(d => {
+        d.addEventListener("toggle", () => {
+            if (!d.open) return;
+            const body = d.querySelector(".role-body");
+            if (!body || !body.dataset.pending) return;
+            delete body.dataset.pending;
+            const slug = d.dataset.role;
+            const topics = roleTopics[slug] || [];
+            body.innerHTML = `<div class="matches">` + topics.map(x =>
+                clusterDetails(x.label, `${x.count} of this role's modules`, slug)).join("") + `</div>`;
+            wireClusterBodies(body);
+        });
+    });
+}
+
+/* ---------- tab 4: solution areas ---------- */
+
+function renderAreaGroups() {
+    const root = document.getElementById("area-groups");
+    const rows = [...DATA.solution_areas];
+    const unassigned = countModulesWhere(mod => !mod.area);
+    if (unassigned > 0) rows.push({ name: "(unassigned)", module_count: unassigned });
+    const max = Math.max(...rows.map(r => r.module_count), 1);
+
+    root.innerHTML = rows.map(r => {
+        const topics = areaTopics[r.name] || [];
+        const thin = topics.filter(x => (clusterByLabel[x.label] || {}).module_count <= THIN_MAX).length;
+        return `<details class="group area" data-area="${esc(r.name)}">
+            <summary><span class="tri">▶</span>
+                <h3>${esc(r.name)}</h3>
+                <span class="g-bar"><i style="width:${Math.max(100 * r.module_count / max, 1)}%"></i></span>
+                <span class="g-meta">${r.module_count.toLocaleString()} modules · ${topics.length.toLocaleString()} topics · ${thin} globally-thin</span></summary>
+            <div class="area-body" data-pending="1"></div>
+        </details>`;
+    }).join("");
+
+    // area bodies render lazily — each can hold hundreds of topic rows
+    root.querySelectorAll("details.area").forEach(d => {
+        d.addEventListener("toggle", () => {
+            if (!d.open) return;
+            const body = d.querySelector(".area-body");
+            if (!body || !body.dataset.pending) return;
+            delete body.dataset.pending;
+            const name = d.dataset.area;
+            const topics = areaTopics[name] || [];
+            body.innerHTML = `<div class="matches">` + topics.map(x =>
+                clusterDetails(x.label, `${x.count} of this area's modules`, null, name)).join("") + `</div>`;
+            wireClusterBodies(body);
+        });
+    });
+}
+
+/* ---------- tab 5: external sources with capture provenance ---------- */
+
+function exactnessClass(s) {
+    if (/^exact/.test(s)) return "exact";
+    if (/^directional/.test(s)) return "directional";
+    if (/^analytical/.test(s)) return "analytical";
+    return "derived";
+}
+
+function renderSources() {
+    const root = document.getElementById("source-groups");
+    if (!EXT) { root.innerHTML = ""; return; }
+    document.getElementById("sources-note").textContent =
+        `${EXT.meta.n_terms.toLocaleString()} terms across ${EXT.meta.n_sources} sources · matched at cos ≥ ${EXT.meta.match_sim}`;
+
+    root.innerHTML = EXT.sources.map(src => {
+        const nTerms = src.groups.reduce((a, g) => a + g.terms.length, 0);
+        const ex = src.capture.exactness;
+        return `<details class="group ext-source" data-src="${esc(src.id)}">
+            <summary><span class="tri">▶</span><h3>${esc(src.name)}</h3>
+                <span class="exact-chip ${exactnessClass(ex)}">${esc(ex.split(" ")[0].toUpperCase())}</span>
+                <span class="g-meta">${nTerms.toLocaleString()} terms · ${src.groups.length} group${src.groups.length === 1 ? "" : "s"}</span></summary>
+            <div class="src-body" data-pending="1"></div>
+        </details>`;
+    }).join("");
+
+    root.querySelectorAll("details.ext-source").forEach(d => {
+        d.addEventListener("toggle", () => {
+            if (!d.open) return;
+            const body = d.querySelector(".src-body");
+            if (!body || !body.dataset.pending) return;
+            delete body.dataset.pending;
+            const src = EXT.sources.find(s => s.id === d.dataset.src);
+            body.innerHTML = sourceBody(src);
+            wireClusterBodies(body);
+            wireExtTerms(body, src);
+        });
+    });
+}
+
+function sourceBody(src) {
+    const c = src.capture;
+    const prov = `<div class="prov-block">
+        <b>capture provenance:</b> ${esc(c.method)}.<br>
+        <b>captured:</b> ${esc(c.date)} by ${esc(c.by)} · <b>fidelity:</b> ${esc(c.exactness)} ·
+        <b>organizes by:</b> ${esc(src.organizes_by)}<br>
+        <b>where it lives:</b> ${esc(c.link)}</div>`;
+    return prov + src.groups.map(g => {
+        const sorted = [...g.terms].sort((a, b) => a.ms_module_coverage - b.ms_module_coverage);
+        const max = Math.max(...g.terms.map(t => t.ms_module_coverage), 1);
+        const counts = SEVERITY
+            .map(s => [s, g.terms.filter(t => sev(t.ms_module_coverage).key === s.key).length])
+            .filter(([, n]) => n)
+            .map(([s, n]) => `<span style="background:${s.color}">${n} ${s.key}</span>`).join("");
+        return `<details class="vocab"${g.terms.length <= 40 ? " open" : ""}>
+            <summary><span class="tri">▶</span><h4>${esc(g.label)}</h4>
+                <div class="sev-mini">${counts}</div>
+                <div class="v-sub">${esc(g.note)} ${g.terms.length} terms, sorted gaps-first by MS module coverage.</div></summary>
+            ${sorted.map(t => extTermRow(t, max, g)).join("")}
+        </details>`;
+    }).join("");
+}
+
+function extTermRow(t, max, g) {
+    const s = sev(t.ms_module_coverage);
+    const pct = Math.max(100 * t.ms_module_coverage / max, 1);
+    const d = t.detail || {};
+    const detail = d.n_items != null ? `<span class="t-detail">${d.n_items.toLocaleString()} ${esc(d.unit || "")}</span>` : "";
+    return `<details class="term ext-term" data-term="${esc(t.term)}" data-group="${esc(g.id)}">
+        <summary><span class="tri">▶</span><span class="badge ${s.key}">${s.label}</span>
+            <span class="term-name">${esc(t.term)}</span>${detail}
+            <span class="term-bar"><i style="width:${pct}%;background:${s.color}"></i></span>
+            <span class="term-count">${t.ms_module_coverage.toLocaleString()} MS modules</span></summary>
+        <div class="matches" data-pending="1"></div>
+    </details>`;
+}
+
+// Term bodies render lazily: per-area rescoring chips, matched MS topics,
+// and (for derived Pluralsight topics) the source courses with surface forms.
+function wireExtTerms(body, src) {
+    body.querySelectorAll("details.ext-term").forEach(dd => {
+        dd.addEventListener("toggle", () => {
+            if (!dd.open) return;
+            const m = dd.querySelector(".matches");
+            if (!m || !m.dataset.pending) return;
+            delete m.dataset.pending;
+            const g = src.groups.find(x => x.id === dd.dataset.group);
+            const t = g.terms.find(x => x.term === dd.dataset.term);
+            m.innerHTML = extTermBody(t, src, g);
+            wireClusterBodies(m);
+        });
+    });
+}
+
+function extTermBody(t, src, g) {
+    const d = t.detail || {};
+    const fidelity = g && g.kind === "derived"
+        ? "LLM-derived (Sonnet batch over course titles)"
+        : src.capture.exactness;
+    let html = `<div class="prov-line"><b>term provenance:</b> ${esc(src.name)} — ${esc(fidelity)},
+        from the capture of ${esc(src.capture.date)} by ${esc(src.capture.by)}.`;
+    if (d.url) html += ` <a href="${esc(d.url)}" target="_blank" rel="noopener">source page ↗</a>`;
+    if (d.members && d.members.length > 1) html += `<br><b>merged names:</b> ${d.members.map(esc).join(" · ")}`;
+    html += `</div>`;
+
+    // per-solution-area rescoring of this term's MS coverage
+    if (t.matches.length) {
+        const byArea = {};
+        t.matches.forEach(mm => {
+            Object.entries(topicAreaCounts[mm.topic] || {}).forEach(([a, n]) => byArea[a] = (byArea[a] || 0) + n);
+        });
+        const chips = Object.entries(byArea).sort((a, b) => b[1] - a[1])
+            .map(([a, n]) => `<span class="role-chip">${esc(a)} × ${n}</span>`).join(" ");
+        if (chips) html += `<div class="c-roles" style="padding:2px 0 6px"><b>MS coverage by solution area:</b> ${chips}</div>`;
+    }
+
+    html += t.matches.length
+        ? t.matches.map(mm => clusterDetails(mm.topic, `sim ${mm.sim}`)).join("")
+        : `<div class="none">No MS topic cluster matches at cos ≥ ${EXT.meta.match_sim}
+           (best similarity anywhere: ${t.best_sim}). Either MS Learn doesn't teach it, or the name is too
+           broad/credential-shaped to embed near specific topics — judge by the term.</div>`;
+
+    if (d.courses && d.courses.length) {
+        html += `<div class="mod-head" style="margin-top:10px"><b>${d.courses.length}</b> Pluralsight source courses for this derived topic:</div>` +
+            d.courses.map(c => `<div class="ps-course">
+                ${c.url ? `<a href="${esc(c.url)}" target="_blank" rel="noopener">${esc(c.title)}</a>` : esc(c.title)}
+                ${c.via && c.via.length ? `<span class="via">via “${c.via.map(esc).join("” · “")}”</span>` : ""}</div>`).join("");
+    }
+    return html;
+}
+
+/* ---------- expand / collapse controls ---------- */
+
+function wireControls() {
+    document.querySelectorAll("[data-expand]").forEach(b =>
+        b.addEventListener("click", () => expandAll(b.dataset.expand, false)));
+    document.querySelectorAll("[data-expand-deep]").forEach(b =>
+        b.addEventListener("click", () => expandAll(b.dataset.expandDeep, true)));
+    document.querySelectorAll("[data-collapse]").forEach(b =>
+        b.addEventListener("click", () =>
+            document.querySelectorAll(b.dataset.collapse + " details[open]").forEach(d => d.open = false)));
+    document.getElementById("thin-only").addEventListener("change", e =>
+        renderDomainGroups(e.target.checked));
+}
+
+// Deep expand renders thousands of provenance rows — chunked so the UI
+// breathes. Re-queries every pass, because opening a group lazily renders
+// children that weren't in the first snapshot; toggle events fire as async
+// tasks, so allow a few empty grace passes before declaring convergence.
+function expandAll(sel, deep) {
+    let calm = 0;
+    (function step() {
+        const closed = [...document.querySelectorAll(sel + " details:not([open])")]
+            .filter(d => deep || !d.classList.contains("cluster"));
+        if (!closed.length) {
+            if (++calm >= 4) return;
+        } else {
+            calm = 0;
+            closed.slice(0, 60).forEach(d => d.open = true);
+        }
+        setTimeout(step, 0);
+    })();
+}
+
+/* ---------- legend ---------- */
 
 function renderLegend() {
     const m = DATA.meta;
@@ -275,8 +847,16 @@ function renderLegend() {
         `.<br>Coverage counts come from embedding matches (cos ≥ ${m.competitor_match_sim}, ${esc(m.embedding_model)})
          between each vocabulary term and the ${m.n_clusters.toLocaleString()} extracted topic clusters
          (${m.n_mentions.toLocaleString()} skill mentions, Sonnet 4.6 batch extraction, merge cos ≥ ${m.merge_sim}).
-         Vocabularies: ${esc(m.competitor_vocab_source)}. Broad terms aggregate loosely-related clusters —
-         audit the drill-down before quoting a number.`;
+         Vocabularies: ${esc(m.competitor_vocab_source)}.<br>
+         ASN roles: ${esc(m.roles_source)} — catalog snapshot ${esc(shortPath(m.catalog_source))},
+         covering ${m.n_modules_with_roles.toLocaleString()} of ${m.n_modules.toLocaleString()} corpus modules.<br>
+         Solution areas: ${esc(m.areas_note)} — covering ${m.n_modules_with_area.toLocaleString()} of
+         ${m.n_modules.toLocaleString()} corpus modules.
+         Broad terms aggregate loosely-related clusters — audit the drill-down before quoting a number.`;
+}
+
+function shortPath(p) {
+    return (p || "").split("/").slice(-1)[0];
 }
 
 function esc(s) {
