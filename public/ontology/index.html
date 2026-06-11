@@ -97,8 +97,8 @@
 
 <div class="top-bar">
     <div class="crumbs"><a href="/">ASN Content Freshness</a> <span>›</span> <span>Content Ontology</span></div>
-    <h1>Content Ontology — Roles → Jobs to be Done → Topics</h1>
-    <div class="subtitle">A content-derived ontology over the full MS Learn module corpus, linking three layers: derived <b>roles</b> (personas) → the <b>jobs to be done</b> they pursue → the <b>topics</b> those jobs draw on. Topics come from the v3 topic extractor (Sonnet 4.6, full-corpus batch) and are joined to jobs by semantic similarity; near-duplicate topics and jobs are merged into shared hubs, and nodes below the module-coverage floor are hidden to keep the graph readable. Click any node to trace its full path. See also the <a href="/ontology/gap-explorer/" style="color:#7dd3fc">gap explorer</a> and the <a href="/ontology/gaps/" style="color:#7dd3fc">coverage map</a>.</div>
+    <h1>Content Ontology — Roles → Topics</h1>
+    <div class="subtitle">A content-derived ontology over the full MS Learn module corpus, linking derived <b>roles</b> (personas) directly to the <b>topics</b> they draw on (the intermediate jobs-to-be-done layer is collapsed into the role→topic edges). Topics come from the v3 topic extractor (Sonnet 4.6, full-corpus batch); near-duplicate topics are merged into shared hubs, and nodes below the module-coverage floor are hidden to keep the graph readable. Click any node to isolate its connections. See also the <a href="/ontology/gap-explorer/" style="color:#7dd3fc">gap explorer</a> and the <a href="/ontology/gaps/" style="color:#7dd3fc">coverage map</a>.</div>
     <div class="agg-stats" id="agg-stats"></div>
 </div>
 
@@ -107,7 +107,7 @@
 </div>
 
 <div class="controls">
-    <label><input type="checkbox" id="toggle-weak" checked> show weak job↔topic links</label>
+    <label><input type="checkbox" id="toggle-weak" checked> show weak role↔topic links</label>
     <button id="reset-btn">Reset highlight</button>
     <span class="hint">Drag nodes to rearrange · drag background to pan · scroll to zoom · click a node to isolate its connections · hover for detail</span>
 </div>
@@ -182,7 +182,7 @@ function computeDomainModel() {
     nodes.forEach(n => { if (n.layer !== "role") dom[n.id] = n.domain || "other"; });
     const roleDoms = {};
     state.graph.links.forEach(l => {
-        if (l.kind === "role-job") {
+        if (l.kind === "role-job" || l.kind === "role-topic") {
             const jd = dom[l.target] || "other";
             (roleDoms[l.source] || (roleDoms[l.source] = [])).push(jd);
         }
@@ -216,7 +216,7 @@ function renderAggStats() {
         `<button class="agg-chip ${cls} toggle ${f[tier] ? "on" : "off"}" data-tier="${tier}" title="Show only / hide ${tier} nodes">${label}</button>`;
     document.getElementById("agg-stats").innerHTML =
         chip("role", "role", `<b>${m.n_roles}</b> roles`) +
-        chip("job", "job", `<b>${m.n_jobs}</b> jobs to be done`) +
+        (m.n_jobs ? chip("job", "job", `<b>${m.n_jobs}</b> jobs to be done`) : "") +
         chip("topic", "topic", `<b>${m.n_topics}</b> topics`) +
         `<span class="agg-chip"><b>${m.n_links}</b> links</span>` +
         `<span style="color:#94a3b8;">click a count to filter · ${(m.n_modules || 20).toLocaleString()} modules · Sonnet 4.6 · topics joined @ cos≥${m.thresholds.strong}${m.floors ? ` · floors r≥${m.floors.min_role_modules}/j≥${m.floors.min_job_modules}/t≥${m.floors.min_topic_modules}` : ""}</span>`;
@@ -236,9 +236,9 @@ function renderLegend() {
     document.getElementById("legend").innerHTML =
         `<span style="font-weight:600;color:#334155;">Roles</span>
          <span><span class="swatch" style="background:${ROLE_COLOR}"></span>persona</span>
-         <span style="font-weight:600;color:#334155;margin-left:8px;">Jobs / Topics by domain:</span>` +
+         <span style="font-weight:600;color:#334155;margin-left:8px;">Topics by domain:</span>` +
         domains.map(d => `<span><span class="swatch" style="background:${DOMAIN_COLORS[d]}"></span>${d}</span>`).join("") +
-        `<span style="margin-left:8px;color:#94a3b8;">— dashed link = weak (0.45–0.65) job↔topic match</span>`;
+        `<span style="margin-left:8px;color:#94a3b8;">— dashed link = weak (0.45–0.65) role↔topic path</span>`;
 }
 
 function render() {
@@ -253,7 +253,7 @@ function render() {
     // nodes that have at least one (weak-aware) link in the FULL graph — drops
     // globally-isolated nodes; computed before the tier filter so single-tier
     // views still show that tier's full connected set.
-    const weakOk = l => state.showWeak || !(l.kind === "job-topic" && l.strength === "weak");
+    const weakOk = l => state.showWeak || l.strength !== "weak";
     const linkedIds = new Set();
     state.graph.links.forEach(l => { if (weakOk(l)) { linkedIds.add(l.source); linkedIds.add(l.target); } });
 

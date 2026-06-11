@@ -146,10 +146,11 @@
 <div class="section tab-pane" id="pane-gaps">
     <h2>Gaps vs the field — by solution area</h2>
     <div class="sec-sub">
-        Top level is Microsoft's published solution areas; inside each, the external vocabularies and
-        their terms, scored on that area's modules only (corpus-wide count kept alongside). Open a term
-        to see its provenance (which vocabulary it comes from and how it was captured) and every
-        extracted topic it matched; open a topic to audit the area's own modules with evidence.
+        Top level is the three current solution areas; inside each, <b>Pluralsight's derived course
+        topics lead</b> (the high-fidelity comparison — full catalog, same extraction method as ours),
+        followed by the curated field vocabularies. Terms are scored on that area's modules only
+        (corpus-wide count kept alongside). Open a term for its provenance and every extracted topic it
+        matched; open a topic to audit the area's own modules with evidence.
     </div>
     <div class="controls">
         <button data-expand="#vocab-groups">Expand all</button>
@@ -247,6 +248,7 @@ const sev = c => SEVERITY.find(s => s.test(c));
 const THIN_MAX = 4; // per-topic "thin" badge threshold inside the catalogue
 
 const VOCAB_TITLES = {
+    pluralsight_topics: ["Pluralsight — derived course topics (high-fidelity comparison)", "Exact catalog scrape (2026-05-19, Kevin Wang) + Sonnet topic extraction over all 6,289 course titles; terms with ≥ 20 Pluralsight courses, sorted gaps-first. Full vocabulary on the Sources tab."],
     datacamp_ai_topics: ["DataCamp — AI topic vocabulary", "Exact (API capture). The strongest external topic vocabulary per the comp research."],
     udemy_goal_labels: ["Udemy — goal labels", "Directional (landing-page read). Outcome-first goals — the front-door framing the research recommends."],
     frontier_no_external_source: ["Microsoft frontier — topics no external taxonomy names", "The ~12% slice ASN must define itself. Low coverage here means the catalogue lags Microsoft's own strategy."],
@@ -281,6 +283,7 @@ async function init() {
     DATA = await fetch(DATA_FILE).then(r => { if (!r.ok) throw new Error(DATA_FILE + " " + r.status); return r.json(); });
     EXT = await fetch(EXT_FILE).then(r => r.ok ? r.json() : null).catch(() => null);
     DATA.topics.forEach(t => clusterByLabel[t.label] = t);
+    injectPluralsightVocab();
     buildFacetIndexes();
     renderVocabGroups();
     renderDomainGroups(false);
@@ -326,6 +329,25 @@ function buildFacetIndexes() {
             .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label))]));
     roleTopics = toSorted(roleAcc);
     areaTopics = toSorted(areaAcc);
+}
+
+// Pluralsight is the high-fidelity comparison — surface its derived course
+// topics (>= 20 PS courses) as the LEAD vocabulary in the gaps tab, not just
+// on the Sources tab. Terms carry their PS-side course count.
+function injectPluralsightVocab() {
+    if (!EXT) return;
+    const ps = EXT.sources.find(s => s.id === "pluralsight");
+    const der = ps && ps.groups.find(g => g.id === "ps_derived_topics");
+    if (!der) return;
+    const terms = der.terms
+        .filter(t => (t.detail || {}).n_items >= 20)
+        .sort((a, b) => b.detail.n_items - a.detail.n_items)
+        .map(t => ({
+            term: t.term, matches: t.matches, best_sim: t.best_sim,
+            ms_module_coverage: t.ms_module_coverage,
+            ps_count: t.detail.n_items,
+        }));
+    if (terms.length) DATA.competitors = Object.assign({ pluralsight_topics: terms }, DATA.competitors);
 }
 
 function allTerms() {
@@ -478,7 +500,9 @@ function moduleRow(t, p) {
         : `<span class="ex-mod">${esc(mod.name)}</span>`;
     const via = p.via.some(v => v !== t.label)
         ? `<span class="ex-via">via “${p.via.map(esc).join("” · “")}”</span>` : "";
-    const area = mod.area ? `area: ${esc(mod.area)} · ` : "area: — · ";
+    const area = mod.area
+        ? `area: ${esc(mod.area)}${mod.theme && mod.theme !== mod.area ? ` (${esc(mod.theme)})` : ""} · `
+        : "area: — · ";
     const roles = mod.roles && mod.roles.length
         ? `roles: ${mod.roles.map(r => esc(roleLabel(r))).join(" · ")}`
         : `roles: — (module newer than catalog snapshot)`;
@@ -562,9 +586,11 @@ function termRow(r, cov, max, vocab, area) {
             clusterDetails(m.topic, `${n} in this area · sim ${m.sim}`, null, area)).join("")
         : provLine + `<div class="none">No extracted topic matches at cos ≥ ${DATA.meta.competitor_match_sim}
            (best similarity anywhere: ${r.best_sim}). Either a true catalogue gap or a vocabulary mismatch — judge by the term.</div>`;
+    const psDetail = r.ps_count != null
+        ? `<span class="t-detail">${r.ps_count.toLocaleString()} PS courses</span>` : "";
     return `<details class="term">
         <summary><span class="tri">▶</span><span class="badge ${s.key}">${s.label}</span>
-            <span class="term-name">${esc(r.term)}</span>
+            <span class="term-name">${esc(r.term)}</span>${psDetail}
             <span class="term-bar"><i style="width:${pct}%;background:${s.color}"></i></span>
             <span class="term-count">${cov.toLocaleString()} in area · ${r.ms_module_coverage.toLocaleString()} corpus</span></summary>
         <div class="matches">${inner}</div>
