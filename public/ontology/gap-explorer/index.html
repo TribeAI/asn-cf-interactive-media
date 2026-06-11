@@ -557,13 +557,13 @@ const AI_BADGE = `<span class="ai-tag" title="AI / ML topic">AI</span>`;
 // clusters, corpus-wide). Sorted by the deficit so the real gaps surface.
 function renderVocabGroups() {
     const root = document.getElementById("vocab-groups");
+    const relGap = r => (r.ps_count > 0) ? (r.ps_count - r.ms_module_coverage) / r.ps_count : 0;
     const ps = (DATA.competitors.pluralsight_topics || [])
-        .map(r => ({ ...r, gap: (r.ps_count || 0) - r.ms_module_coverage }))
         // severity tier first (missing → thin → partial → covered), then the
-        // biggest gap within a tier. Missing rises to the top.
+        // largest RELATIVE gap within a tier (fraction of the field ASN is
+        // missing), then bigger Pluralsight presence. Missing rises to the top.
         .sort((a, b) => SEV_RANK[termSev(a).key] - SEV_RANK[termSev(b).key]
-            || b.gap - a.gap || (b.ps_count || 0) - (a.ps_count || 0));
-    const gapMax = Math.max(...ps.map(r => Math.max(0, r.gap)), 1);
+            || relGap(b) - relGap(a) || (b.ps_count || 0) - (a.ps_count || 0));
 
     const other = Object.entries(DATA.competitors)
         .filter(([v]) => v !== "pluralsight_topics")
@@ -572,10 +572,10 @@ function renderVocabGroups() {
     root.innerHTML =
         `<details class="group" open>
             <summary><span class="tri">▶</span><h3>Pluralsight head-to-head — courses vs ASN modules</h3>
-                <span class="g-meta">${ps.length} topics · gaps first (bar = gap size)</span></summary>
+                <span class="g-meta">${ps.length} topics · gaps first (bar = % of field ASN is missing)</span></summary>
             <div class="hh-head">
-                <span class="hh-spacer"></span><span class="hh-ps">gap (PS − ASN)</span><span class="hh-ms">courses · modules</span></div>
-            ${ps.map(r => headToHeadRow(r, gapMax)).join("")}
+                <span class="hh-spacer"></span><span class="hh-ps">field gap</span><span class="hh-ms">courses · modules</span></div>
+            ${ps.map(r => headToHeadRow(r)).join("")}
         </details>` +
         other.map(({ vocab, rows }) => {
             const [title, sub] = VOCAB_TITLES[vocab] || [vocab, ""];
@@ -594,18 +594,20 @@ function renderVocabGroups() {
     wireClusterBodies(root);
 }
 
-// Pluralsight head-to-head row: bar = gap size (PS − ASN), two absolute
-// numbers alongside, gap-based severity badge.
-function headToHeadRow(r, gapMax) {
+// Pluralsight head-to-head row: bar = fraction of the field ASN is missing
+// ((PS − ASN)/PS), so MISSING (0 ASN) is a full bar and covered is empty.
+// Two absolute numbers alongside, gap-based severity badge.
+function headToHeadRow(r) {
     const M = r.ms_module_coverage;
+    const N = r.ps_count || 0;
     const s = termSev(r);
-    const gap = Math.max(0, r.gap);
-    const gapPct = gap > 0 ? Math.max(100 * gap / gapMax, 1.5) : 0;
+    const missingFrac = N > 0 ? Math.max(0, Math.min(1, (N - M) / N)) : 0;
+    const gapPct = missingFrac > 0 ? Math.max(100 * missingFrac, 1.5) : 0;
     return `<details class="term">
         <summary><span class="tri">▶</span><span class="badge ${s.key}">${s.label}</span>
             <span class="term-name">${esc(r.term)}${isAITopic(r) ? AI_BADGE : ""}</span>
-            <span class="hh-bars" title="gap = ${gap.toLocaleString()} (Pluralsight ${(r.ps_count||0).toLocaleString()} − ASN ${M.toLocaleString()})"><i class="hh-ps-bar" style="width:${gapPct}%"></i></span>
-            <span class="hh-nums"><b class="ps">${(r.ps_count || 0).toLocaleString()}</b> PS · <b class="ms" style="color:${s.color}">${M.toLocaleString()}</b> ASN</span></summary>
+            <span class="hh-bars" title="ASN is missing ${Math.round(missingFrac * 100)}% of the field here (Pluralsight ${N.toLocaleString()} − ASN ${M.toLocaleString()})"><i class="hh-ps-bar" style="width:${gapPct}%"></i></span>
+            <span class="hh-nums"><b class="ps">${N.toLocaleString()}</b> PS · <b class="ms" style="color:${s.color}">${M.toLocaleString()}</b> ASN</span></summary>
         <div class="matches">${matchBody(r)}</div>
     </details>`;
 }
