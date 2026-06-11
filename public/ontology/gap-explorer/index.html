@@ -56,6 +56,16 @@
     .g-bar { width: 160px; background: #f1f5f9; height: 12px; border-radius: 4px; overflow: hidden; flex-shrink: 0; }
     .g-bar i { display: block; height: 100%; border-radius: 4px; background: #6366f1; }
 
+    /* Pluralsight head-to-head rows */
+    .hh-head { display: flex; align-items: center; gap: 10px; padding: 6px 16px 4px 38px; font-size: 0.7em; text-transform: uppercase; letter-spacing: 0.04em; color: #94a3b8; }
+    .hh-head .hh-spacer { flex: 1; min-width: 250px; }
+    .hh-head .hh-ps { width: 200px; text-align: right; color: #7c3aed; }
+    .hh-head .hh-ms { width: 150px; text-align: right; }
+    .hh-bars { flex: 1; max-width: 380px; background: #f1f5f9; height: 14px; border-radius: 4px; overflow: hidden; }
+    .hh-bars i.hh-ps-bar { display: block; height: 100%; border-radius: 4px; background: #7c3aed; }
+    .hh-nums { font-size: 0.85em; color: #64748b; font-variant-numeric: tabular-nums; width: 150px; text-align: right; flex-shrink: 0; }
+    .hh-nums b.ps { color: #7c3aed; }
+
     /* source provenance block + exactness chips */
     .prov-block { margin: 4px 12px 10px; padding: 10px 14px; background: #f8fafc; border-left: 3px solid #94a3b8; font-size: 0.78em; color: #64748b; line-height: 1.6; }
     .prov-block b { color: #475569; }
@@ -144,13 +154,13 @@
 <div class="headline" id="headline"></div>
 
 <div class="section tab-pane" id="pane-gaps">
-    <h2>Gaps vs the field — by solution area</h2>
+    <h2>Gaps vs the field — Pluralsight head-to-head</h2>
     <div class="sec-sub">
-        Top level is the three current solution areas; inside each, <b>Pluralsight's derived course
-        topics lead</b> (the high-fidelity comparison — full catalog, same extraction method as ours),
-        followed by the curated field vocabularies. Terms are scored on that area's modules only
-        (corpus-wide count kept alongside). Open a term for its provenance and every extracted topic it
-        matched; open a topic to audit the area's own modules with evidence.
+        A direct, absolute comparison: each topic shows how many <b>Pluralsight courses</b> teach it
+        versus how many <b>ASN modules</b> do (the high-fidelity source — Pluralsight's full catalog,
+        extracted the same way as ours). Sorted by least ASN coverage first — the thinnest areas lead.
+        The curated field vocabularies (DataCamp, Udemy, OpenAI, Anthropic, frontier) follow below. Open
+        a topic to see every matched ASN cluster and its source modules with evidence.
     </div>
     <div class="controls">
         <button data-expand="#vocab-groups">Expand all</button>
@@ -379,10 +389,10 @@ function renderHeadline() {
         el.innerHTML = SEVERITY.map(s =>
             `<div class="sev-chip"><span class="dot" style="background:${s.color}"></span><b>${counts[s.key]}</b><span>${s.label.toLowerCase()}<br>${s.desc}</span></div>`
         ).join("") +
-        `<div class="lede">Corpus-wide: of <b style="color:white">${total}</b> field-vocabulary terms tested against the
-         ${m.n_modules.toLocaleString()}-module catalogue, <b style="color:white">${counts.missing + counts.thin}</b>
-         are missing or thin. Below, the same terms are re-scored inside each solution area —
-         open an area to see where its specific gaps are.</div>`;
+        `<div class="lede">Of <b style="color:white">${total}</b> field topics compared against the
+         ${m.n_modules.toLocaleString()}-module ASN catalogue, <b style="color:white">${counts.missing + counts.thin}</b>
+         are taught by ≤ 25 ASN modules — the candidate gaps. Counts below are absolute module coverage
+         (sum across matched clusters); open a topic to audit the evidence.</div>`;
     } else if (activeTab === "topics") {
         const thin = DATA.topics.filter(t => t.module_count <= THIN_MAX).length;
         const chips = [
@@ -441,7 +451,7 @@ function clusterDetails(label, extraMeta, filterRole, filterArea) {
     return `<details class="cluster" data-label="${esc(label)}"${filters}>
         <summary><span class="tri">▶</span><span class="c-dot" style="background:${DOMAIN_COLORS[t.domain] || "#94a3b8"}"></span>
             <span class="c-label">${esc(t.label)}</span>
-            <span class="c-meta">${t.module_count} modules · ${esc(t.domain)}${extraMeta ? " · " + esc(extraMeta) : ""}</span></summary>
+            <span class="c-meta" title="a topic cluster: ${t.members.length} merged name(s), taught by ${t.module_count} MS modules across the corpus">${t.module_count} modules · ${esc(t.domain)}${extraMeta ? " · " + esc(extraMeta) : ""}</span></summary>
         <div class="c-body" data-pending="1"></div>
     </details>`;
 }
@@ -460,18 +470,9 @@ function wireClusterBodies(root) {
     });
 }
 
-function facetChips(counts, labelFn) {
-    return Object.entries(counts).sort((a, b) => b[1] - a[1])
-        .map(([k, n]) => `<span class="role-chip">${esc(labelFn(k))} × ${n}</span>`).join(" ");
-}
-
 function clusterBody(t, filterRole, filterArea) {
     const members = t.members.length > 1
         ? `<div class="c-members"><b>merged names:</b> ${t.members.map(esc).join(" · ")}</div>` : "";
-    const areaChips = facetChips(topicAreaCounts[t.label] || {}, a => a);
-    const areasLine = areaChips ? `<div class="c-roles"><b>solution areas across its modules:</b> ${areaChips}</div>` : "";
-    const roleChips = facetChips(topicRoleCounts[t.label] || {}, roleLabel);
-    const rolesLine = roleChips ? `<div class="c-roles"><b>ASN roles across its modules:</b> ${roleChips}</div>` : "";
 
     let prov = t.provenance;
     let head;
@@ -490,7 +491,7 @@ function clusterBody(t, filterRole, filterArea) {
         ? prov.map(p => moduleRow(t, p)).join("")
         : `<div class="none">None of this topic's ${t.module_count} modules fall in this slice —
            the match exists corpus-wide, not here.</div>`;
-    return members + areasLine + rolesLine + head + rows;
+    return members + head + rows;
 }
 
 function moduleRow(t, p) {
@@ -510,102 +511,94 @@ function moduleRow(t, p) {
         <div class="ex-roles">${area}${roles}</div><div class="ex-quote">“${esc(p.evidence)}”</div></div>`;
 }
 
-/* ---------- tab 1: gaps vs the field ---------- */
+/* ---------- tab 1: gaps vs the field — flat Pluralsight head-to-head ---------- */
 
-// Area-scoped coverage for a field term: sum of the term's matched clusters'
-// module counts inside one solution area (same sum-over-matches methodology
-// as the corpus-wide ms_module_coverage).
-function termAreaCoverage(r, area) {
-    return r.matches.reduce((s, m) => s + ((topicAreaCounts[m.topic] || {})[area] || 0), 0);
-}
-
+// Absolute head-to-head: each field topic shows its source-side count
+// (Pluralsight courses) vs ASN's module coverage (sum across all matched
+// clusters, corpus-wide). Sorted by the deficit so the real gaps surface.
 function renderVocabGroups() {
     const root = document.getElementById("vocab-groups");
-    const areas = [...DATA.solution_areas];
-    const unassigned = countModulesWhere(mod => !mod.area);
-    if (unassigned > 0) areas.push({ name: "(unassigned)", module_count: unassigned });
+    const ps = (DATA.competitors.pluralsight_topics || [])
+        .map(r => ({ ...r, gap: (r.ps_count || 0) - r.ms_module_coverage }))
+        // least ASN coverage first; within a tie, the bigger Pluralsight presence leads.
+        .sort((a, b) => a.ms_module_coverage - b.ms_module_coverage || (b.ps_count || 0) - (a.ps_count || 0));
+    const psMax = Math.max(...ps.map(r => r.ps_count || 0), 1);
 
-    root.innerHTML = areas.map(a => {
-        const covs = allTerms().map(r => termAreaCoverage(r, a.name));
-        const chips = SEVERITY
-            .map(s => [s, covs.filter(c => sev(c).key === s.key).length])
-            .filter(([, n]) => n)
-            .map(([s, n]) => `<span style="background:${s.color}">${n} ${s.key}</span>`).join("");
-        return `<details class="group gap-area" data-area="${esc(a.name)}">
-            <summary><span class="tri">▶</span><h3>${esc(a.name)}</h3>
-                <div class="sev-mini">${chips}</div>
-                <span class="g-meta">${a.module_count.toLocaleString()} modules</span></summary>
-            <div class="ga-body" data-pending="1"></div>
-        </details>`;
-    }).join("");
+    const other = Object.entries(DATA.competitors)
+        .filter(([v]) => v !== "pluralsight_topics")
+        .map(([vocab, rows]) => ({ vocab, rows }));
 
-    // each area body (vocabularies -> terms) renders lazily on first open
-    root.querySelectorAll("details.gap-area").forEach(d => {
-        d.addEventListener("toggle", () => {
-            if (!d.open) return;
-            const body = d.querySelector(".ga-body");
-            if (!body || !body.dataset.pending) return;
-            delete body.dataset.pending;
-            body.innerHTML = areaGapBody(d.dataset.area);
-            wireClusterBodies(body);
-        });
-    });
+    root.innerHTML =
+        `<details class="group" open>
+            <summary><span class="tri">▶</span><h3>Pluralsight head-to-head — courses vs ASN modules</h3>
+                <span class="g-meta">${ps.length} topics · least ASN coverage first</span></summary>
+            <div class="hh-head">
+                <span class="hh-spacer"></span><span class="hh-ps">Pluralsight courses</span><span class="hh-ms">ASN modules</span></div>
+            ${ps.map(r => headToHeadRow(r, psMax)).join("")}
+        </details>` +
+        other.map(({ vocab, rows }) => {
+            const [title, sub] = VOCAB_TITLES[vocab] || [vocab, ""];
+            const sorted = [...rows].sort((a, b) => a.ms_module_coverage - b.ms_module_coverage);
+            const max = Math.max(...rows.map(r => r.ms_module_coverage), 1);
+            const chips = SEVERITY
+                .map(s => [s, sorted.filter(x => sev(x.ms_module_coverage).key === s.key).length])
+                .filter(([, n]) => n)
+                .map(([s, n]) => `<span style="background:${s.color}">${n} ${s.key}</span>`).join("");
+            return `<details class="group">
+                <summary><span class="tri">▶</span><h3>${esc(title)}</h3><div class="sev-mini">${chips}</div>
+                    <div class="v-sub" style="padding-left:22px">${esc(sub)}</div></summary>
+                ${sorted.map(r => curatedRow(r, max, vocab)).join("")}
+            </details>`;
+        }).join("");
+    wireClusterBodies(root);
 }
 
-function areaGapBody(area) {
-    return Object.entries(DATA.competitors).map(([vocab, rows]) => {
-        const [title, sub] = VOCAB_TITLES[vocab] || [vocab, ""];
-        const scored = rows.map(r => ({ r, cov: termAreaCoverage(r, area) }))
-            .sort((a, b) => a.cov - b.cov || a.r.ms_module_coverage - b.r.ms_module_coverage);
-        const max = Math.max(...scored.map(x => x.cov), 1);
-        const chips = SEVERITY
-            .map(s => [s, scored.filter(x => sev(x.cov).key === s.key).length])
-            .filter(([, n]) => n)
-            .map(([s, n]) => `<span style="background:${s.color}">${n} ${s.key}</span>`).join("");
-        return `<details class="vocab" open>
-            <summary><span class="tri">▶</span><h4>${esc(title)}</h4><div class="sev-mini">${chips}</div>
-                <div class="v-sub">${esc(sub)}</div></summary>
-            ${scored.map(x => termRow(x.r, x.cov, max, vocab, area)).join("")}
-        </details>`;
-    }).join("");
+// Pluralsight head-to-head row: two absolute numbers, ASN-coverage badge.
+function headToHeadRow(r, psMax) {
+    const M = r.ms_module_coverage;
+    const s = sev(M);
+    const psPct = Math.max(100 * (r.ps_count || 0) / psMax, 2);
+    return `<details class="term">
+        <summary><span class="tri">▶</span><span class="badge ${s.key}">${s.label}</span>
+            <span class="term-name">${esc(r.term)}</span>
+            <span class="hh-bars"><i class="hh-ps-bar" style="width:${psPct}%"></i></span>
+            <span class="hh-nums"><b class="ps">${(r.ps_count || 0).toLocaleString()}</b> PS · <b class="ms" style="color:${s.color}">${M.toLocaleString()}</b> ASN</span></summary>
+        <div class="matches">${matchBody(r)}</div>
+    </details>`;
 }
 
-function termRow(r, cov, max, vocab, area) {
-    const s = sev(cov);
-    const pct = Math.max(100 * cov / max, 1);
-    const [title] = VOCAB_TITLES[vocab] || [vocab, ""];
-    // Pluralsight terms come from Kevin Wang's scrape, not Annas's comp research.
-    const sourceAttr = vocab === "pluralsight_topics"
+// Curated-vocab row (no PS course count): just ASN module coverage.
+function curatedRow(r, max, vocab) {
+    const M = r.ms_module_coverage;
+    const s = sev(M);
+    const pct = Math.max(100 * M / max, 1);
+    return `<details class="term">
+        <summary><span class="tri">▶</span><span class="badge ${s.key}">${s.label}</span>
+            <span class="term-name">${esc(r.term)}</span>
+            <span class="term-bar"><i style="width:${pct}%;background:${s.color}"></i></span>
+            <span class="term-count">${M.toLocaleString()} ASN modules</span></summary>
+        <div class="matches">${matchBody(r, vocab)}</div>
+    </details>`;
+}
+
+// Shared drill-down: provenance line + every matched ASN cluster (actual data).
+function matchBody(r, vocab) {
+    const isPS = r.ps_count != null;
+    const sourceAttr = isPS
         ? "Pluralsight catalog scrape (2026-05-19, Kevin Wang) + Sonnet topic extraction over course titles"
         : DATA.meta.competitor_vocab_source;
     const n = r.matches.length;
-    // coverage is a SUM over the matched clusters' module counts — spell that
-    // out so a near-identical single match (e.g. "NLP" sim 1.0, 41 modules)
-    // isn't mistaken for the whole term total (here 46 across 4 clusters).
     const sumNote = n > 1
-        ? ` Its <b>${cov.toLocaleString()} in-area / ${r.ms_module_coverage.toLocaleString()} corpus</b> coverage is the SUM across these ${n} clusters, not any single one.`
+        ? ` ASN's <b>${r.ms_module_coverage.toLocaleString()} modules</b> is the SUM across these ${n} matched clusters.`
         : "";
-    const provLine = `<div class="prov-line"><b>term provenance:</b> ${esc(title)} —
-        ${esc(sourceAttr)}. Matched ${n} extracted
-        topic${n === 1 ? "" : "s"} at cos ≥ ${DATA.meta.competitor_match_sim}
-        (exhaustive, no cap); coverage scored on <b>${esc(area)}</b> modules only.${sumNote}</div>`;
-    const matches = r.matches
-        .map(m => ({ m, n: (topicAreaCounts[m.topic] || {})[area] || 0 }))
-        .sort((a, b) => b.n - a.n || b.m.sim - a.m.sim);
-    const inner = matches.length
-        ? provLine + matches.map(({ m, n }) =>
-            clusterDetails(m.topic, `${n} in this area · sim ${m.sim}`, null, area)).join("")
-        : provLine + `<div class="none">No extracted topic matches at cos ≥ ${DATA.meta.competitor_match_sim}
-           (best similarity anywhere: ${r.best_sim}). Either a true catalogue gap or a vocabulary mismatch — judge by the term.</div>`;
-    const psDetail = r.ps_count != null
-        ? `<span class="t-detail">${r.ps_count.toLocaleString()} PS courses</span>` : "";
-    return `<details class="term">
-        <summary><span class="tri">▶</span><span class="badge ${s.key}">${s.label}</span>
-            <span class="term-name">${esc(r.term)}</span>${psDetail}
-            <span class="term-bar"><i style="width:${pct}%;background:${s.color}"></i></span>
-            <span class="term-count">${cov.toLocaleString()} in area · ${r.ms_module_coverage.toLocaleString()} corpus</span></summary>
-        <div class="matches">${inner}</div>
-    </details>`;
+    const provLine = `<div class="prov-line"><b>term provenance:</b> ${esc(sourceAttr)}.
+        Matched ${n} ASN topic${n === 1 ? "" : "s"} at cos ≥ ${DATA.meta.competitor_match_sim} (exhaustive, no cap).${sumNote}</div>`;
+    const matches = [...r.matches].sort((a, b) => b.module_count - a.module_count || b.sim - a.sim);
+    return matches.length
+        ? provLine + matches.map(m =>
+            clusterDetails(m.topic, `${m.module_count} modules · sim ${m.sim}`)).join("")
+        : provLine + `<div class="none">No ASN topic-cluster matches at cos ≥ ${DATA.meta.competitor_match_sim}
+           (best similarity anywhere: ${r.best_sim}). Either ASN doesn't teach it, or the name is too broad to embed near specific topics — judge by the term.</div>`;
 }
 
 /* ---------- tab 2: all catalogue topics by domain ---------- */
@@ -879,6 +872,14 @@ function expandAll(sel, deep) {
 function renderLegend() {
     const m = DATA.meta;
     document.getElementById("legend").innerHTML =
+        `<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 14px;margin-bottom:12px;color:#475569;">
+         <b style="color:#1e293b;">Reading the numbers.</b>
+         A <b>topic cluster</b> is one deduplicated topic — every way the catalogue names the same concept
+         ("NLP", "Natural Language Processing", …) merged into a single node (${m.n_mentions.toLocaleString()}
+         raw mentions → ${m.n_clusters.toLocaleString()} clusters at cos ≥ ${m.merge_sim}); open a topic to see its merged names.
+         <b>Corpus</b> = modules teaching it across the whole ${m.n_modules.toLocaleString()}-module catalogue.
+         <b>In area</b> = just the modules within the open solution area, so it is always ≤ corpus.
+         When a field term matches several clusters, both counts are the SUM across those clusters.</div>` +
         `Severity thresholds (MS module coverage): ` +
         SEVERITY.map(s => `<b style="color:${s.color}">${s.label.toLowerCase()}</b> = ${s.desc}`).join(" · ") +
         `.<br>Coverage counts come from embedding matches (cos ≥ ${m.competitor_match_sim}, ${esc(m.embedding_model)})
