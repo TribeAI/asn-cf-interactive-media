@@ -4,9 +4,9 @@
       "role",
       "topic"
     ],
-    "n_roles": 24,
-    "n_topics": 103,
-    "n_links": 204,
+    "n_roles": 25,
+    "n_topics": 253,
+    "n_links": 451,
     "thresholds": {
       "strong": 0.65,
       "weak": 0.45,
@@ -17,8 +17,8 @@
     "jobs_collapsed": true,
     "floors": {
       "min_role_modules": 5,
-      "min_job_modules": 5,
-      "min_topic_modules": 5
+      "min_job_modules": 1,
+      "min_topic_modules": 1
     },
     "n_modules": 3418
   },
@@ -28,10 +28,22 @@
   ],
   "nodes": [
     {
+      "id": "r:windows server administrator",
+      "layer": "role",
+      "label": "Windows Server Administrator",
+      "module_count": 2
+    },
+    {
       "id": "r:business central al developer",
       "layer": "role",
       "label": "Business Central AL developer",
       "module_count": 1
+    },
+    {
+      "id": "r:finance or accounting professional using business central",
+      "layer": "role",
+      "label": "Finance or accounting professional using Business Central",
+      "module_count": 10
     },
     {
       "id": "r:ai application developer",
@@ -40,16 +52,46 @@
       "module_count": 6
     },
     {
+      "id": "r:identity and security administrator",
+      "layer": "role",
+      "label": "Identity and security administrator",
+      "module_count": 1
+    },
+    {
+      "id": "r:teams administrator",
+      "layer": "role",
+      "label": "Teams Administrator",
+      "module_count": 8
+    },
+    {
       "id": "r:security operations analyst",
       "layer": "role",
       "label": "Security Operations Analyst",
       "module_count": 3
     },
     {
+      "id": "r:identity and access administrator",
+      "layer": "role",
+      "label": "Identity and Access Administrator",
+      "module_count": 5
+    },
+    {
       "id": "r:finance and operations app developer",
       "layer": "role",
       "label": "Finance and operations app developer",
       "module_count": 10
+    },
+    {
+      "id": "r:copilot studio agent builder",
+      "layer": "role",
+      "label": "Copilot Studio agent builder",
+      "module_count": 7
+    },
+    {
+      "id": "r:business central extension developer",
+      "layer": "role",
+      "label": "Business Central extension developer",
+      "module_count": 8
     },
     {
       "id": "r:power platform solution architect",
@@ -76,22 +118,16 @@
       "module_count": 6
     },
     {
+      "id": "r:cloud security administrator",
+      "layer": "role",
+      "label": "Cloud security administrator",
+      "module_count": 3
+    },
+    {
       "id": "r:hybrid infrastructure administrator",
       "layer": "role",
       "label": "Hybrid infrastructure administrator",
       "module_count": 5
-    },
-    {
-      "id": "r:identity and access administrator",
-      "layer": "role",
-      "label": "Identity and Access Administrator",
-      "module_count": 5
-    },
-    {
-      "id": "r:finance or accounting professional using business central",
-      "layer": "role",
-      "label": "Finance or accounting professional using Business Central",
-      "module_count": 10
     },
     {
       "id": "r:azure virtual desktop administrator",
@@ -106,52 +142,10 @@
       "module_count": 18
     },
     {
-      "id": "r:windows server administrator",
+      "id": "r:devops release engineer",
       "layer": "role",
-      "label": "Windows Server Administrator",
-      "module_count": 2
-    },
-    {
-      "id": "r:identity and security administrator",
-      "layer": "role",
-      "label": "Identity and security administrator",
-      "module_count": 1
-    },
-    {
-      "id": "r:copilot studio agent builder",
-      "layer": "role",
-      "label": "Copilot Studio agent builder",
-      "module_count": 7
-    },
-    {
-      "id": "r:business central extension developer",
-      "layer": "role",
-      "label": "Business Central extension developer",
-      "module_count": 8
-    },
-    {
-      "id": "r:finance or accounting professional managing fixed assets",
-      "layer": "role",
-      "label": "Finance or accounting professional managing fixed assets",
+      "label": "DevOps / Release Engineer",
       "module_count": 5
-    },
-    {
-      "id": "r:teams administrator",
-      "layer": "role",
-      "label": "Teams Administrator",
-      "module_count": 8
-    },
-    {
-      "id": "r:windows server infrastructure administrator",
-      "layer": "role",
-      "label": "Windows Server infrastructure administrator",
-      "module_count": 8
-    },
-    {
-      "id": "r:cloud security administrator",
-      "layer": "role",
-      "label": "Cloud security administrator",
-      "module_count": 3
     },
     {
       "id": "r:citizen developer low-code app builder",
@@ -160,9 +154,9 @@
       "module_count": 5
     },
     {
-      "id": "r:ai application developer on azure",
+      "id": "r:finance or accounting professional managing fixed assets",
       "layer": "role",
-      "label": "AI application developer on Azure",
+      "label": "Finance or accounting professional managing fixed assets",
       "module_count": 5
     },
     {
@@ -170,6 +164,26 @@
       "layer": "role",
       "label": "Microsoft 365 Administrator",
       "module_count": 5
+    },
+    {
+      "id": "r:windows server infrastructure administrator",
+      "layer": "role",
+      "label": "Windows Server infrastructure administrator",
+      "module_count": 8
+    },
+    {
+      "id": "r:ai application developer on azure",
+      "layer": "role",
+      "label": "AI application developer on Azure",
+      "module_count": 5
+    },
+    {
+      "id": "t:dhcp administration",
+      "layer": "topic",
+      "label": "DHCP Administration",
+      "domain": "networking",
+      "merged_from": [],
+      "module_count": 3
     },
     {
       "id": "t:microsoft azure",
@@ -282,6 +296,17 @@
       "module_count": 32
     },
     {
+      "id": "t:event-driven architecture",
+      "layer": "topic",
+      "label": "Event-Driven Programming",
+      "domain": "development-tools",
+      "merged_from": [
+        "Event-Driven Architecture",
+        "Event-Driven Programming"
+      ],
+      "module_count": 19
+    },
+    {
       "id": "t:.net development",
       "layer": "topic",
       "label": "C#",
@@ -318,6 +343,65 @@
         "Power Platform Governance"
       ],
       "module_count": 310
+    },
+    {
+      "id": "t:api integration",
+      "layer": "topic",
+      "label": "API Design",
+      "domain": "development-tools",
+      "merged_from": [
+        "API Design",
+        "API Design and Integration",
+        "API Development",
+        "API Documentation",
+        "API Integration",
+        "API Key Management",
+        "API Management",
+        "API Troubleshooting",
+        "Data API Builder",
+        "REST API Development",
+        "REST API Integration",
+        "RESTful API Development",
+        "RESTful API Integration",
+        "Web API Development"
+      ],
+      "module_count": 76
+    },
+    {
+      "id": "t:machine learning",
+      "layer": "topic",
+      "label": "Microsoft AI",
+      "domain": "ai-and-ml",
+      "merged_from": [
+        "AI Evaluation",
+        "Artificial Intelligence",
+        "Artificial Intelligence Fundamentals",
+        "Automated Machine Learning",
+        "Classification",
+        "Classification Modeling",
+        "Computer Vision",
+        "Convolutional Neural Networks",
+        "Deep Learning",
+        "Feature Engineering",
+        "Generative AI",
+        "Image Classification",
+        "Image Processing",
+        "Machine Learning",
+        "Machine Learning Engineering",
+        "Machine Learning Experimentation",
+        "Machine Learning Frameworks",
+        "Machine Learning Model Training",
+        "Microsoft AI",
+        "Model Evaluation",
+        "Model Training and Evaluation",
+        "Neural Networks",
+        "Predictive Modeling",
+        "Speech Recognition",
+        "Transfer Learning",
+        "Unsupervised Learning",
+        "Windows Machine Learning"
+      ],
+      "module_count": 159
     },
     {
       "id": "t:microsoft 365 copilot",
@@ -428,6 +512,21 @@
       "module_count": 46
     },
     {
+      "id": "t:security operations",
+      "layer": "topic",
+      "label": "Network Security",
+      "domain": "security",
+      "merged_from": [
+        "Infrastructure Security",
+        "Network Security",
+        "Operational Technology Security",
+        "Security Administration",
+        "Security Architecture",
+        "Security Operations"
+      ],
+      "module_count": 162
+    },
+    {
       "id": "t:regulatory compliance",
       "layer": "topic",
       "label": "Regulatory Compliance",
@@ -438,6 +537,14 @@
         "Regulatory Compliance Reporting"
       ],
       "module_count": 87
+    },
+    {
+      "id": "t:ai-assisted content creation",
+      "layer": "topic",
+      "label": "AI-Assisted Content Creation",
+      "domain": "ai-and-ml",
+      "merged_from": [],
+      "module_count": 14
     },
     {
       "id": "t:robotic process automation",
@@ -467,6 +574,32 @@
         "Power Query"
       ],
       "module_count": 89
+    },
+    {
+      "id": "t:azure health data services",
+      "layer": "topic",
+      "label": "Healthcare Analytics",
+      "domain": "data-and-analytics",
+      "merged_from": [
+        "Azure Health Data Services",
+        "Healthcare Analytics",
+        "Healthcare Data Analytics",
+        "Healthcare Data Management",
+        "Microsoft Azure Health Data Services"
+      ],
+      "module_count": 14
+    },
+    {
+      "id": "t:microsoft dynamics lifecycle services",
+      "layer": "topic",
+      "label": "Microsoft Dynamics AX",
+      "domain": "business-applications",
+      "merged_from": [
+        "Microsoft Dynamics AX",
+        "Microsoft Dynamics GP",
+        "Microsoft Dynamics Lifecycle Services"
+      ],
+      "module_count": 5
     },
     {
       "id": "t:azure ai foundry",
@@ -564,6 +697,19 @@
       "module_count": 52
     },
     {
+      "id": "t:microsoft graph",
+      "layer": "topic",
+      "label": "Microsoft Graph",
+      "domain": "productivity-and-collaboration",
+      "merged_from": [
+        "Microsoft Graph",
+        "Microsoft Graph Connectors",
+        "Microsoft Graph PowerShell SDK",
+        "Microsoft Graph Toolkit"
+      ],
+      "module_count": 34
+    },
+    {
       "id": "t:copilot agents",
       "layer": "topic",
       "label": "Copilot Agents",
@@ -575,6 +721,53 @@
         "Copilot Studio"
       ],
       "module_count": 10
+    },
+    {
+      "id": "t:retrieval-augmented generation",
+      "layer": "topic",
+      "label": "Retrieval-Augmented Generation",
+      "domain": "ai-and-ml",
+      "merged_from": [],
+      "module_count": 34
+    },
+    {
+      "id": "t:data integration",
+      "layer": "topic",
+      "label": "SQL",
+      "domain": "data-and-analytics",
+      "merged_from": [
+        "Analytics Engineering",
+        "Data Aggregation",
+        "Data Connectivity",
+        "Data Engineering",
+        "Data Import and Export",
+        "Data Integration",
+        "Data Lakehouse",
+        "Data Mapping",
+        "Data Stewardship",
+        "Data Transformation",
+        "Data Warehousing",
+        "Data Wrangling",
+        "Database Administration",
+        "Database Client Tools",
+        "Enterprise Data Integration",
+        "SQL",
+        "SQL Server",
+        "SQL Server Integration Services",
+        "Transact-SQL"
+      ],
+      "module_count": 161
+    },
+    {
+      "id": "t:endpoint security",
+      "layer": "topic",
+      "label": "Endpoint Security",
+      "domain": "security",
+      "merged_from": [
+        "Endpoint Privilege Management",
+        "Endpoint Security"
+      ],
+      "module_count": 135
     },
     {
       "id": "t:cost accounting",
@@ -595,6 +788,29 @@
         "Standard Costing"
       ],
       "module_count": 52
+    },
+    {
+      "id": "t:virtual event production",
+      "layer": "topic",
+      "label": "Virtual Collaboration",
+      "domain": "productivity-and-collaboration",
+      "merged_from": [
+        "Virtual Collaboration",
+        "Virtual Event Management",
+        "Virtual Event Production"
+      ],
+      "module_count": 9
+    },
+    {
+      "id": "t:unified communications",
+      "layer": "topic",
+      "label": "Unified Communications",
+      "domain": "productivity-and-collaboration",
+      "merged_from": [
+        "Messaging Channel Integration",
+        "Unified Communications"
+      ],
+      "module_count": 38
     },
     {
       "id": "t:budget management",
@@ -732,6 +948,19 @@
       "module_count": 45
     },
     {
+      "id": "t:change management",
+      "layer": "topic",
+      "label": "Change Management",
+      "domain": "other",
+      "merged_from": [
+        "Breaking Change Management",
+        "Change Management",
+        "IT Change Management",
+        "Organizational Change Management"
+      ],
+      "module_count": 34
+    },
+    {
       "id": "t:stakeholder management",
       "layer": "topic",
       "label": "Stakeholder Management",
@@ -796,6 +1025,56 @@
       "module_count": 96
     },
     {
+      "id": "t:microsoft excel",
+      "layer": "topic",
+      "label": "Microsoft Excel",
+      "domain": "productivity-and-collaboration",
+      "merged_from": [
+        "Microsoft Copilot for Excel",
+        "Microsoft Excel",
+        "Microsoft Excel Automation"
+      ],
+      "module_count": 19
+    },
+    {
+      "id": "t:powershell",
+      "layer": "topic",
+      "label": "PowerShell",
+      "domain": "development-tools",
+      "merged_from": [
+        "PowerShell",
+        "PowerShell Pipeline",
+        "PowerShell Scripting",
+        "Windows PowerShell"
+      ],
+      "module_count": 72
+    },
+    {
+      "id": "t:windows hello for business",
+      "layer": "topic",
+      "label": "Windows Hello",
+      "domain": "identity-and-access",
+      "merged_from": [
+        "Windows Hello",
+        "Windows Hello for Business",
+        "Windows as a Service"
+      ],
+      "module_count": 4
+    },
+    {
+      "id": "t:microsoft sustainability manager",
+      "layer": "topic",
+      "label": "Sustainability Management",
+      "domain": "business-applications",
+      "merged_from": [
+        "Microsoft Cloud for Sustainability",
+        "Microsoft Sustainability Manager",
+        "Sustainability Data Management",
+        "Sustainability Management"
+      ],
+      "module_count": 20
+    },
+    {
       "id": "t:azure data factory",
       "layer": "topic",
       "label": "Azure SQL",
@@ -821,6 +1100,19 @@
       "domain": "security",
       "merged_from": [],
       "module_count": 38
+    },
+    {
+      "id": "t:windows administration",
+      "layer": "topic",
+      "label": "Windows Administration",
+      "domain": "other",
+      "merged_from": [
+        "Windows 11 Administration",
+        "Windows Administration",
+        "Windows Client Administration",
+        "Windows File System Administration"
+      ],
+      "module_count": 56
     },
     {
       "id": "t:data governance",
@@ -872,6 +1164,34 @@
       "module_count": 54
     },
     {
+      "id": "t:sharepoint administration",
+      "layer": "topic",
+      "label": "SharePoint",
+      "domain": "productivity-and-collaboration",
+      "merged_from": [
+        "Collaboration Tools Administration",
+        "Microsoft SharePoint",
+        "Microsoft SharePoint Administration",
+        "SharePoint",
+        "SharePoint Administration",
+        "SharePoint Development",
+        "SharePoint Online",
+        "SharePoint Online Administration"
+      ],
+      "module_count": 51
+    },
+    {
+      "id": "t:it troubleshooting",
+      "layer": "topic",
+      "label": "IT Troubleshooting",
+      "domain": "other",
+      "merged_from": [
+        "Application Troubleshooting",
+        "IT Troubleshooting"
+      ],
+      "module_count": 18
+    },
+    {
       "id": "t:azure cosmos db",
       "layer": "topic",
       "label": "Azure Storage",
@@ -906,6 +1226,21 @@
       "module_count": 9
     },
     {
+      "id": "t:it asset management",
+      "layer": "topic",
+      "label": "IT Asset Management",
+      "domain": "other",
+      "merged_from": [
+        "IT Asset Lifecycle Management",
+        "IT Asset Management",
+        "IT Financial Management",
+        "IT Performance Management",
+        "IT Project Management",
+        "IT Service Management"
+      ],
+      "module_count": 13
+    },
+    {
       "id": "t:application lifecycle management",
       "layer": "topic",
       "label": "Program Management",
@@ -917,6 +1252,34 @@
         "Program Management"
       ],
       "module_count": 41
+    },
+    {
+      "id": "t:github copilot",
+      "layer": "topic",
+      "label": "Git",
+      "domain": "development-tools",
+      "merged_from": [
+        "Git",
+        "GitHub",
+        "GitHub Actions",
+        "GitHub Codespaces",
+        "GitHub Copilot",
+        "GitHub Enterprise",
+        "GitHub Packages"
+      ],
+      "module_count": 115
+    },
+    {
+      "id": "t:continuous integration",
+      "layer": "topic",
+      "label": "Continuous Delivery",
+      "domain": "development-tools",
+      "merged_from": [
+        "Continuous Delivery",
+        "Continuous Integration",
+        "Continuous Integration and Continuous Delivery"
+      ],
+      "module_count": 31
     },
     {
       "id": "t:azure blob storage",
@@ -942,6 +1305,22 @@
         "Microsoft Bot Framework"
       ],
       "module_count": 5
+    },
+    {
+      "id": "t:direct routing",
+      "layer": "topic",
+      "label": "Direct Routing",
+      "domain": "productivity-and-collaboration",
+      "merged_from": [],
+      "module_count": 1
+    },
+    {
+      "id": "t:voip quality monitoring",
+      "layer": "topic",
+      "label": "VoIP Quality Monitoring",
+      "domain": "observability",
+      "merged_from": [],
+      "module_count": 1
     },
     {
       "id": "t:endpoint management",
@@ -980,6 +1359,43 @@
       "module_count": 31
     },
     {
+      "id": "t:database migration",
+      "layer": "topic",
+      "label": "Data Migration",
+      "domain": "data-and-analytics",
+      "merged_from": [
+        "Cloud Database Migration",
+        "Data Migration",
+        "Database Development",
+        "Database Migration",
+        "SAP Database Migration"
+      ],
+      "module_count": 40
+    },
+    {
+      "id": "t:microsoft graph api",
+      "layer": "topic",
+      "label": "GraphQL",
+      "domain": "development-tools",
+      "merged_from": [
+        "GraphQL",
+        "Microsoft Graph API"
+      ],
+      "module_count": 12
+    },
+    {
+      "id": "t:azure app configuration",
+      "layer": "topic",
+      "label": "Azure API Center",
+      "domain": "development-tools",
+      "merged_from": [
+        "Azure API Center",
+        "Azure App Configuration",
+        "Azure Static Web Apps"
+      ],
+      "module_count": 7
+    },
+    {
       "id": "t:semantic search",
       "layer": "topic",
       "label": "Hybrid Search",
@@ -1010,6 +1426,14 @@
         "Workflow Automation"
       ],
       "module_count": 83
+    },
+    {
+      "id": "t:msix app attach",
+      "layer": "topic",
+      "label": "MSIX App Attach",
+      "domain": "cloud-infrastructure",
+      "merged_from": [],
+      "module_count": 2
     },
     {
       "id": "t:microsoft security copilot",
@@ -1117,6 +1541,17 @@
       "module_count": 18
     },
     {
+      "id": "t:object-oriented programming",
+      "layer": "topic",
+      "label": "Object-Oriented Design",
+      "domain": "development-tools",
+      "merged_from": [
+        "Object-Oriented Design",
+        "Object-Oriented Programming"
+      ],
+      "module_count": 19
+    },
+    {
       "id": "t:intelligent document processing",
       "layer": "topic",
       "label": "Document Processing",
@@ -1128,6 +1563,18 @@
         "Intelligent Document Processing"
       ],
       "module_count": 16
+    },
+    {
+      "id": "t:master data management",
+      "layer": "topic",
+      "label": "Master Data Management",
+      "domain": "business-applications",
+      "merged_from": [
+        "Financial Master Data Management",
+        "Master Data Management",
+        "Personal Data Management"
+      ],
+      "module_count": 9
     },
     {
       "id": "t:devops",
@@ -1143,6 +1590,27 @@
         "DevOps Migration"
       ],
       "module_count": 90
+    },
+    {
+      "id": "t:version control",
+      "layer": "topic",
+      "label": "Source Control",
+      "domain": "development-tools",
+      "merged_from": [
+        "Semantic Versioning",
+        "Source Control",
+        "Source Control Management",
+        "Version Control"
+      ],
+      "module_count": 34
+    },
+    {
+      "id": "t:shared responsibility model",
+      "layer": "topic",
+      "label": "Shared Responsibility Model",
+      "domain": "security",
+      "merged_from": [],
+      "module_count": 2
     },
     {
       "id": "t:cloud governance",
@@ -1214,6 +1682,42 @@
       "module_count": 7
     },
     {
+      "id": "t:exception handling",
+      "layer": "topic",
+      "label": "Error Handling",
+      "domain": "development-tools",
+      "merged_from": [
+        "Error Handling",
+        "Exception Handling"
+      ],
+      "module_count": 8
+    },
+    {
+      "id": "t:azure bot service",
+      "layer": "topic",
+      "label": "Azure Bot Service",
+      "domain": "productivity-and-collaboration",
+      "merged_from": [
+        "Azure AI Bot Service",
+        "Azure Bot Service"
+      ],
+      "module_count": 4
+    },
+    {
+      "id": "t:test automation",
+      "layer": "topic",
+      "label": "Test Automation",
+      "domain": "development-tools",
+      "merged_from": [
+        "Automated Testing",
+        "Build Automation",
+        "Development Environment Automation",
+        "Software Testing",
+        "Test Automation"
+      ],
+      "module_count": 16
+    },
+    {
       "id": "t:hybrid cloud management",
       "layer": "topic",
       "label": "Hybrid Cloud",
@@ -1231,6 +1735,48 @@
         "Storage Management"
       ],
       "module_count": 49
+    },
+    {
+      "id": "t:x++ development",
+      "layer": "topic",
+      "label": "X++ Development",
+      "domain": "business-applications",
+      "merged_from": [],
+      "module_count": 12
+    },
+    {
+      "id": "t:relational database design",
+      "layer": "topic",
+      "label": "Database Views",
+      "domain": "data-and-analytics",
+      "merged_from": [
+        "Database Design",
+        "Database Programming",
+        "Database Query Development",
+        "Database Schema Design",
+        "Database Views",
+        "Distributed Database Design",
+        "Relational Data Modeling",
+        "Relational Database Design",
+        "Relational Database Development",
+        "Relational Database Management",
+        "Relational Databases",
+        "SQL Database Design",
+        "SQL Query Development"
+      ],
+      "module_count": 24
+    },
+    {
+      "id": "t:incident response",
+      "layer": "topic",
+      "label": "Incident Response",
+      "domain": "security",
+      "merged_from": [
+        "Incident Response",
+        "Security Incident Management",
+        "Security Incident Response"
+      ],
+      "module_count": 17
     },
     {
       "id": "t:business central report development",
@@ -1270,6 +1816,33 @@
       "module_count": 17
     },
     {
+      "id": "t:accounts payable",
+      "layer": "topic",
+      "label": "Accounts Payable",
+      "domain": "business-applications",
+      "merged_from": [
+        "Accounts Payable",
+        "Accounts Payable Automation",
+        "Accounts Payable Management",
+        "Accounts Payable and Receivable",
+        "Accounts Receivable"
+      ],
+      "module_count": 52
+    },
+    {
+      "id": "t:data replication",
+      "layer": "topic",
+      "label": "Data Redundancy",
+      "domain": "cloud-infrastructure",
+      "merged_from": [
+        "Data Redundancy",
+        "Data Replication",
+        "Storage Replica",
+        "Workload Replication"
+      ],
+      "module_count": 6
+    },
+    {
       "id": "t:microsoft purview",
       "layer": "topic",
       "label": "Microsoft Purview",
@@ -1285,12 +1858,34 @@
       "module_count": 81
     },
     {
+      "id": "t:digital forensics",
+      "layer": "topic",
+      "label": "Digital Forensics",
+      "domain": "security",
+      "merged_from": [
+        "Digital Forensics",
+        "Forensic Investigation"
+      ],
+      "module_count": 5
+    },
+    {
       "id": "t:subscription management",
       "layer": "topic",
       "label": "Subscription Management",
       "domain": "cloud-infrastructure",
       "merged_from": [],
       "module_count": 21
+    },
+    {
+      "id": "t:vector search",
+      "layer": "topic",
+      "label": "Vector Search",
+      "domain": "ai-and-ml",
+      "merged_from": [
+        "Vector Search",
+        "Vector Search and Indexing"
+      ],
+      "module_count": 12
     },
     {
       "id": "t:conversational ai",
@@ -1317,6 +1912,14 @@
       "module_count": 9
     },
     {
+      "id": "t:access reviews",
+      "layer": "topic",
+      "label": "Access Reviews",
+      "domain": "identity-and-access",
+      "merged_from": [],
+      "module_count": 2
+    },
+    {
       "id": "t:unit testing",
       "layer": "topic",
       "label": "Unit Testing",
@@ -1327,6 +1930,42 @@
         "Unit Testing"
       ],
       "module_count": 8
+    },
+    {
+      "id": "t:marketing automation",
+      "layer": "topic",
+      "label": "Web Automation",
+      "domain": "business-applications",
+      "merged_from": [
+        "Marketing Automation",
+        "Sales Automation",
+        "Web Automation"
+      ],
+      "module_count": 18
+    },
+    {
+      "id": "t:onedrive administration",
+      "layer": "topic",
+      "label": "Microsoft OneDrive",
+      "domain": "productivity-and-collaboration",
+      "merged_from": [
+        "Microsoft OneDrive",
+        "Microsoft OneDrive Administration",
+        "OneDrive Administration",
+        "OneDrive Development"
+      ],
+      "module_count": 8
+    },
+    {
+      "id": "t:data retention management",
+      "layer": "topic",
+      "label": "Data Retention Management",
+      "domain": "security",
+      "merged_from": [
+        "Data Retention Management",
+        "Data Retention and Compliance"
+      ],
+      "module_count": 9
     },
     {
       "id": "t:microsoft 365 compliance",
@@ -1340,6 +1979,19 @@
         "Microsoft Security, Compliance, and Identity Fundamentals"
       ],
       "module_count": 11
+    },
+    {
+      "id": "t:information governance",
+      "layer": "topic",
+      "label": "Privacy Governance",
+      "domain": "security",
+      "merged_from": [
+        "Information Governance",
+        "Information Security Governance",
+        "Privacy Governance",
+        "Security Governance"
+      ],
+      "module_count": 10
     },
     {
       "id": "t:exchange online administration",
@@ -1358,6 +2010,72 @@
       "module_count": 20
     },
     {
+      "id": "t:ai image generation",
+      "layer": "topic",
+      "label": "Image Generation",
+      "domain": "ai-and-ml",
+      "merged_from": [
+        "AI Image Generation",
+        "Image Generation"
+      ],
+      "module_count": 4
+    },
+    {
+      "id": "t:devsecops",
+      "layer": "topic",
+      "label": "DevSecOps",
+      "domain": "security",
+      "merged_from": [],
+      "module_count": 30
+    },
+    {
+      "id": "t:patch management",
+      "layer": "topic",
+      "label": "Patch Management",
+      "domain": "cloud-infrastructure",
+      "merged_from": [],
+      "module_count": 8
+    },
+    {
+      "id": "t:azure role-based access control",
+      "layer": "topic",
+      "label": "Azure Managed Identity",
+      "domain": "identity-and-access",
+      "merged_from": [
+        "Azure Managed Identity",
+        "Azure Role-Based Access Control",
+        "Microsoft Azure Managed Identities"
+      ],
+      "module_count": 10
+    },
+    {
+      "id": "t:microsoft powerpoint",
+      "layer": "topic",
+      "label": "Microsoft Word",
+      "domain": "productivity-and-collaboration",
+      "merged_from": [
+        "Microsoft Outlook",
+        "Microsoft PowerPoint",
+        "Microsoft Word",
+        "Presentation Design"
+      ],
+      "module_count": 28
+    },
+    {
+      "id": "t:threat intelligence",
+      "layer": "topic",
+      "label": "Threat Hunting",
+      "domain": "security",
+      "merged_from": [
+        "Microsoft Defender Threat Intelligence",
+        "Threat Detection",
+        "Threat Hunting",
+        "Threat Identification",
+        "Threat Intelligence"
+      ],
+      "module_count": 38
+    },
+    {
       "id": "t:azure pipelines",
       "layer": "topic",
       "label": "Azure Pipelines",
@@ -1366,11 +2084,53 @@
       "module_count": 14
     },
     {
+      "id": "t:app registration",
+      "layer": "topic",
+      "label": "App Registration",
+      "domain": "identity-and-access",
+      "merged_from": [
+        "App Registration",
+        "Application Registration"
+      ],
+      "module_count": 4
+    },
+    {
+      "id": "t:data exchange framework",
+      "layer": "topic",
+      "label": "Data Exchange Framework",
+      "domain": "business-applications",
+      "merged_from": [
+        "Data Exchange Framework",
+        "Data Management Framework"
+      ],
+      "module_count": 2
+    },
+    {
       "id": "t:microsoft appsource publishing",
       "layer": "topic",
       "label": "Microsoft AppSource Publishing",
       "domain": "business-applications",
       "merged_from": [],
+      "module_count": 5
+    },
+    {
+      "id": "t:chatbot development",
+      "layer": "topic",
+      "label": "Chatbot Development",
+      "domain": "ai-and-ml",
+      "merged_from": [],
+      "module_count": 6
+    },
+    {
+      "id": "t:document management",
+      "layer": "topic",
+      "label": "Document Management",
+      "domain": "business-applications",
+      "merged_from": [
+        "Business Document Management",
+        "Document Management",
+        "Document Processing Automation"
+      ],
       "module_count": 5
     },
     {
@@ -1388,6 +2148,19 @@
       "domain": "security",
       "merged_from": [],
       "module_count": 18
+    },
+    {
+      "id": "t:solution architecture",
+      "layer": "topic",
+      "label": "Solution Design",
+      "domain": "business-applications",
+      "merged_from": [
+        "Solution Architecture",
+        "Solution Design",
+        "Solution Management",
+        "Solutions Architecture"
+      ],
+      "module_count": 46
     },
     {
       "id": "t:application deployment",
@@ -1423,6 +2196,14 @@
       "module_count": 5
     },
     {
+      "id": "t:data platform modernization",
+      "layer": "topic",
+      "label": "Data Platform Modernization",
+      "domain": "data-and-analytics",
+      "merged_from": [],
+      "module_count": 1
+    },
+    {
       "id": "t:typescript",
       "layer": "topic",
       "label": "TypeSpec",
@@ -1432,6 +2213,26 @@
         "TypeSpec"
       ],
       "module_count": 13
+    },
+    {
+      "id": "t:multicloud security",
+      "layer": "topic",
+      "label": "Multicloud Security",
+      "domain": "security",
+      "merged_from": [],
+      "module_count": 3
+    },
+    {
+      "id": "t:mobile application development",
+      "layer": "topic",
+      "label": "Application Development",
+      "domain": "development-tools",
+      "merged_from": [
+        "Application Development",
+        "Desktop Application Development",
+        "Mobile Application Development"
+      ],
+      "module_count": 31
     },
     {
       "id": "t:kusto query language kql",
@@ -1445,6 +2246,26 @@
       "module_count": 18
     },
     {
+      "id": "t:release management",
+      "layer": "topic",
+      "label": "Release Management",
+      "domain": "development-tools",
+      "merged_from": [],
+      "module_count": 11
+    },
+    {
+      "id": "t:meeting room technology",
+      "layer": "topic",
+      "label": "Meeting Management",
+      "domain": "productivity-and-collaboration",
+      "merged_from": [
+        "Meeting Facilitation",
+        "Meeting Management",
+        "Meeting Room Technology"
+      ],
+      "module_count": 4
+    },
+    {
       "id": "t:threat modeling",
       "layer": "topic",
       "label": "Threat Modeling",
@@ -1454,6 +2275,25 @@
         "Threat Protection"
       ],
       "module_count": 23
+    },
+    {
+      "id": "t:knowledge management integration",
+      "layer": "topic",
+      "label": "Knowledge Management Integration",
+      "domain": "ai-and-ml",
+      "merged_from": [],
+      "module_count": 1
+    },
+    {
+      "id": "t:canvas app development",
+      "layer": "topic",
+      "label": "Canvas App Development",
+      "domain": "business-applications",
+      "merged_from": [
+        "Canvas App Development",
+        "Power Apps Canvas App Development"
+      ],
+      "module_count": 4
     },
     {
       "id": "t:application performance optimization",
@@ -1466,6 +2306,32 @@
         "UI Performance Optimization"
       ],
       "module_count": 8
+    },
+    {
+      "id": "t:application performance monitoring",
+      "layer": "topic",
+      "label": "Application Monitoring",
+      "domain": "observability",
+      "merged_from": [
+        "Application Diagnostics",
+        "Application Instrumentation",
+        "Application Monitoring",
+        "Application Performance Monitoring",
+        "Application Performance Profiling",
+        "Performance Monitoring"
+      ],
+      "module_count": 31
+    },
+    {
+      "id": "t:ai sdk integration",
+      "layer": "topic",
+      "label": "AI SDK Integration",
+      "domain": "ai-and-ml",
+      "merged_from": [
+        "AI SDK Integration",
+        "AI-Integrated Application Development"
+      ],
+      "module_count": 2
     },
     {
       "id": "t:azure key vault",
@@ -1495,12 +2361,49 @@
       "module_count": 12
     },
     {
+      "id": "t:branch policies",
+      "layer": "topic",
+      "label": "Branch Policies",
+      "domain": "development-tools",
+      "merged_from": [
+        "Branch Management",
+        "Branch Policies",
+        "Branch Protection"
+      ],
+      "module_count": 4
+    },
+    {
+      "id": "t:software quality assurance",
+      "layer": "topic",
+      "label": "Quality Assurance",
+      "domain": "development-tools",
+      "merged_from": [
+        "Code Quality Assurance",
+        "Quality Assurance",
+        "Software Quality Assurance"
+      ],
+      "module_count": 10
+    },
+    {
       "id": "t:microsoft configuration manager",
       "layer": "topic",
       "label": "Microsoft Configuration Manager",
       "domain": "other",
       "merged_from": [],
       "module_count": 10
+    },
+    {
+      "id": "t:windows deployment",
+      "layer": "topic",
+      "label": "Windows Deployment",
+      "domain": "other",
+      "merged_from": [
+        "Desktop Deployment",
+        "Microsoft Deployment Toolkit",
+        "Operating System Deployment",
+        "Windows Deployment"
+      ],
+      "module_count": 13
     },
     {
       "id": "t:dragon copilot",
@@ -1512,6 +2415,34 @@
         "Dragon Copilot"
       ],
       "module_count": 19
+    },
+    {
+      "id": "t:application configuration management",
+      "layer": "topic",
+      "label": "Application State Management",
+      "domain": "development-tools",
+      "merged_from": [
+        "Application Configuration Management",
+        "Application State Management",
+        "Web Application Configuration"
+      ],
+      "module_count": 8
+    },
+    {
+      "id": "t:continuous deployment",
+      "layer": "topic",
+      "label": "Software Deployment",
+      "domain": "development-tools",
+      "merged_from": [
+        "Continuous Deployment",
+        "Deployment Patterns",
+        "Deployment Pipelines",
+        "Deployment Strategy Design",
+        "Software Deployment",
+        "Solution Deployment",
+        "Web Application Deployment"
+      ],
+      "module_count": 11
     },
     {
       "id": "t:storage snapshot management",
@@ -1534,6 +2465,74 @@
       "domain": "security",
       "merged_from": [],
       "module_count": 6
+    },
+    {
+      "id": "t:federated identity",
+      "layer": "topic",
+      "label": "Federated Identity",
+      "domain": "identity-and-access",
+      "merged_from": [
+        "Decentralized Identity",
+        "External Identities",
+        "Federated Identity"
+      ],
+      "module_count": 4
+    },
+    {
+      "id": "t:shadow it discovery",
+      "layer": "topic",
+      "label": "Shadow IT Discovery",
+      "domain": "security",
+      "merged_from": [],
+      "module_count": 1
+    },
+    {
+      "id": "t:application monetization",
+      "layer": "topic",
+      "label": "Software Monetization",
+      "domain": "business-applications",
+      "merged_from": [
+        "Application Monetization",
+        "Software Monetization"
+      ],
+      "module_count": 2
+    },
+    {
+      "id": "t:feature flag management",
+      "layer": "topic",
+      "label": "Feature Flags",
+      "domain": "development-tools",
+      "merged_from": [
+        "Feature Flag Management",
+        "Feature Flags",
+        "Feature Management"
+      ],
+      "module_count": 7
+    },
+    {
+      "id": "t:microsoft search",
+      "layer": "topic",
+      "label": "Microsoft Search",
+      "domain": "productivity-and-collaboration",
+      "merged_from": [
+        "Enterprise Search",
+        "Enterprise Search and Content Integration",
+        "Microsoft Search"
+      ],
+      "module_count": 13
+    },
+    {
+      "id": "t:multi-currency accounting",
+      "layer": "topic",
+      "label": "Currency Management",
+      "domain": "business-applications",
+      "merged_from": [
+        "Currency Management",
+        "Foreign Currency Management",
+        "Multi-Currency Accounting",
+        "Multicurrency Accounting"
+      ],
+      "module_count": 9
     },
     {
       "id": "t:security auditing",
@@ -1565,6 +2564,17 @@
       "module_count": 15
     },
     {
+      "id": "t:desktop management",
+      "layer": "topic",
+      "label": "Desktop Management",
+      "domain": "other",
+      "merged_from": [
+        "Desktop Management",
+        "Enterprise Desktop Administration"
+      ],
+      "module_count": 2
+    },
+    {
       "id": "t:hyper-v administration",
       "layer": "topic",
       "label": "Microsoft Hyper-V",
@@ -1581,6 +2591,36 @@
       "module_count": 13
     },
     {
+      "id": "t:extended detection and response xdr",
+      "layer": "topic",
+      "label": "Extended Detection and Response",
+      "domain": "security",
+      "merged_from": [
+        "Extended Detection and Response",
+        "Extended Detection and Response (XDR)"
+      ],
+      "module_count": 4
+    },
+    {
+      "id": "t:journal entry management",
+      "layer": "topic",
+      "label": "Journal Entry Management",
+      "domain": "business-applications",
+      "merged_from": [
+        "Journal Entry Management",
+        "Journal Entry Processing"
+      ],
+      "module_count": 3
+    },
+    {
+      "id": "t:microsoft 365 agents toolkit",
+      "layer": "topic",
+      "label": "Microsoft 365 Agents Toolkit",
+      "domain": "development-tools",
+      "merged_from": [],
+      "module_count": 2
+    },
+    {
       "id": "t:traffic management",
       "layer": "topic",
       "label": "Traffic Filtering",
@@ -1592,6 +2632,35 @@
         "Traffic Management"
       ],
       "module_count": 6
+    },
+    {
+      "id": "t:linux administration",
+      "layer": "topic",
+      "label": "OS Deployment",
+      "domain": "cloud-infrastructure",
+      "merged_from": [
+        "Cloud Administration",
+        "Distributed Systems",
+        "IT Administration",
+        "Linux Administration",
+        "Linux Package Management",
+        "OS Deployment",
+        "Remote Server Administration",
+        "Web Server Administration"
+      ],
+      "module_count": 26
+    },
+    {
+      "id": "t:artifact repository management",
+      "layer": "topic",
+      "label": "Artifact Management",
+      "domain": "development-tools",
+      "merged_from": [
+        "Artifact Management",
+        "Artifact Repository Management",
+        "Repository Migration"
+      ],
+      "module_count": 4
     },
     {
       "id": "t:network monitoring",
@@ -1608,6 +2677,25 @@
         "System Monitoring"
       ],
       "module_count": 18
+    },
+    {
+      "id": "t:security posture management",
+      "layer": "topic",
+      "label": "Security Posture Management",
+      "domain": "security",
+      "merged_from": [
+        "Data Security Posture Management",
+        "Security Posture Management"
+      ],
+      "module_count": 8
+    },
+    {
+      "id": "t:software extensibility",
+      "layer": "topic",
+      "label": "Software Extensibility",
+      "domain": "development-tools",
+      "merged_from": [],
+      "module_count": 1
     },
     {
       "id": "t:insider risk management",
@@ -1642,6 +2730,140 @@
       "module_count": 6
     },
     {
+      "id": "t:cloud compliance management",
+      "layer": "topic",
+      "label": "Government Cloud Compliance",
+      "domain": "security",
+      "merged_from": [
+        "Cloud Compliance Management",
+        "Cloud Security and Compliance",
+        "Government Cloud Compliance",
+        "Security Compliance Management"
+      ],
+      "module_count": 4
+    },
+    {
+      "id": "t:agent testing and validation",
+      "layer": "topic",
+      "label": "Agent Testing and Validation",
+      "domain": "ai-and-ml",
+      "merged_from": [],
+      "module_count": 1
+    },
+    {
+      "id": "t:fslogix",
+      "layer": "topic",
+      "label": "FSLogix",
+      "domain": "cloud-infrastructure",
+      "merged_from": [],
+      "module_count": 3
+    },
+    {
+      "id": "t:blue-green deployment",
+      "layer": "topic",
+      "label": "Blue-Green Deployment",
+      "domain": "development-tools",
+      "merged_from": [],
+      "module_count": 1
+    },
+    {
+      "id": "t:progressive delivery",
+      "layer": "topic",
+      "label": "Progressive Delivery",
+      "domain": "development-tools",
+      "merged_from": [],
+      "module_count": 2
+    },
+    {
+      "id": "t:oauth 2.0 and openid connect",
+      "layer": "topic",
+      "label": "OAuth",
+      "domain": "identity-and-access",
+      "merged_from": [
+        "OAuth",
+        "OAuth 2.0",
+        "OAuth 2.0 and OpenID Connect",
+        "OAuth 2.0 and Token-Based Authentication"
+      ],
+      "module_count": 10
+    },
+    {
+      "id": "t:policy management",
+      "layer": "topic",
+      "label": "Policy Management",
+      "domain": "productivity-and-collaboration",
+      "merged_from": [],
+      "module_count": 2
+    },
+    {
+      "id": "t:microsoft adoption score",
+      "layer": "topic",
+      "label": "Microsoft Adoption Score",
+      "domain": "productivity-and-collaboration",
+      "merged_from": [],
+      "module_count": 1
+    },
+    {
+      "id": "t:performance optimization",
+      "layer": "topic",
+      "label": "Performance Optimization",
+      "domain": "other",
+      "merged_from": [
+        "Performance Optimization",
+        "Windows Performance Optimization"
+      ],
+      "module_count": 3
+    },
+    {
+      "id": "t:copilot in power apps",
+      "layer": "topic",
+      "label": "Copilot in Power Apps",
+      "domain": "business-applications",
+      "merged_from": [
+        "Copilot in Power Apps",
+        "Copilot in Power Platform"
+      ],
+      "module_count": 2
+    },
+    {
+      "id": "t:environment management",
+      "layer": "topic",
+      "label": "Environment Management",
+      "domain": "business-applications",
+      "merged_from": [
+        "Environment Management",
+        "Sandbox Environment Management"
+      ],
+      "module_count": 4
+    },
+    {
+      "id": "t:optical character recognition",
+      "layer": "topic",
+      "label": "Optical Character Recognition",
+      "domain": "ai-and-ml",
+      "merged_from": [],
+      "module_count": 10
+    },
+    {
+      "id": "t:business central page design",
+      "layer": "topic",
+      "label": "Business Central Page Design",
+      "domain": "business-applications",
+      "merged_from": [
+        "Business Central Page Design",
+        "Business Central Page Development"
+      ],
+      "module_count": 2
+    },
+    {
+      "id": "t:self-service password reset",
+      "layer": "topic",
+      "label": "Self-Service Password Reset",
+      "domain": "identity-and-access",
+      "merged_from": [],
+      "module_count": 7
+    },
+    {
       "id": "t:network attached storage",
       "layer": "topic",
       "label": "Storage Spaces",
@@ -1668,6 +2890,62 @@
       "module_count": 7
     },
     {
+      "id": "t:data lifecycle management",
+      "layer": "topic",
+      "label": "Data Lifecycle Management",
+      "domain": "data-and-analytics",
+      "merged_from": [
+        "Data Lifecycle Management",
+        "Information Lifecycle Management"
+      ],
+      "module_count": 6
+    },
+    {
+      "id": "t:multimodal ai",
+      "layer": "topic",
+      "label": "Multimodal AI",
+      "domain": "ai-and-ml",
+      "merged_from": [],
+      "module_count": 4
+    },
+    {
+      "id": "t:custom connector development",
+      "layer": "topic",
+      "label": "Connector Management",
+      "domain": "business-applications",
+      "merged_from": [
+        "Connector Management",
+        "Custom Connector Development",
+        "Power Apps Custom Connectors",
+        "Power Platform Custom Connectors"
+      ],
+      "module_count": 5
+    },
+    {
+      "id": "t:security monitoring",
+      "layer": "topic",
+      "label": "Security Analytics",
+      "domain": "security",
+      "merged_from": [
+        "Network Security Monitoring",
+        "Security Analytics",
+        "Security Monitoring"
+      ],
+      "module_count": 6
+    },
+    {
+      "id": "t:al programming",
+      "layer": "topic",
+      "label": "AL Programming",
+      "domain": "development-tools",
+      "merged_from": [
+        "AL Language Development",
+        "AL Programming",
+        "AL Programming Language"
+      ],
+      "module_count": 4
+    },
+    {
       "id": "t:azure update manager",
       "layer": "topic",
       "label": "Azure Update Manager",
@@ -1680,6 +2958,272 @@
       "module_count": 6
     },
     {
+      "id": "t:server performance tuning",
+      "layer": "topic",
+      "label": "Server Performance Tuning",
+      "domain": "cloud-infrastructure",
+      "merged_from": [
+        "Server Performance Tuning",
+        "Storage Performance Tuning",
+        "Web Server Performance Tuning"
+      ],
+      "module_count": 3
+    },
+    {
+      "id": "t:pipeline concurrency management",
+      "layer": "topic",
+      "label": "Pipeline Concurrency Management",
+      "domain": "development-tools",
+      "merged_from": [
+        "Pipeline Concurrency Management",
+        "Pipeline Configuration Management"
+      ],
+      "module_count": 2
+    },
+    {
+      "id": "t:vat compliance",
+      "layer": "topic",
+      "label": "VAT Compliance",
+      "domain": "business-applications",
+      "merged_from": [
+        "VAT Accounting",
+        "VAT Compliance"
+      ],
+      "module_count": 4
+    },
+    {
+      "id": "t:foundation model selection",
+      "layer": "topic",
+      "label": "Foundation Model Selection",
+      "domain": "ai-and-ml",
+      "merged_from": [],
+      "module_count": 1
+    },
+    {
+      "id": "t:spring boot",
+      "layer": "topic",
+      "label": "Spring Boot",
+      "domain": "development-tools",
+      "merged_from": [
+        "Spring Boot",
+        "Spring Cloud",
+        "Spring Framework"
+      ],
+      "module_count": 3
+    },
+    {
+      "id": "t:ai infrastructure operations",
+      "layer": "topic",
+      "label": "AI Infrastructure Security",
+      "domain": "ai-and-ml",
+      "merged_from": [
+        "AI Infrastructure Operations",
+        "AI Infrastructure Security"
+      ],
+      "module_count": 2
+    },
+    {
+      "id": "t:application proxy",
+      "layer": "topic",
+      "label": "Application Proxy",
+      "domain": "identity-and-access",
+      "merged_from": [
+        "Application Proxy",
+        "Microsoft Entra Application Proxy"
+      ],
+      "module_count": 2
+    },
+    {
+      "id": "t:ai agent identity management",
+      "layer": "topic",
+      "label": "AI Agent Identity Management",
+      "domain": "identity-and-access",
+      "merged_from": [],
+      "module_count": 1
+    },
+    {
+      "id": "t:regression testing",
+      "layer": "topic",
+      "label": "Regression Testing",
+      "domain": "other",
+      "merged_from": [],
+      "module_count": 2
+    },
+    {
+      "id": "t:cloud solution publishing",
+      "layer": "topic",
+      "label": "Cloud Solution Publishing",
+      "domain": "cloud-infrastructure",
+      "merged_from": [
+        "Cloud Solution Publishing",
+        "Cloud-Hosted Development Environments"
+      ],
+      "module_count": 2
+    },
+    {
+      "id": "t:b2b collaboration",
+      "layer": "topic",
+      "label": "B2B Collaboration",
+      "domain": "identity-and-access",
+      "merged_from": [],
+      "module_count": 1
+    },
+    {
+      "id": "t:performance testing",
+      "layer": "topic",
+      "label": "Performance Testing",
+      "domain": "other",
+      "merged_from": [],
+      "module_count": 7
+    },
+    {
+      "id": "t:security reporting",
+      "layer": "topic",
+      "label": "Security Reporting",
+      "domain": "security",
+      "merged_from": [
+        "Security Reporting",
+        "Security Reporting and Analytics"
+      ],
+      "module_count": 3
+    },
+    {
+      "id": "t:json data processing",
+      "layer": "topic",
+      "label": "JSON Data Processing",
+      "domain": "data-and-analytics",
+      "merged_from": [],
+      "module_count": 4
+    },
+    {
+      "id": "t:it infrastructure assessment",
+      "layer": "topic",
+      "label": "IT Environment Assessment",
+      "domain": "other",
+      "merged_from": [
+        "IT Environment Assessment",
+        "IT Infrastructure Assessment"
+      ],
+      "module_count": 3
+    },
+    {
+      "id": "t:it process automation",
+      "layer": "topic",
+      "label": "IT Process Automation",
+      "domain": "identity-and-access",
+      "merged_from": [],
+      "module_count": 1
+    },
+    {
+      "id": "t:device configuration management",
+      "layer": "topic",
+      "label": "Modern Device Management",
+      "domain": "other",
+      "merged_from": [
+        "Device Configuration Management",
+        "Modern Device Management",
+        "Peripheral Device Management"
+      ],
+      "module_count": 4
+    },
+    {
+      "id": "t:microsoft store for business",
+      "layer": "topic",
+      "label": "Microsoft Store for Business",
+      "domain": "productivity-and-collaboration",
+      "merged_from": [],
+      "module_count": 1
+    },
+    {
+      "id": "t:social engineering awareness",
+      "layer": "topic",
+      "label": "Social Engineering Awareness",
+      "domain": "security",
+      "merged_from": [],
+      "module_count": 1
+    },
+    {
+      "id": "t:call quality management",
+      "layer": "topic",
+      "label": "Call Quality Management",
+      "domain": "productivity-and-collaboration",
+      "merged_from": [],
+      "module_count": 1
+    },
+    {
+      "id": "t:windows client deployment",
+      "layer": "topic",
+      "label": "Windows Server Deployment",
+      "domain": "cloud-infrastructure",
+      "merged_from": [
+        "Windows Client Deployment",
+        "Windows Server Deployment"
+      ],
+      "module_count": 2
+    },
+    {
+      "id": "t:nested virtualization",
+      "layer": "topic",
+      "label": "Server Virtualization",
+      "domain": "cloud-infrastructure",
+      "merged_from": [
+        "Nested Virtualization",
+        "Server Virtualization"
+      ],
+      "module_count": 2
+    },
+    {
+      "id": "t:user and entity behavior analytics",
+      "layer": "topic",
+      "label": "User Behavior Analytics",
+      "domain": "security",
+      "merged_from": [
+        "User Behavior Analytics",
+        "User and Entity Behavior Analytics"
+      ],
+      "module_count": 4
+    },
+    {
+      "id": "t:windows application management",
+      "layer": "topic",
+      "label": "Windows Application Management",
+      "domain": "productivity-and-collaboration",
+      "merged_from": [],
+      "module_count": 1
+    },
+    {
+      "id": "t:deployment governance",
+      "layer": "topic",
+      "label": "Deployment Governance",
+      "domain": "development-tools",
+      "merged_from": [],
+      "module_count": 1
+    },
+    {
+      "id": "t:data deduplication",
+      "layer": "topic",
+      "label": "Data Deduplication",
+      "domain": "cloud-infrastructure",
+      "merged_from": [],
+      "module_count": 1
+    },
+    {
+      "id": "t:remote server administration tools",
+      "layer": "topic",
+      "label": "Remote Server Administration Tools",
+      "domain": "cloud-infrastructure",
+      "merged_from": [],
+      "module_count": 1
+    },
+    {
+      "id": "t:azure cognitive search",
+      "layer": "topic",
+      "label": "Azure Cognitive Search",
+      "domain": "data-and-analytics",
+      "merged_from": [],
+      "module_count": 1
+    },
+    {
       "id": "t:microsoft endpoint configuration manager",
       "layer": "topic",
       "label": "Configuration Profile Management",
@@ -1689,27 +3233,219 @@
         "Microsoft Endpoint Configuration Manager"
       ],
       "module_count": 5
+    },
+    {
+      "id": "t:barcode scanning integration",
+      "layer": "topic",
+      "label": "Barcode Scanning Integration",
+      "domain": "development-tools",
+      "merged_from": [],
+      "module_count": 1
+    },
+    {
+      "id": "t:financial period close",
+      "layer": "topic",
+      "label": "Period-End Close",
+      "domain": "business-applications",
+      "merged_from": [
+        "Financial Period Close",
+        "Financial Period-End Close",
+        "Period-End Close",
+        "Period-End Close Processes"
+      ],
+      "module_count": 4
+    },
+    {
+      "id": "t:teams toolkit",
+      "layer": "topic",
+      "label": "Teams Toolkit",
+      "domain": "development-tools",
+      "merged_from": [
+        "Teams JavaScript Client Library",
+        "Teams Toolkit"
+      ],
+      "module_count": 3
+    },
+    {
+      "id": "t:iscsi",
+      "layer": "topic",
+      "label": "iSCSI",
+      "domain": "cloud-infrastructure",
+      "merged_from": [],
+      "module_count": 1
+    },
+    {
+      "id": "t:storage administration",
+      "layer": "topic",
+      "label": "Storage Administration",
+      "domain": "other",
+      "merged_from": [
+        "Storage Administration",
+        "Windows Storage Administration"
+      ],
+      "module_count": 4
+    },
+    {
+      "id": "t:formula authoring",
+      "layer": "topic",
+      "label": "Formula Authoring",
+      "domain": "business-applications",
+      "merged_from": [
+        "Formula Authoring",
+        "Formula Writing in Power Apps"
+      ],
+      "module_count": 2
+    },
+    {
+      "id": "t:extended security updates",
+      "layer": "topic",
+      "label": "Extended Security Updates",
+      "domain": "security",
+      "merged_from": [],
+      "module_count": 1
+    },
+    {
+      "id": "t:ai cost management",
+      "layer": "topic",
+      "label": "AI Cost Management",
+      "domain": "ai-and-ml",
+      "merged_from": [
+        "AI Cost Management",
+        "AI Infrastructure Cost Optimization"
+      ],
+      "module_count": 2
+    },
+    {
+      "id": "t:availability testing",
+      "layer": "topic",
+      "label": "Availability Testing",
+      "domain": "observability",
+      "merged_from": [],
+      "module_count": 1
+    },
+    {
+      "id": "t:azure traffic manager",
+      "layer": "topic",
+      "label": "Azure Traffic Manager",
+      "domain": "networking",
+      "merged_from": [],
+      "module_count": 2
+    },
+    {
+      "id": "t:xml",
+      "layer": "topic",
+      "label": "XML",
+      "domain": "development-tools",
+      "merged_from": [],
+      "module_count": 1
+    },
+    {
+      "id": "t:canary deployments",
+      "layer": "topic",
+      "label": "Canary Deployments",
+      "domain": "development-tools",
+      "merged_from": [],
+      "module_count": 1
+    },
+    {
+      "id": "t:agentic process automation",
+      "layer": "topic",
+      "label": "Agentic Process Automation",
+      "domain": "ai-and-ml",
+      "merged_from": [],
+      "module_count": 1
+    },
+    {
+      "id": "t:ui extensibility",
+      "layer": "topic",
+      "label": "UI Extensibility",
+      "domain": "business-applications",
+      "merged_from": [],
+      "module_count": 1
     }
   ],
   "links": [
     {
-      "source": "r:business central al developer",
-      "target": "t:dynamics 365 business central",
-      "value": 5,
-      "kind": "role-topic",
-      "strength": "strong"
-    },
-    {
-      "source": "r:business central al developer",
-      "target": "t:business central report development",
-      "value": 1,
+      "source": "r:windows server administrator",
+      "target": "t:dhcp administration",
+      "value": 3,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
       "source": "r:business central al developer",
       "target": "t:al development",
-      "value": 2,
+      "value": 17,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:business central al developer",
+      "target": "t:event-driven architecture",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:finance or accounting professional using business central",
+      "target": "t:general ledger accounting",
+      "value": 4,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:finance or accounting professional using business central",
+      "target": "t:asset management",
+      "value": 7,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:finance or accounting professional using business central",
+      "target": "t:budget management",
+      "value": 4,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:finance or accounting professional using business central",
+      "target": "t:dynamics 365 business central",
+      "value": 8,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:finance or accounting professional using business central",
+      "target": "t:microsoft excel",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:finance or accounting professional using business central",
+      "target": "t:database migration",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:business central al developer",
+      "target": "t:dynamics 365 business central",
+      "value": 29,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:business central al developer",
+      "target": "t:al programming",
+      "value": 6,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:business central al developer",
+      "target": "t:business central report development",
+      "value": 8,
       "kind": "role-topic",
       "strength": "strong"
     },
@@ -1730,7 +3466,7 @@
     {
       "source": "r:ai application developer",
       "target": "t:azure ai foundry",
-      "value": 3,
+      "value": 4,
       "kind": "role-topic",
       "strength": "strong"
     },
@@ -1765,7 +3501,7 @@
     {
       "source": "r:ai application developer on azure",
       "target": "t:azure ai foundry",
-      "value": 5,
+      "value": 8,
       "kind": "role-topic",
       "strength": "strong"
     },
@@ -1786,70 +3522,252 @@
     {
       "source": "r:ai application developer on azure",
       "target": "t:microsoft azure",
-      "value": 5,
+      "value": 6,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
       "source": "r:ai application developer",
       "target": "t:.net development",
-      "value": 1,
+      "value": 2,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
       "source": "r:ai application developer on azure",
       "target": "t:.net development",
-      "value": 1,
+      "value": 2,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
       "source": "r:ai application developer on azure",
       "target": "t:semantic search",
-      "value": 1,
-      "kind": "role-topic",
-      "strength": "weak"
-    },
-    {
-      "source": "r:security operations analyst",
-      "target": "t:microsoft purview",
       "value": 2,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
-      "source": "r:compliance and security administrator",
+      "source": "r:ai application developer",
+      "target": "t:business process automation",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:ai application developer",
+      "target": "t:generative ai application development",
+      "value": 7,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:ai application developer",
+      "target": "t:machine learning",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:ai application developer",
+      "target": "t:robotic process automation",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:identity and security administrator",
+      "target": "t:windows hello for business",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:identity and security administrator",
+      "target": "t:microsoft entra id",
+      "value": 11,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:security operations analyst implementing microsoft sentinel",
+      "target": "t:microsoft entra id",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:identity and security administrator",
+      "target": "t:multi-factor authentication",
+      "value": 4,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:identity and access administrator",
+      "target": "t:multi-factor authentication",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:identity and security administrator",
+      "target": "t:zero trust security",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:identity and access administrator",
+      "target": "t:zero trust security",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:business central al developer",
+      "target": "t:exception handling",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:teams administrator",
+      "target": "t:microsoft teams administration",
+      "value": 33,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:teams administrator",
+      "target": "t:identity and access management",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:teams administrator",
+      "target": "t:meeting room technology",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:teams administrator",
+      "target": "t:virtual event production",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:security operations analyst",
       "target": "t:microsoft purview",
       "value": 5,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
+      "source": "r:compliance and security administrator",
+      "target": "t:microsoft purview",
+      "value": 12,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
       "source": "r:security operations analyst",
       "target": "t:security auditing",
-      "value": 1,
+      "value": 2,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
       "source": "r:compliance and security administrator",
       "target": "t:security auditing",
+      "value": 5,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:security operations analyst",
+      "target": "t:data retention management",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:compliance and security administrator",
+      "target": "t:data retention management",
+      "value": 4,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:security operations analyst",
+      "target": "t:data lifecycle management",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:compliance and security administrator",
+      "target": "t:data lifecycle management",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:identity and access administrator",
+      "target": "t:microsoft entra id",
+      "value": 42,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:identity and access administrator",
+      "target": "t:identity and access management",
+      "value": 37,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:identity and access administrator",
+      "target": "t:regulatory compliance",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:identity and access administrator",
+      "target": "t:access reviews",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:finance or accounting professional using business central",
+      "target": "t:master data management",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:finance and operations app developer",
+      "target": "t:dynamics 365 business central",
+      "value": 12,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:finance and operations app developer",
+      "target": "t:data exchange framework",
       "value": 1,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
       "source": "r:finance and operations app developer",
-      "target": "t:dynamics 365 business central",
-      "value": 2,
-      "kind": "role-topic",
-      "strength": "strong"
-    },
-    {
-      "source": "r:finance and operations app developer",
       "target": "t:data modeling",
-      "value": 2,
+      "value": 3,
       "kind": "role-topic",
       "strength": "strong"
     },
@@ -1868,16 +3786,135 @@
       "strength": "weak"
     },
     {
+      "source": "r:finance and operations app developer",
+      "target": "t:azure cosmos db",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:finance or accounting professional using business central",
+      "target": "t:bank reconciliation",
+      "value": 6,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:copilot studio agent builder",
+      "target": "t:microsoft 365 copilot",
+      "value": 5,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:copilot studio agent builder",
+      "target": "t:knowledge management integration",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:copilot studio agent builder",
+      "target": "t:microsoft copilot studio",
+      "value": 21,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:copilot studio agent builder",
+      "target": "t:microsoft security copilot",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:copilot studio agent builder",
+      "target": "t:generative ai application development",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:finance and operations app developer",
+      "target": "t:application performance optimization",
+      "value": 3,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:finance and operations app developer",
+      "target": "t:performance testing",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:finance and operations app developer",
+      "target": "t:application performance monitoring",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:finance and operations app developer",
+      "target": "t:software extensibility",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:finance and operations app developer",
+      "target": "t:x++ development",
+      "value": 9,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:business central extension developer",
+      "target": "t:dynamics 365 business central",
+      "value": 9,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:business central extension developer",
+      "target": "t:test automation",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:business central al developer",
+      "target": "t:test automation",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:business central extension developer",
+      "target": "t:containerization",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:business central al developer",
+      "target": "t:containerization",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
       "source": "r:power platform solution architect",
       "target": "t:power platform development",
-      "value": 9,
+      "value": 26,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
       "source": "r:power platform solution architect",
       "target": "t:microsoft dataverse",
-      "value": 2,
+      "value": 6,
       "kind": "role-topic",
       "strength": "strong"
     },
@@ -1898,13 +3935,13 @@
     {
       "source": "r:it administrator endpoint manager",
       "target": "t:microsoft configuration manager",
-      "value": 4,
+      "value": 10,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
       "source": "r:it administrator endpoint manager",
-      "target": "t:application deployment",
+      "target": "t:windows deployment",
       "value": 2,
       "kind": "role-topic",
       "strength": "strong"
@@ -1912,42 +3949,70 @@
     {
       "source": "r:it administrator endpoint manager",
       "target": "t:microsoft endpoint configuration manager",
+      "value": 6,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:it administrator endpoint manager",
+      "target": "t:endpoint management",
+      "value": 4,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:it administrator endpoint manager",
+      "target": "t:application deployment",
+      "value": 4,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:it administrator endpoint manager",
+      "target": "t:it troubleshooting",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:business central al developer",
+      "target": "t:business central page design",
+      "value": 5,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:business central extension developer",
+      "target": "t:business central page design",
       "value": 2,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
       "source": "r:business central extension developer",
-      "target": "t:dynamics 365 business central",
-      "value": 1,
-      "kind": "role-topic",
-      "strength": "weak"
-    },
-    {
-      "source": "r:business central extension developer",
       "target": "t:al development",
-      "value": 1,
+      "value": 3,
       "kind": "role-topic",
-      "strength": "weak"
+      "strength": "strong"
     },
     {
       "source": "r:business central al developer",
       "target": "t:business central extension development",
-      "value": 1,
+      "value": 3,
       "kind": "role-topic",
-      "strength": "weak"
+      "strength": "strong"
     },
     {
       "source": "r:business central extension developer",
       "target": "t:business central extension development",
-      "value": 1,
+      "value": 7,
       "kind": "role-topic",
-      "strength": "weak"
+      "strength": "strong"
     },
     {
       "source": "r:compliance and security administrator",
       "target": "t:microsoft 365 compliance",
-      "value": 1,
+      "value": 3,
       "kind": "role-topic",
       "strength": "strong"
     },
@@ -1980,11 +4045,25 @@
       "strength": "strong"
     },
     {
-      "source": "r:security operations analyst implementing microsoft sentinel",
-      "target": "t:kusto query language kql",
-      "value": 3,
+      "source": "r:power platform solution architect",
+      "target": "t:canvas app development",
+      "value": 1,
       "kind": "role-topic",
       "strength": "strong"
+    },
+    {
+      "source": "r:security operations analyst implementing microsoft sentinel",
+      "target": "t:kusto query language kql",
+      "value": 9,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:security operations analyst implementing microsoft sentinel",
+      "target": "t:log management",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "weak"
     },
     {
       "source": "r:security operations analyst",
@@ -1996,35 +4075,133 @@
     {
       "source": "r:security operations analyst implementing microsoft sentinel",
       "target": "t:microsoft sentinel",
-      "value": 3,
+      "value": 11,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
       "source": "r:security operations analyst",
       "target": "t:microsoft sentinel",
-      "value": 1,
+      "value": 6,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
       "source": "r:security operations analyst implementing microsoft sentinel",
       "target": "t:microsoft defender for cloud",
-      "value": 4,
+      "value": 5,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
       "source": "r:security operations analyst",
       "target": "t:microsoft defender for cloud",
+      "value": 15,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:cloud security administrator",
+      "target": "t:shadow it discovery",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:cloud security administrator",
+      "target": "t:data loss prevention",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:cloud security administrator",
+      "target": "t:threat modeling",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:cloud security administrator",
+      "target": "t:threat intelligence",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:cloud security administrator",
+      "target": "t:microsoft defender for cloud",
+      "value": 11,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:finance and operations app developer",
+      "target": "t:object-oriented programming",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:business central al developer",
+      "target": "t:database migration",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:business central extension developer",
+      "target": "t:database migration",
       "value": 1,
       "kind": "role-topic",
       "strength": "weak"
     },
     {
+      "source": "r:business central al developer",
+      "target": "t:relational database design",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:it administrator endpoint manager",
+      "target": "t:desktop management",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:it administrator endpoint manager",
+      "target": "t:it infrastructure assessment",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:it administrator endpoint manager",
+      "target": "t:it asset management",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:it administrator endpoint manager",
+      "target": "t:device configuration management",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
       "source": "r:hybrid infrastructure administrator",
       "target": "t:microsoft azure",
-      "value": 6,
+      "value": 17,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:hybrid infrastructure administrator",
+      "target": "t:hyper-v administration",
+      "value": 1,
       "kind": "role-topic",
       "strength": "strong"
     },
@@ -2044,13 +4221,6 @@
     },
     {
       "source": "r:identity and access administrator",
-      "target": "t:identity and access management",
-      "value": 8,
-      "kind": "role-topic",
-      "strength": "strong"
-    },
-    {
-      "source": "r:identity and access administrator",
       "target": "t:active directory domain services",
       "value": 1,
       "kind": "role-topic",
@@ -2065,92 +4235,106 @@
     },
     {
       "source": "r:identity and access administrator",
-      "target": "t:microsoft entra id",
-      "value": 16,
-      "kind": "role-topic",
-      "strength": "strong"
-    },
-    {
-      "source": "r:finance or accounting professional using business central",
-      "target": "t:asset management",
-      "value": 3,
-      "kind": "role-topic",
-      "strength": "strong"
-    },
-    {
-      "source": "r:finance or accounting professional managing fixed assets",
-      "target": "t:asset management",
+      "target": "t:azure role-based access control",
       "value": 5,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
-      "source": "r:finance or accounting professional using business central",
-      "target": "t:dynamics 365 business central",
-      "value": 4,
+      "source": "r:identity and access administrator",
+      "target": "t:information governance",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:finance or accounting professional managing fixed assets",
+      "target": "t:asset management",
+      "value": 9,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
       "source": "r:finance or accounting professional managing fixed assets",
       "target": "t:dynamics 365 business central",
+      "value": 5,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:finance or accounting professional managing fixed assets",
+      "target": "t:budget management",
       "value": 3,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
-      "source": "r:finance or accounting professional using business central",
-      "target": "t:budget management",
+      "source": "r:azure virtual desktop administrator",
+      "target": "t:msix app attach",
+      "value": 3,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:azure virtual desktop administrator",
+      "target": "t:microsoft azure",
+      "value": 16,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:azure virtual desktop administrator",
+      "target": "t:onedrive administration",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:azure virtual desktop administrator",
+      "target": "t:microsoft teams administration",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:teams administrator",
+      "target": "t:microsoft azure",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:azure virtual desktop administrator",
+      "target": "t:teams toolkit",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:teams administrator",
+      "target": "t:teams toolkit",
       "value": 2,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
-      "source": "r:finance or accounting professional managing fixed assets",
-      "target": "t:budget management",
-      "value": 1,
-      "kind": "role-topic",
-      "strength": "strong"
-    },
-    {
-      "source": "r:azure virtual desktop administrator",
-      "target": "t:microsoft teams administration",
-      "value": 1,
-      "kind": "role-topic",
-      "strength": "strong"
-    },
-    {
-      "source": "r:teams administrator",
-      "target": "t:microsoft teams administration",
-      "value": 7,
-      "kind": "role-topic",
-      "strength": "strong"
-    },
-    {
-      "source": "r:azure virtual desktop administrator",
-      "target": "t:microsoft azure",
-      "value": 6,
-      "kind": "role-topic",
-      "strength": "strong"
-    },
-    {
-      "source": "r:teams administrator",
-      "target": "t:microsoft azure",
-      "value": 1,
+      "source": "r:compliance and security administrator",
+      "target": "t:regulatory compliance",
+      "value": 2,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
       "source": "r:business process automator",
       "target": "t:intelligent document processing",
-      "value": 2,
+      "value": 11,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
       "source": "r:business process automator",
       "target": "t:natural language processing",
-      "value": 1,
+      "value": 2,
       "kind": "role-topic",
       "strength": "weak"
     },
@@ -2164,28 +4348,28 @@
     {
       "source": "r:business process automator",
       "target": "t:ai builder",
-      "value": 3,
+      "value": 5,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
       "source": "r:windows server administrator",
       "target": "t:microsoft azure",
-      "value": 3,
+      "value": 8,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
       "source": "r:windows server infrastructure administrator",
       "target": "t:microsoft azure",
-      "value": 6,
+      "value": 7,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
       "source": "r:windows server administrator",
       "target": "t:cloud migration",
-      "value": 2,
+      "value": 3,
       "kind": "role-topic",
       "strength": "strong"
     },
@@ -2212,92 +4396,141 @@
     },
     {
       "source": "r:windows server administrator",
-      "target": "t:dns administration",
-      "value": 1,
-      "kind": "role-topic",
-      "strength": "weak"
-    },
-    {
-      "source": "r:windows server infrastructure administrator",
-      "target": "t:dns administration",
-      "value": 1,
-      "kind": "role-topic",
-      "strength": "weak"
-    },
-    {
-      "source": "r:windows server administrator",
-      "target": "t:network attached storage",
-      "value": 2,
-      "kind": "role-topic",
-      "strength": "weak"
-    },
-    {
-      "source": "r:windows server infrastructure administrator",
-      "target": "t:network attached storage",
-      "value": 2,
-      "kind": "role-topic",
-      "strength": "weak"
-    },
-    {
-      "source": "r:windows server administrator",
-      "target": "t:hyper-v administration",
-      "value": 1,
-      "kind": "role-topic",
-      "strength": "weak"
-    },
-    {
-      "source": "r:windows server infrastructure administrator",
-      "target": "t:hyper-v administration",
-      "value": 1,
-      "kind": "role-topic",
-      "strength": "weak"
-    },
-    {
-      "source": "r:windows server administrator",
-      "target": "t:windows server failover clustering",
-      "value": 1,
+      "target": "t:windows client deployment",
+      "value": 5,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
       "source": "r:windows server infrastructure administrator",
-      "target": "t:windows server failover clustering",
+      "target": "t:windows client deployment",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:windows server administrator",
+      "target": "t:dns administration",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:windows server infrastructure administrator",
+      "target": "t:dns administration",
+      "value": 5,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:windows server administrator",
+      "target": "t:network attached storage",
+      "value": 3,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:windows server infrastructure administrator",
+      "target": "t:network attached storage",
+      "value": 7,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:windows server administrator",
+      "target": "t:hyper-v administration",
+      "value": 3,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:windows server infrastructure administrator",
+      "target": "t:hyper-v administration",
       "value": 3,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
       "source": "r:windows server administrator",
-      "target": "t:containerization",
+      "target": "t:windows server failover clustering",
       "value": 1,
       "kind": "role-topic",
-      "strength": "weak"
+      "strength": "strong"
+    },
+    {
+      "source": "r:windows server infrastructure administrator",
+      "target": "t:windows server failover clustering",
+      "value": 7,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:windows server administrator",
+      "target": "t:containerization",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
     },
     {
       "source": "r:windows server infrastructure administrator",
       "target": "t:containerization",
-      "value": 1,
+      "value": 2,
       "kind": "role-topic",
-      "strength": "weak"
+      "strength": "strong"
     },
     {
       "source": "r:windows server administrator",
       "target": "t:storage snapshot management",
-      "value": 1,
+      "value": 3,
       "kind": "role-topic",
-      "strength": "weak"
+      "strength": "strong"
     },
     {
       "source": "r:windows server infrastructure administrator",
       "target": "t:storage snapshot management",
+      "value": 3,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:copilot studio agent builder",
+      "target": "t:agent testing and validation",
       "value": 1,
       "kind": "role-topic",
-      "strength": "weak"
+      "strength": "strong"
+    },
+    {
+      "source": "r:devops release engineer",
+      "target": "t:blue-green deployment",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:devops release engineer",
+      "target": "t:microsoft azure",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:devops release engineer",
+      "target": "t:progressive delivery",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:devops release engineer",
+      "target": "t:continuous integration",
+      "value": 5,
+      "kind": "role-topic",
+      "strength": "strong"
     },
     {
       "source": "r:business process automator",
       "target": "t:power automate",
-      "value": 18,
+      "value": 34,
       "kind": "role-topic",
       "strength": "strong"
     },
@@ -2311,7 +4544,7 @@
     {
       "source": "r:business process automator",
       "target": "t:robotic process automation",
-      "value": 1,
+      "value": 4,
       "kind": "role-topic",
       "strength": "strong"
     },
@@ -2325,7 +4558,7 @@
     {
       "source": "r:business process automator",
       "target": "t:business process automation",
-      "value": 1,
+      "value": 3,
       "kind": "role-topic",
       "strength": "strong"
     },
@@ -2344,23 +4577,58 @@
       "strength": "strong"
     },
     {
-      "source": "r:finance or accounting professional using business central",
-      "target": "t:general ledger accounting",
+      "source": "r:teams administrator",
+      "target": "t:microsoft defender for cloud",
       "value": 1,
       "kind": "role-topic",
-      "strength": "weak"
+      "strength": "strong"
+    },
+    {
+      "source": "r:teams administrator",
+      "target": "t:security monitoring",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:teams administrator",
+      "target": "t:microsoft adoption score",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:teams administrator",
+      "target": "t:microsoft entra id",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:citizen developer low-code app builder",
+      "target": "t:copilot in power apps",
+      "value": 3,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:citizen developer low-code app builder",
+      "target": "t:power platform development",
+      "value": 12,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:citizen developer low-code app builder",
+      "target": "t:microsoft 365 copilot",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
     },
     {
       "source": "r:finance or accounting professional managing fixed assets",
       "target": "t:general ledger accounting",
-      "value": 1,
-      "kind": "role-topic",
-      "strength": "weak"
-    },
-    {
-      "source": "r:finance or accounting professional using business central",
-      "target": "t:bank reconciliation",
-      "value": 1,
+      "value": 2,
       "kind": "role-topic",
       "strength": "weak"
     },
@@ -2374,13 +4642,97 @@
     {
       "source": "r:finance or accounting professional using business central",
       "target": "t:cost accounting",
-      "value": 2,
+      "value": 5,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
       "source": "r:finance or accounting professional managing fixed assets",
       "target": "t:cost accounting",
+      "value": 4,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:finance or accounting professional using business central",
+      "target": "t:accounts payable",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:finance and operations app developer",
+      "target": "t:application lifecycle management",
+      "value": 3,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:finance and operations app developer",
+      "target": "t:regression testing",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:finance and operations app developer",
+      "target": "t:software quality assurance",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:finance and operations app developer",
+      "target": "t:change management",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:finance and operations app developer",
+      "target": "t:release management",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:finance and operations app developer",
+      "target": "t:environment management",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:finance and operations app developer",
+      "target": "t:version control",
+      "value": 4,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:teams administrator",
+      "target": "t:policy management",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:teams administrator",
+      "target": "t:data retention management",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:power platform solution architect",
+      "target": "t:microsoft azure",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:power platform solution architect",
+      "target": "t:azure health data services",
       "value": 1,
       "kind": "role-topic",
       "strength": "strong"
@@ -2388,7 +4740,7 @@
     {
       "source": "r:finance or accounting professional using business central",
       "target": "t:financial reporting",
-      "value": 1,
+      "value": 3,
       "kind": "role-topic",
       "strength": "strong"
     },
@@ -2401,15 +4753,8 @@
     },
     {
       "source": "r:identity and security administrator",
-      "target": "t:microsoft entra id",
-      "value": 4,
-      "kind": "role-topic",
-      "strength": "strong"
-    },
-    {
-      "source": "r:identity and security administrator",
       "target": "t:identity and access management",
-      "value": 2,
+      "value": 6,
       "kind": "role-topic",
       "strength": "strong"
     },
@@ -2422,15 +4767,43 @@
     },
     {
       "source": "r:identity and security administrator",
-      "target": "t:multi-factor authentication",
+      "target": "t:extended detection and response xdr",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:identity and security administrator",
+      "target": "t:security operations",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:identity and security administrator",
+      "target": "t:social engineering awareness",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:identity and security administrator",
+      "target": "t:self-service password reset",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:business process automator",
+      "target": "t:power platform development",
       "value": 2,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
-      "source": "r:identity and access administrator",
-      "target": "t:multi-factor authentication",
-      "value": 1,
+      "source": "r:business process automator",
+      "target": "t:data loss prevention",
+      "value": 2,
       "kind": "role-topic",
       "strength": "strong"
     },
@@ -2443,21 +4816,14 @@
     },
     {
       "source": "r:copilot studio agent builder",
-      "target": "t:microsoft 365 copilot",
-      "value": 2,
-      "kind": "role-topic",
-      "strength": "strong"
-    },
-    {
-      "source": "r:copilot studio agent builder",
-      "target": "t:microsoft copilot studio",
-      "value": 6,
-      "kind": "role-topic",
-      "strength": "strong"
-    },
-    {
-      "source": "r:copilot studio agent builder",
       "target": "t:typescript",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:copilot studio agent builder",
+      "target": "t:microsoft 365 agents toolkit",
       "value": 1,
       "kind": "role-topic",
       "strength": "strong"
@@ -2491,9 +4857,142 @@
       "strength": "strong"
     },
     {
+      "source": "r:ai application developer",
+      "target": "t:foundation model selection",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:identity and access administrator",
+      "target": "t:microsoft graph",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:windows server administrator",
+      "target": "t:application performance monitoring",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:windows server administrator",
+      "target": "t:windows administration",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:windows server administrator",
+      "target": "t:server performance tuning",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:windows server administrator",
+      "target": "t:performance optimization",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:power platform solution architect",
+      "target": "t:data platform modernization",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:identity and access administrator",
+      "target": "t:application proxy",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:identity and access administrator",
+      "target": "t:app registration",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
       "source": "r:identity and access administrator",
       "target": "t:application governance",
       "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:identity and access administrator",
+      "target": "t:security reporting",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:identity and security administrator",
+      "target": "t:security reporting",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:security operations analyst",
+      "target": "t:disaster recovery",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:security operations analyst",
+      "target": "t:threat intelligence",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:identity and access administrator",
+      "target": "t:ai agent identity management",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:identity and access administrator",
+      "target": "t:multi-agent systems",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:identity and access administrator",
+      "target": "t:cloud governance",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:identity and access administrator",
+      "target": "t:federated identity",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:identity and access administrator",
+      "target": "t:microsoft teams administration",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:hybrid infrastructure administrator",
+      "target": "t:azure update manager",
+      "value": 2,
       "kind": "role-topic",
       "strength": "strong"
     },
@@ -2527,22 +5026,113 @@
     },
     {
       "source": "r:hybrid infrastructure administrator",
-      "target": "t:azure update manager",
+      "target": "t:extended security updates",
       "value": 1,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
+      "source": "r:microsoft 365 administrator",
+      "target": "t:microsoft search",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:identity and access administrator",
+      "target": "t:b2b collaboration",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:power platform solution architect",
+      "target": "t:robotic process automation",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:power platform solution architect",
+      "target": "t:power automate",
+      "value": 4,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:finance and operations app developer",
+      "target": "t:cloud solution publishing",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:finance and operations app developer",
+      "target": "t:.net development",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:identity and access administrator",
+      "target": "t:security posture management",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:finance or accounting professional using business central",
+      "target": "t:vat compliance",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:identity and access administrator",
+      "target": "t:it process automation",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:cloud security administrator",
+      "target": "t:endpoint security",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:cloud security administrator",
+      "target": "t:microsoft azure",
+      "value": 3,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:cloud security administrator",
+      "target": "t:cloud security",
+      "value": 4,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:finance and operations app developer",
+      "target": "t:mobile application development",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
       "source": "r:it administrator endpoint manager",
       "target": "t:microsoft entra id",
-      "value": 2,
+      "value": 10,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
       "source": "r:it administrator endpoint manager",
       "target": "t:microsoft teams administration",
-      "value": 2,
+      "value": 3,
       "kind": "role-topic",
       "strength": "strong"
     },
@@ -2556,7 +5146,56 @@
     {
       "source": "r:it administrator endpoint manager",
       "target": "t:microsoft 365 copilot",
+      "value": 3,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:it administrator endpoint manager",
+      "target": "t:identity and access management",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:it administrator endpoint manager",
+      "target": "t:microsoft store for business",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:it administrator endpoint manager",
+      "target": "t:windows application management",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:business process automator",
+      "target": "t:marketing automation",
       "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:power platform solution architect",
+      "target": "t:business process automation",
+      "value": 3,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:compliance and security administrator",
+      "target": "t:microsoft teams administration",
+      "value": 5,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:business process automator",
+      "target": "t:microsoft excel",
+      "value": 3,
       "kind": "role-topic",
       "strength": "strong"
     },
@@ -2577,20 +5216,104 @@
     {
       "source": "r:copilot studio agent builder",
       "target": "t:power automate",
-      "value": 3,
+      "value": 4,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
+      "source": "r:business central al developer",
+      "target": "t:.net development",
+      "value": 3,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:business central al developer",
+      "target": "t:continuous deployment",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:teams administrator",
+      "target": "t:it troubleshooting",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:teams administrator",
+      "target": "t:direct routing",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:teams administrator",
+      "target": "t:voip quality monitoring",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:teams administrator",
+      "target": "t:call quality management",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:windows server administrator",
+      "target": "t:windows deployment",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:windows server administrator",
+      "target": "t:nested virtualization",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:windows server infrastructure administrator",
+      "target": "t:nested virtualization",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:security operations analyst",
+      "target": "t:incident response",
+      "value": 3,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
       "source": "r:it administrator endpoint manager",
-      "target": "t:endpoint management",
+      "target": "t:windows autopilot",
       "value": 1,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
       "source": "r:it administrator endpoint manager",
-      "target": "t:windows autopilot",
+      "target": "t:windows administration",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:it administrator endpoint manager",
+      "target": "t:linux administration",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:it administrator endpoint manager",
+      "target": "t:windows hello for business",
       "value": 1,
       "kind": "role-topic",
       "strength": "strong"
@@ -2603,16 +5326,44 @@
       "strength": "strong"
     },
     {
-      "source": "r:security operations analyst implementing microsoft sentinel",
-      "target": "t:log management",
+      "source": "r:finance and operations app developer",
+      "target": "t:devops",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:finance or accounting professional managing fixed assets",
+      "target": "t:financial reporting",
       "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:devops release engineer",
+      "target": "t:release management",
+      "value": 3,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:devops release engineer",
+      "target": "t:artifact repository management",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:devops release engineer",
+      "target": "t:deployment governance",
+      "value": 2,
       "kind": "role-topic",
       "strength": "weak"
     },
     {
       "source": "r:business process automator",
       "target": "t:exchange online administration",
-      "value": 1,
+      "value": 8,
       "kind": "role-topic",
       "strength": "strong"
     },
@@ -2624,8 +5375,92 @@
       "strength": "strong"
     },
     {
+      "source": "r:it administrator endpoint manager",
+      "target": "t:power bi",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:it administrator endpoint manager",
+      "target": "t:microsoft graph api",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:copilot studio agent builder",
+      "target": "t:conversational ai",
+      "value": 3,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:copilot studio agent builder",
+      "target": "t:chatbot development",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:finance and operations app developer",
+      "target": "t:microsoft dynamics lifecycle services",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
       "source": "r:windows server infrastructure administrator",
       "target": "t:hybrid cloud management",
+      "value": 3,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:windows server infrastructure administrator",
+      "target": "t:data deduplication",
+      "value": 3,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:windows server infrastructure administrator",
+      "target": "t:iscsi",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:business central al developer",
+      "target": "t:microsoft dataverse",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:business central al developer",
+      "target": "t:json data processing",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:business central al developer",
+      "target": "t:api integration",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:windows server administrator",
+      "target": "t:powershell",
+      "value": 6,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:windows server administrator",
+      "target": "t:remote server administration tools",
       "value": 1,
       "kind": "role-topic",
       "strength": "strong"
@@ -2653,21 +5488,28 @@
     },
     {
       "source": "r:cloud security administrator",
-      "target": "t:microsoft defender for cloud",
+      "target": "t:azure cosmos db",
       "value": 2,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
       "source": "r:cloud security administrator",
-      "target": "t:threat modeling",
-      "value": 1,
+      "target": "t:cloud compliance management",
+      "value": 2,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
       "source": "r:cloud security administrator",
-      "target": "t:azure cosmos db",
+      "target": "t:cloud workload protection",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:cloud security administrator",
+      "target": "t:devsecops",
       "value": 1,
       "kind": "role-topic",
       "strength": "strong"
@@ -2681,28 +5523,63 @@
     },
     {
       "source": "r:copilot studio agent builder",
-      "target": "t:conversational ai",
-      "value": 2,
+      "target": "t:microsoft dataverse",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:copilot studio agent builder",
+      "target": "t:retrieval-augmented generation",
+      "value": 1,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
+      "source": "r:copilot studio agent builder",
+      "target": "t:sharepoint administration",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:identity and access administrator",
+      "target": "t:self-service password reset",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:business central al developer",
+      "target": "t:barcode scanning integration",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:compliance and security administrator",
+      "target": "t:identity and access management",
+      "value": 3,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:compliance and security administrator",
+      "target": "t:microsoft entra id",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
       "source": "r:cloud security administrator",
-      "target": "t:cloud workload protection",
+      "target": "t:multicloud security",
       "value": 1,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
       "source": "r:cloud security administrator",
-      "target": "t:microsoft azure",
-      "value": 1,
-      "kind": "role-topic",
-      "strength": "strong"
-    },
-    {
-      "source": "r:cloud security administrator",
-      "target": "t:cloud security",
+      "target": "t:database security",
       "value": 1,
       "kind": "role-topic",
       "strength": "strong"
@@ -2715,16 +5592,100 @@
       "strength": "strong"
     },
     {
-      "source": "r:citizen developer low-code app builder",
-      "target": "t:power platform development",
-      "value": 5,
+      "source": "r:business process automator",
+      "target": "t:microsoft powerpoint",
+      "value": 1,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
       "source": "r:azure virtual desktop administrator",
+      "target": "t:hyper-v administration",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:ai application developer",
+      "target": "t:prompt engineering",
+      "value": 4,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:citizen developer low-code app builder",
+      "target": "t:custom connector development",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:citizen developer low-code app builder",
+      "target": "t:power automate",
+      "value": 3,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:devops release engineer",
+      "target": "t:continuous deployment",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:finance or accounting professional using business central",
+      "target": "t:multi-currency accounting",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:azure virtual desktop administrator",
       "target": "t:microsoft entra id",
       "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:azure virtual desktop administrator",
+      "target": "t:identity and access management",
+      "value": 3,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:azure virtual desktop administrator",
+      "target": "t:azure role-based access control",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:ai application developer on azure",
+      "target": "t:azure app configuration",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:ai application developer on azure",
+      "target": "t:application configuration management",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:ai application developer on azure",
+      "target": "t:secrets management",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:ai application developer on azure",
+      "target": "t:identity and access management",
+      "value": 2,
       "kind": "role-topic",
       "strength": "weak"
     },
@@ -2737,15 +5698,36 @@
     },
     {
       "source": "r:ai application developer on azure",
-      "target": "t:secrets management",
+      "target": "t:azure pipelines",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:power platform solution architect",
+      "target": "t:power bi",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:power platform solution architect",
+      "target": "t:ai builder",
       "value": 1,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
-      "source": "r:ai application developer on azure",
-      "target": "t:azure pipelines",
+      "source": "r:power platform solution architect",
+      "target": "t:solution architecture",
       "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:power platform solution architect",
+      "target": "t:microsoft copilot studio",
+      "value": 2,
       "kind": "role-topic",
       "strength": "strong"
     },
@@ -2760,6 +5742,27 @@
       "source": "r:identity and access administrator",
       "target": "t:microsoft defender for cloud",
       "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:security operations analyst",
+      "target": "t:user and entity behavior analytics",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:cloud security administrator",
+      "target": "t:application governance",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:citizen developer low-code app builder",
+      "target": "t:canvas app development",
+      "value": 2,
       "kind": "role-topic",
       "strength": "strong"
     },
@@ -2785,9 +5788,9 @@
       "strength": "strong"
     },
     {
-      "source": "r:citizen developer low-code app builder",
-      "target": "t:power automate",
-      "value": 2,
+      "source": "r:identity and access administrator",
+      "target": "t:powershell",
+      "value": 1,
       "kind": "role-topic",
       "strength": "strong"
     },
@@ -2801,7 +5804,7 @@
     {
       "source": "r:microsoft 365 administrator",
       "target": "t:microsoft 365 copilot",
-      "value": 4,
+      "value": 5,
       "kind": "role-topic",
       "strength": "strong"
     },
@@ -2843,7 +5846,7 @@
     {
       "source": "r:microsoft 365 administrator",
       "target": "t:microsoft teams administration",
-      "value": 2,
+      "value": 10,
       "kind": "role-topic",
       "strength": "strong"
     },
@@ -2876,6 +5879,13 @@
       "strength": "strong"
     },
     {
+      "source": "r:security operations analyst",
+      "target": "t:log management",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
       "source": "r:ai application developer on azure",
       "target": "t:microsoft 365 copilot",
       "value": 1,
@@ -2884,8 +5894,15 @@
     },
     {
       "source": "r:ai application developer on azure",
+      "target": "t:azure bot service",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:ai application developer on azure",
       "target": "t:generative ai application development",
-      "value": 3,
+      "value": 5,
       "kind": "role-topic",
       "strength": "strong"
     },
@@ -2897,9 +5914,93 @@
       "strength": "strong"
     },
     {
+      "source": "r:ai application developer on azure",
+      "target": "t:ai cost management",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:ai application developer on azure",
+      "target": "t:spring boot",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:finance or accounting professional using business central",
+      "target": "t:journal entry management",
+      "value": 4,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:ai application developer",
+      "target": "t:azure cosmos db",
+      "value": 3,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:security operations analyst implementing microsoft sentinel",
+      "target": "t:azure monitor",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:business central extension developer",
+      "target": "t:business central report development",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:business central al developer",
+      "target": "t:microsoft excel",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:windows server administrator",
+      "target": "t:storage administration",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:security operations analyst",
+      "target": "t:extended detection and response xdr",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:microsoft 365 administrator",
+      "target": "t:dns administration",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:microsoft 365 administrator",
+      "target": "t:exchange online administration",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:microsoft 365 administrator",
+      "target": "t:it troubleshooting",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
       "source": "r:azure virtual desktop administrator",
       "target": "t:azure site recovery",
-      "value": 1,
+      "value": 2,
       "kind": "role-topic",
       "strength": "strong"
     },
@@ -2907,13 +6008,6 @@
       "source": "r:azure virtual desktop administrator",
       "target": "t:disaster recovery",
       "value": 2,
-      "kind": "role-topic",
-      "strength": "strong"
-    },
-    {
-      "source": "r:azure virtual desktop administrator",
-      "target": "t:hyper-v administration",
-      "value": 1,
       "kind": "role-topic",
       "strength": "strong"
     },
@@ -2932,6 +6026,20 @@
       "strength": "strong"
     },
     {
+      "source": "r:microsoft 365 administrator",
+      "target": "t:subscription management",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:citizen developer low-code app builder",
+      "target": "t:formula authoring",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
       "source": "r:citizen developer low-code app builder",
       "target": "t:microsoft dataverse",
       "value": 3,
@@ -2939,37 +6047,93 @@
       "strength": "strong"
     },
     {
-      "source": "r:power platform solution architect",
-      "target": "t:power automate",
+      "source": "r:ai application developer on azure",
+      "target": "t:ai sdk integration",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:devops release engineer",
+      "target": "t:cloud migration",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:devops release engineer",
+      "target": "t:devops",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:devops release engineer",
+      "target": "t:pipeline concurrency management",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:devops release engineer",
+      "target": "t:devsecops",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:devops release engineer",
+      "target": "t:test automation",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:devops release engineer",
+      "target": "t:availability testing",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:devops release engineer",
+      "target": "t:software quality assurance",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:compliance and security administrator",
+      "target": "t:shared responsibility model",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:identity and access administrator",
+      "target": "t:oauth 2.0 and openid connect",
       "value": 1,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
       "source": "r:power platform solution architect",
-      "target": "t:business process automation",
-      "value": 1,
-      "kind": "role-topic",
-      "strength": "strong"
-    },
-    {
-      "source": "r:business process automator",
-      "target": "t:data loss prevention",
-      "value": 1,
-      "kind": "role-topic",
-      "strength": "strong"
-    },
-    {
-      "source": "r:power platform solution architect",
-      "target": "t:application lifecycle management",
+      "target": "t:conversational ai",
       "value": 2,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
       "source": "r:power platform solution architect",
-      "target": "t:power bi",
+      "target": "t:generative ai application development",
       "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:power platform solution architect",
+      "target": "t:application lifecycle management",
+      "value": 2,
       "kind": "role-topic",
       "strength": "strong"
     },
@@ -2983,6 +6147,55 @@
     {
       "source": "r:power platform solution architect",
       "target": "t:azure pipelines",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:ai application developer on azure",
+      "target": "t:azure cosmos db",
+      "value": 3,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:ai application developer on azure",
+      "target": "t:relational database design",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:ai application developer on azure",
+      "target": "t:vector search",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:ai application developer on azure",
+      "target": "t:azure cognitive search",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:business process automator",
+      "target": "t:optical character recognition",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:business process automator",
+      "target": "t:document management",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:finance or accounting professional using business central",
+      "target": "t:financial period close",
       "value": 1,
       "kind": "role-topic",
       "strength": "strong"
@@ -3003,28 +6216,91 @@
     },
     {
       "source": "r:ai application developer",
-      "target": "t:azure cosmos db",
-      "value": 1,
-      "kind": "role-topic",
-      "strength": "strong"
-    },
-    {
-      "source": "r:ai application developer",
       "target": "t:microsoft copilot studio",
       "value": 1,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
+      "source": "r:ai application developer",
+      "target": "t:natural language processing",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:windows server infrastructure administrator",
+      "target": "t:data replication",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:business central extension developer",
+      "target": "t:microsoft appsource publishing",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:business central extension developer",
+      "target": "t:application monetization",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:teams administrator",
+      "target": "t:sharepoint administration",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:business central al developer",
+      "target": "t:power bi",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:teams administrator",
+      "target": "t:unified communications",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:hybrid infrastructure administrator",
+      "target": "t:identity and access management",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
       "source": "r:compliance and security administrator",
       "target": "t:insider risk management",
-      "value": 2,
+      "value": 4,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:azure virtual desktop administrator",
+      "target": "t:azure netapp files",
+      "value": 4,
       "kind": "role-topic",
       "strength": "strong"
     },
     {
       "source": "r:azure virtual desktop administrator",
       "target": "t:azure cosmos db",
+      "value": 3,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:azure virtual desktop administrator",
+      "target": "t:fslogix",
       "value": 1,
       "kind": "role-topic",
       "strength": "strong"
@@ -3044,8 +6320,43 @@
       "strength": "strong"
     },
     {
-      "source": "r:azure virtual desktop administrator",
-      "target": "t:azure netapp files",
+      "source": "r:business central al developer",
+      "target": "t:data integration",
+      "value": 3,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:business central al developer",
+      "target": "t:xml",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:business central extension developer",
+      "target": "t:application performance monitoring",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:ai application developer",
+      "target": "t:ai image generation",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:ai application developer",
+      "target": "t:multimodal ai",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:ai application developer",
+      "target": "t:ai-assisted content creation",
       "value": 1,
       "kind": "role-topic",
       "strength": "strong"
@@ -3053,7 +6364,7 @@
     {
       "source": "r:hybrid infrastructure administrator",
       "target": "t:hybrid cloud management",
-      "value": 1,
+      "value": 2,
       "kind": "role-topic",
       "strength": "strong"
     },
@@ -3086,9 +6397,72 @@
       "strength": "strong"
     },
     {
+      "source": "r:hybrid infrastructure administrator",
+      "target": "t:patch management",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:devops release engineer",
+      "target": "t:canary deployments",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:devops release engineer",
+      "target": "t:azure traffic manager",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:devops release engineer",
+      "target": "t:feature flag management",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:business central al developer",
+      "target": "t:branch policies",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:business central al developer",
+      "target": "t:github copilot",
+      "value": 3,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:business central al developer",
+      "target": "t:version control",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:ai application developer on azure",
+      "target": "t:ai infrastructure operations",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
       "source": "r:ai application developer on azure",
       "target": "t:cloud security",
-      "value": 1,
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:ai application developer on azure",
+      "target": "t:agentic process automation",
+      "value": 2,
       "kind": "role-topic",
       "strength": "strong"
     },
@@ -3115,7 +6489,35 @@
     },
     {
       "source": "r:identity and access administrator",
-      "target": "t:zero trust security",
+      "target": "t:responsible ai",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:identity and access administrator",
+      "target": "t:microsoft sustainability manager",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:business central al developer",
+      "target": "t:ui extensibility",
+      "value": 2,
+      "kind": "role-topic",
+      "strength": "weak"
+    },
+    {
+      "source": "r:compliance and security administrator",
+      "target": "t:log management",
+      "value": 1,
+      "kind": "role-topic",
+      "strength": "strong"
+    },
+    {
+      "source": "r:compliance and security administrator",
+      "target": "t:digital forensics",
       "value": 1,
       "kind": "role-topic",
       "strength": "strong"
