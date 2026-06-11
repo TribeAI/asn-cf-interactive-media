@@ -262,24 +262,24 @@ const sev = c => SEVERITY.find(s => s.test(c));
 const sevByKey = k => SEVERITY.find(s => s.key === k);
 const THIN_MAX = 4; // per-topic "thin" badge threshold inside the catalogue
 
-// Gap-based severity for a Pluralsight head-to-head term: grade ASN by how
-// much of the field's coverage it has (ASN modules ÷ Pluralsight courses), so
-// a small slice of a big field reads as a severe gap regardless of absolute
-// count. Curated vocabs (no course count) fall back to absolute coverage.
-// Gap-severity descriptions for the gaps-tab headline (override absolute desc).
+// Gap-based severity for a Pluralsight head-to-head term: MISSING only when
+// ASN has zero modules (truly absent); otherwise grade by how much of the
+// field's coverage ASN has (ASN modules ÷ Pluralsight courses). Curated vocabs
+// (no course count) fall back to absolute coverage.
 const GAP_DESC = {
-    missing: "ASN has < 10% of the field",
-    thin: "10–50% of the field",
+    missing: "no ASN modules",
+    thin: "< 50% of the field",
     partial: "50–100% of the field",
     covered: "matches or leads the field",
 };
+const SEV_RANK = { missing: 0, thin: 1, partial: 2, covered: 3 };
 function termSev(r) {
     if (r.ps_count != null && r.ps_count > 0) {
+        if (r.ms_module_coverage === 0) return sevByKey("missing");
         const ratio = r.ms_module_coverage / r.ps_count;
         if (ratio >= 1) return sevByKey("covered");
         if (ratio >= 0.5) return sevByKey("partial");
-        if (ratio >= 0.1) return sevByKey("thin");
-        return sevByKey("missing");
+        return sevByKey("thin");
     }
     return sev(r.ms_module_coverage);
 }
@@ -559,10 +559,11 @@ function renderVocabGroups() {
     const root = document.getElementById("vocab-groups");
     const ps = (DATA.competitors.pluralsight_topics || [])
         .map(r => ({ ...r, gap: (r.ps_count || 0) - r.ms_module_coverage }))
-        // biggest gap first (how far ASN trails Pluralsight); ASN-ahead topics
-        // (negative gap) sink to the bottom. Bigger Pluralsight presence breaks ties.
-        .sort((a, b) => b.gap - a.gap || (b.ps_count || 0) - (a.ps_count || 0));
-    const psMax = Math.max(...ps.map(r => r.ps_count || 0), 1);
+        // severity tier first (missing → thin → partial → covered), then the
+        // biggest gap within a tier. Missing rises to the top.
+        .sort((a, b) => SEV_RANK[termSev(a).key] - SEV_RANK[termSev(b).key]
+            || b.gap - a.gap || (b.ps_count || 0) - (a.ps_count || 0));
+    const gapMax = Math.max(...ps.map(r => Math.max(0, r.gap)), 1);
 
     const other = Object.entries(DATA.competitors)
         .filter(([v]) => v !== "pluralsight_topics")
@@ -571,10 +572,10 @@ function renderVocabGroups() {
     root.innerHTML =
         `<details class="group" open>
             <summary><span class="tri">▶</span><h3>Pluralsight head-to-head — courses vs ASN modules</h3>
-                <span class="g-meta">${ps.length} topics · biggest gap first</span></summary>
+                <span class="g-meta">${ps.length} topics · gaps first (bar = gap size)</span></summary>
             <div class="hh-head">
-                <span class="hh-spacer"></span><span class="hh-ps">Pluralsight courses</span><span class="hh-ms">ASN modules</span></div>
-            ${ps.map(r => headToHeadRow(r, psMax)).join("")}
+                <span class="hh-spacer"></span><span class="hh-ps">gap (PS − ASN)</span><span class="hh-ms">courses · modules</span></div>
+            ${ps.map(r => headToHeadRow(r, gapMax)).join("")}
         </details>` +
         other.map(({ vocab, rows }) => {
             const [title, sub] = VOCAB_TITLES[vocab] || [vocab, ""];
@@ -593,15 +594,17 @@ function renderVocabGroups() {
     wireClusterBodies(root);
 }
 
-// Pluralsight head-to-head row: two absolute numbers, ASN-coverage badge.
-function headToHeadRow(r, psMax) {
+// Pluralsight head-to-head row: bar = gap size (PS − ASN), two absolute
+// numbers alongside, gap-based severity badge.
+function headToHeadRow(r, gapMax) {
     const M = r.ms_module_coverage;
     const s = termSev(r);
-    const psPct = Math.max(100 * (r.ps_count || 0) / psMax, 2);
+    const gap = Math.max(0, r.gap);
+    const gapPct = gap > 0 ? Math.max(100 * gap / gapMax, 1.5) : 0;
     return `<details class="term">
         <summary><span class="tri">▶</span><span class="badge ${s.key}">${s.label}</span>
             <span class="term-name">${esc(r.term)}${isAITopic(r) ? AI_BADGE : ""}</span>
-            <span class="hh-bars"><i class="hh-ps-bar" style="width:${psPct}%"></i></span>
+            <span class="hh-bars" title="gap = ${gap.toLocaleString()} (Pluralsight ${(r.ps_count||0).toLocaleString()} − ASN ${M.toLocaleString()})"><i class="hh-ps-bar" style="width:${gapPct}%"></i></span>
             <span class="hh-nums"><b class="ps">${(r.ps_count || 0).toLocaleString()}</b> PS · <b class="ms" style="color:${s.color}">${M.toLocaleString()}</b> ASN</span></summary>
         <div class="matches">${matchBody(r)}</div>
     </details>`;
