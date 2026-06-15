@@ -167,7 +167,7 @@
         <button data-expand="#vocab-groups">Expand all</button>
         <button data-expand-deep="#vocab-groups">Expand everything</button>
         <button data-collapse="#pane-gaps">Collapse all</button>
-        <label title="Hide field topics named after clear Microsoft competitors (AWS, Google Cloud / Gemini / Workspace, Snowflake, Oracle, Cisco, Citrix, VMware, Salesforce, …) — content Microsoft will never cover, not a real catalogue gap."><input type="checkbox" id="hide-competitors"> hide competitor-only technologies</label>
+        <label title="Field topics named after clear Microsoft competitors (AWS, Google Cloud / Gemini / Workspace, Snowflake, Oracle, Cisco, VMware, Salesforce, …) — content Microsoft will never cover, not a real catalogue gap. Hidden from the base list by default; check to show them."><input type="checkbox" id="hide-competitors"> show competitor-only technologies</label>
         <span class="note" id="gaps-note"></span>
     </div>
     <div id="vocab-groups"></div>
@@ -557,11 +557,13 @@ const AI_BADGE = `<span class="ai-tag" title="AI / ML topic">AI</span>`;
 // in a catalogue-gap view, not a real gap. Matched by brand name on the term.
 // Conservative on purpose: vendor-neutral certs (CompTIA), independent
 // frameworks (Vue), and first-party Azure partners (Databricks) are NOT here.
-const COMPETITOR_KW = /\b(aws|amazon web services|amazon|ec2|s3|dynamodb|redshift|sagemaker|cloudformation|google cloud|gcp|google workspace|bigquery|vertex ai|gemini|firebase|looker|google apps script|snowflake|oracle|salesforce|vmware|cisco|citrix|ibm|watson|alibaba cloud)\b/i;
+const COMPETITOR_KW = /\b(aws|amazon web services|amazon|ec2|s3|dynamodb|redshift|sagemaker|cloudformation|google cloud|gcp|google workspace|bigquery|vertex ai|gemini|firebase|looker|google apps script|snowflake|oracle|salesforce|vmware|cisco|ibm|watson|alibaba cloud)\b/i;
 function isCompetitorTopic(r) { return COMPETITOR_KW.test(r.term); }
+// Competitors are excluded from the base list by default; the checkbox
+// ("show competitor-only technologies") opts them back in.
 function competitorsHidden() {
     const el = document.getElementById("hide-competitors");
-    return !!(el && el.checked);
+    return !(el && el.checked);
 }
 function dropCompetitors(rows) {
     return competitorsHidden() ? rows.filter(r => !isCompetitorTopic(r)) : rows;
