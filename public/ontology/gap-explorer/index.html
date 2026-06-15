@@ -136,12 +136,9 @@
 
 <div class="top-bar">
     <div class="crumbs"><a href="/">ASN Content Freshness</a> <span>›</span> <a href="/ontology/">Content Ontology</a> <span>›</span> <span>Gap Explorer</span></div>
-    <h1>Gap Explorer — where the MS Learn catalogue is thin</h1>
+    <h1>Topic Gaps Explorer</h1>
     <div class="subtitle">
-        A foldable, exhaustive view of the full-corpus extraction with exact provenance: every number
-        drills down to the complete list of source modules — each linked to MS Learn, tagged with its
-        official ASN roles and Microsoft solution area, and carrying the surface form and evidence
-        quote it was extracted from.
+        A view of the full ASN corpus compared to other tools.
         Companion views: <a href="/ontology/gaps/">coverage map</a> · <a href="/ontology/">ontology graph</a>.
     </div>
 </div>
@@ -170,6 +167,8 @@
         <button data-expand="#vocab-groups">Expand all</button>
         <button data-expand-deep="#vocab-groups">Expand everything</button>
         <button data-collapse="#pane-gaps">Collapse all</button>
+        <label title="Hide field topics named after clear Microsoft competitors (AWS, Google Cloud / Gemini / Workspace, Snowflake, Oracle, Cisco, Citrix, VMware, Salesforce, …) — content Microsoft will never cover, not a real catalogue gap."><input type="checkbox" id="hide-competitors"> hide competitor-only technologies</label>
+        <span class="note" id="gaps-note"></span>
     </div>
     <div id="vocab-groups"></div>
 </div>
@@ -411,8 +410,9 @@ function renderHeadline() {
     const m = DATA.meta;
     if (activeTab === "gaps") {
         const counts = { missing: 0, thin: 0, partial: 0, covered: 0 };
-        allTerms().forEach(r => counts[termSev(r).key]++);
-        const total = allTerms().length;
+        const terms = dropCompetitors(allTerms());
+        terms.forEach(r => counts[termSev(r).key]++);
+        const total = terms.length;
         el.innerHTML = SEVERITY.map(s =>
             `<div class="sev-chip"><span class="dot" style="background:${s.color}"></span><b>${counts[s.key]}</b><span>${s.label.toLowerCase()}<br>${GAP_DESC[s.key]}</span></div>`
         ).join("") +
@@ -552,13 +552,28 @@ function isAITopic(r) {
 }
 const AI_BADGE = `<span class="ai-tag" title="AI / ML topic">AI</span>`;
 
+// A field topic is "competitor-only" when its name is a clear Microsoft
+// competitor's product/brand — content MS will never publish, so it's noise
+// in a catalogue-gap view, not a real gap. Matched by brand name on the term.
+// Conservative on purpose: vendor-neutral certs (CompTIA), independent
+// frameworks (Vue), and first-party Azure partners (Databricks) are NOT here.
+const COMPETITOR_KW = /\b(aws|amazon web services|amazon|ec2|s3|dynamodb|redshift|sagemaker|cloudformation|google cloud|gcp|google workspace|bigquery|vertex ai|gemini|firebase|looker|google apps script|snowflake|oracle|salesforce|vmware|cisco|citrix|ibm|watson|alibaba cloud)\b/i;
+function isCompetitorTopic(r) { return COMPETITOR_KW.test(r.term); }
+function competitorsHidden() {
+    const el = document.getElementById("hide-competitors");
+    return !!(el && el.checked);
+}
+function dropCompetitors(rows) {
+    return competitorsHidden() ? rows.filter(r => !isCompetitorTopic(r)) : rows;
+}
+
 // Absolute head-to-head: each field topic shows its source-side count
 // (Pluralsight courses) vs ASN's module coverage (sum across all matched
 // clusters, corpus-wide). Sorted by the deficit so the real gaps surface.
 function renderVocabGroups() {
     const root = document.getElementById("vocab-groups");
     const relGap = r => (r.ps_count > 0) ? (r.ps_count - r.ms_module_coverage) / r.ps_count : 0;
-    const ps = (DATA.competitors.pluralsight_topics || [])
+    const ps = dropCompetitors(DATA.competitors.pluralsight_topics || [])
         // severity tier first (missing → thin → partial → covered), then the
         // largest RELATIVE gap within a tier (fraction of the field ASN is
         // missing), then bigger Pluralsight presence. Missing rises to the top.
@@ -567,7 +582,13 @@ function renderVocabGroups() {
 
     const other = Object.entries(DATA.competitors)
         .filter(([v]) => v !== "pluralsight_topics")
-        .map(([vocab, rows]) => ({ vocab, rows }));
+        .map(([vocab, rows]) => ({ vocab, rows: dropCompetitors(rows) }))
+        .filter(({ rows }) => rows.length);
+
+    const nComp = allTerms().filter(isCompetitorTopic).length;
+    document.getElementById("gaps-note").textContent = nComp
+        ? `${nComp} competitor-only topics ${competitorsHidden() ? "hidden" : "shown"}`
+        : "";
 
     root.innerHTML =
         `<details class="group" open>
@@ -891,6 +912,10 @@ function wireControls() {
             document.querySelectorAll(b.dataset.collapse + " details[open]").forEach(d => d.open = false)));
     document.getElementById("thin-only").addEventListener("change", e =>
         renderDomainGroups(e.target.checked));
+    document.getElementById("hide-competitors").addEventListener("change", () => {
+        renderVocabGroups();
+        renderHeadline();
+    });
 }
 
 // Deep expand renders thousands of provenance rows — chunked so the UI

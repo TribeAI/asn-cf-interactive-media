@@ -24,8 +24,6 @@
     .top-bar .agg-stats .agg-chip.toggle.on { box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.55); }
     .top-bar .agg-stats .agg-chip.toggle.off { opacity: 0.4; filter: saturate(0.45); }
 
-    .scope-note { background: #1e3a5f; color: #cbd5e1; padding: 8px 24px; font-size: 0.78em; border-top: 1px solid #334155; }
-    .scope-note b { color: #fff; }
 
     .controls { background: white; border-bottom: 1px solid #e2e8f0; padding: 10px 24px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; font-size: 0.82em; }
     .controls label { display: flex; align-items: center; gap: 6px; color: #475569; cursor: pointer; }
@@ -98,16 +96,11 @@
 <div class="top-bar">
     <div class="crumbs"><a href="/">ASN Content Freshness</a> <span>›</span> <span>Content Ontology</span></div>
     <h1>Content Ontology — Roles → Topics</h1>
-    <div class="subtitle">A content-derived ontology over the full MS Learn module corpus, linking derived <b>roles</b> (personas) directly to the <b>topics</b> they draw on (the intermediate jobs-to-be-done layer is collapsed into the role→topic edges). Topics come from the v3 topic extractor (Sonnet 4.6, full-corpus batch); near-duplicate topics are merged into shared hubs, and nodes below the module-coverage floor are hidden to keep the graph readable. Click any node to isolate its connections. See also the <a href="/ontology/gap-explorer/" style="color:#7dd3fc">gap explorer</a> and the <a href="/ontology/gaps/" style="color:#7dd3fc">coverage map</a>.</div>
+    <div class="subtitle">A content-derived ontology over the full MS Learn module corpus, linking derived <b>roles</b> (personas) directly to the <b>topics</b> they draw on (the intermediate jobs-to-be-done layer is collapsed into the role→topic edges). Topics come from the content freshness topic extractor (Sonnet 4.6, full-corpus batch); near-duplicate topics are merged into shared hubs, and nodes below the module-coverage floor are hidden to keep the graph readable. Click any node to isolate its connections. See also the <a href="/ontology/gap-explorer/" style="color:#7dd3fc">gap explorer</a> and the <a href="/ontology/gaps/" style="color:#7dd3fc">coverage map</a>.</div>
     <div class="agg-stats" id="agg-stats"></div>
 </div>
 
-<div class="scope-note">
-    <b>Scope:</b> "Roles" here are content-derived persona clusters, not Microsoft's frozen ASN role taxonomy. <b>Topics</b> is the layer Tribe owns; roles and Viva Skills are owned, frozen taxonomies shown only as context.
-</div>
-
 <div class="controls">
-    <label><input type="checkbox" id="toggle-weak" checked> show weak role↔topic links</label>
     <button id="reset-btn">Reset highlight</button>
     <span class="hint">Drag nodes to rearrange · drag background to pan · scroll to zoom · click a node to isolate its connections · hover for detail</span>
 </div>
@@ -157,9 +150,6 @@ async function init() {
         renderAggStats();
         renderLegend();
         render();
-        document.getElementById("toggle-weak").addEventListener("change", (e) => {
-            state.showWeak = e.target.checked; render();
-        });
         document.getElementById("reset-btn").addEventListener("click", () => {
             state.selected = null; applyHighlight();
         });
