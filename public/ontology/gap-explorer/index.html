@@ -56,11 +56,9 @@
     .g-bar { width: 160px; background: #f1f5f9; height: 12px; border-radius: 4px; overflow: hidden; flex-shrink: 0; }
     .g-bar i { display: block; height: 100%; border-radius: 4px; background: #6366f1; }
 
-    /* role hierarchy: parent group rolls up its child roles */
-    details.role-parent > summary h3 { font-size: 1em; color: #0f172a; }
-    details.role-parent > summary .g-bar i { background: #4338ca; }
-    .parent-body { padding: 2px 12px 12px; }
-    .parent-body details.group { margin-bottom: 8px; }
+    /* a role whose coverage is a deduped rollup of related ASN roles */
+    .rollup-tag { font-size: 0.62em; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #4338ca; background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 5px; padding: 2px 6px; margin-left: 7px; flex-shrink: 0; cursor: help; }
+    details.role.is-rollup > summary .g-bar i { background: #4338ca; }
 
     /* Pluralsight head-to-head rows */
     .hh-head { display: flex; align-items: center; gap: 10px; padding: 6px 16px 4px 38px; font-size: 0.7em; text-transform: uppercase; letter-spacing: 0.04em; color: #94a3b8; }
@@ -200,13 +198,13 @@
 <div class="section tab-pane" id="pane-roles">
     <h2>ASN roles — coverage by official role taxonomy</h2>
     <div class="sec-sub">
-        The official ASN role tags (from the catalog metadata, joined per module — not Tribe-derived).
-        Sorted <b>largest gap first</b> — least-covered roles on top, so the rolled-up <b>role families</b>
-        (which aggregate the most content) settle to the bottom. A family rolls up the <b>deduped union</b>
-        of its members' modules and topics purely to report content overlap; membership <b>overlaps</b>
-        (a role can sit in several families — data-engineer is both Engineering and Data). The family
-        groupings are Tribe-defined (the catalog roles themselves are flat). Open a family to see its
-        member roles, a role to see its topics, and a topic to audit the source modules with evidence.
+        Every row is an official ASN role (catalog metadata, joined per module — not Tribe-derived).
+        Sorted <b>largest gap first</b> — least-covered roles on top. A few generic roles marked
+        <span class="rollup-tag" style="cursor:default">rollup</span> are supersets of more specific ones
+        (e.g. <b>engineering</b> covers every engineering role): their coverage is the <b>deduped union</b>
+        of themselves plus those roles, so a superset is always at least as covered as any role under it,
+        and these settle to the bottom. The rolled-up roles still appear as their own rows; nothing is
+        nested. Open a role to see its topics, a topic to audit the source modules with evidence.
     </div>
     <div class="controls">
         <button data-expand="#role-groups">Expand all roles</button>
@@ -315,27 +313,30 @@ function roleLabel(slug) {
     }).join(" ");
 }
 
-// Role families used only to REPORT content overlap (not a strict org chart).
-// The ASN role tags are flat; these umbrellas roll up the deduped union of
-// their members' module + topic coverage. Membership OVERLAPS on purpose — a
-// role can sit in several families (data-engineer is Engineering AND Data;
-// devops/SRE are Engineering AND Operations) — so a parent is not a partition
-// and the same role row can appear under more than one group. Roles that fit
-// no family (student, early-in-career) render as standalone top-level rows.
-const ROLE_HIERARCHY = {
-    "Engineering & Development": ["developer", "ai-engineer", "data-engineer", "devops-engineer", "platform-engineer", "site-reliability-engineer", "network-engineer", "support-engineer", "security-engineer", "solution-architect", "engineering"],
-    "IT & Operations": ["systems-administrator", "administrator", "storage-admin", "operations", "it-professional", "service-adoption-specialist", "devops-engineer", "site-reliability-engineer", "support-engineer", "network-engineer", "database-administrator"],
-    "Data & Analytics": ["data-scientist", "data-analyst", "data-professional", "database-administrator", "data-engineer", "business-analyst"],
-    "Security, Identity & Risk": ["security-engineer", "security-professional", "security-operations-analyst", "identity-access-admin", "ip-admin", "privacy-manager", "risk-practitioner"],
-    "Business & Functional": ["business-user", "functional-consultant", "business-analyst", "finance", "hr", "sales", "marketing", "communications", "customer-service", "product-manager", "legal", "technical-writer", "nonprofit-professionals", "business-owner"],
-    "Leadership & Executive": ["chief-ai-officer", "chief-technology-officer", "chief-financial-officer", "chief-operating-officer", "chief-marketing-officer", "chief-executive-officer", "chief-human-resources-officer", "chief-learning-officer", "executive", "business-leader", "technology-manager", "startup-founder"],
-    "Education": ["k-12-educator", "higher-ed-educator", "faculty", "school-leader", "chief-learning-officer"],
+// Role rollups (DRAFT — see commit msg). Every row on the roles tab is a real
+// ASN role; we do NOT invent umbrella groups or nest roles inside each other.
+// But a few generic ASN roles are conceptual SUPERSETS of more specific ones
+// (the "engineering" tag should cover everything its sub-roles do). For each
+// superset slug below, its displayed coverage is the DEDUPED union of itself +
+// the listed member roles' modules/topics — so e.g. "engineering" ends up at
+// least as covered as "site-reliability-engineer". Members still appear as
+// their own (un-rolled-up) rows. Overlap across rollups is fine; each is
+// computed independently. Roles not listed here are shown with their raw tag
+// coverage only.
+const ROLE_ROLLUPS = {
+    "engineering": ["developer", "ai-engineer", "data-engineer", "devops-engineer", "platform-engineer", "site-reliability-engineer", "network-engineer", "support-engineer", "security-engineer", "solution-architect"],
+    "administrator": ["systems-administrator", "storage-admin", "database-administrator", "identity-access-admin", "ip-admin"],
+    "data-professional": ["data-scientist", "data-analyst", "data-engineer", "database-administrator", "business-analyst"],
+    "security-professional": ["security-engineer", "security-operations-analyst", "identity-access-admin", "ip-admin", "privacy-manager", "risk-practitioner"],
+    "it-professional": ["systems-administrator", "administrator", "storage-admin", "operations", "service-adoption-specialist", "support-engineer", "network-engineer", "devops-engineer", "site-reliability-engineer", "database-administrator"],
+    "executive": ["chief-ai-officer", "chief-technology-officer", "chief-financial-officer", "chief-operating-officer", "chief-marketing-officer", "chief-executive-officer", "chief-human-resources-officer", "chief-learning-officer", "business-leader"],
 };
 
 const EXT_FILE = "external_coverage.json";
 
 let DATA = null, EXT = null, clusterByLabel = {};
-let ROLE_TREE = null;       // cached parent-role rollups (built lazily)
+let ROLE_TREE = null;       // cached flat role nodes (built lazily)
+let ROLE_NODE_BY_SLUG = {}; // slug -> role node (for lazy topic drill-down)
 let topicRoleCounts = {};   // topic label -> {roleSlug: moduleCount}
 let roleTopics = {};        // roleSlug -> [{label, count}] sorted desc
 let topicAreaCounts = {};   // topic label -> {areaName: moduleCount}
@@ -497,11 +498,12 @@ function renderHeadline() {
 
 /* ---------- shared cluster drill-down with exhaustive provenance ---------- */
 
-function clusterDetails(label, extraMeta, filterRole, filterArea) {
+function clusterDetails(label, extraMeta, filterRole, filterArea, filterRoleSet) {
     const t = clusterByLabel[label];
     if (!t) return "";
     const filters = (filterRole ? ` data-role="${esc(filterRole)}"` : "")
-        + (filterArea ? ` data-area="${esc(filterArea)}"` : "");
+        + (filterArea ? ` data-area="${esc(filterArea)}"` : "")
+        + (filterRoleSet && filterRoleSet.length ? ` data-roleset="${esc(filterRoleSet.join("|"))}"` : "");
     return `<details class="cluster" data-label="${esc(label)}"${filters}>
         <summary><span class="tri">▶</span><span class="c-dot" style="background:${DOMAIN_COLORS[t.domain] || "#94a3b8"}"></span>
             <span class="c-label">${esc(t.label)}</span>
@@ -519,18 +521,24 @@ function wireClusterBodies(root) {
             if (!body || !body.dataset.pending) return;
             delete body.dataset.pending;
             body.innerHTML = clusterBody(clusterByLabel[d.dataset.label],
-                d.dataset.role || null, d.dataset.area || null);
+                d.dataset.role || null, d.dataset.area || null,
+                d.dataset.roleset ? d.dataset.roleset.split("|") : null);
         });
     });
 }
 
-function clusterBody(t, filterRole, filterArea) {
+function clusterBody(t, filterRole, filterArea, filterRoleSet) {
     const members = t.members.length > 1
         ? `<div class="c-members"><b>merged names:</b> ${t.members.map(esc).join(" · ")}</div>` : "";
 
     let prov = t.provenance;
     let head;
-    if (filterRole) {
+    if (filterRoleSet) {
+        const set = new Set(filterRoleSet);
+        prov = prov.filter(p => moduleRoles(p.sid).some(r => set.has(r)));
+        head = `<div class="mod-head"><b>${prov.length}</b> of ${t.module_count} modules tagged with any of
+                this role's ${filterRoleSet.length} rolled-up roles — full provenance:</div>`;
+    } else if (filterRole) {
         prov = prov.filter(p => moduleRoles(p.sid).includes(filterRole));
         head = `<div class="mod-head"><b>${prov.length}</b> of ${t.module_count} modules tagged
                 <b>${esc(roleLabel(filterRole))}</b> — full provenance:</div>`;
@@ -724,63 +732,71 @@ function renderDomainGroups(thinOnly) {
     wireClusterBodies(root);
 }
 
-/* ---------- tab 3: ASN roles (parent -> child role -> topics) ---------- */
+/* ---------- tab 3: ASN roles (flat list; some roles roll up others) ---------- */
 
-// Build the two-level rollup once. A parent's module set is the DEDUPED union
-// of its children's module sets (modules carry multiple role tags, so a naive
-// sum double-counts), and its topic counts are recomputed against that union —
-// guaranteeing a parent is always >= any of its children.
-function buildRoleTree() {
+// Build the flat list of role nodes once. Every node is a real ASN role. For a
+// SUPERSET role (a key in ROLE_ROLLUPS), coverage is the DEDUPED union of itself
+// + its member roles' modules (modules carry multiple role tags, so a naive sum
+// double-counts), with topic counts recomputed against that union — so e.g.
+// "engineering" ends up >= any single engineering role. Plain roles keep their
+// own raw tag coverage. Members still appear as their own rows.
+function buildRoleNodes() {
     if (ROLE_TREE) return ROLE_TREE;
     const roleModules = {};   // slug -> Set(sid)
     Object.entries(DATA.modules).forEach(([sid, mod]) =>
         (mod.roles || []).forEach(r => (roleModules[r] || (roleModules[r] = new Set())).add(sid)));
     const rc = {}; DATA.roles.forEach(r => rc[r.slug] = r.module_count);
     const thinOf = topics => topics.filter(x => (clusterByLabel[x.label] || {}).module_count <= THIN_MAX).length;
-
-    const roleOf = c => ({
-        slug: c, module_count: rc[c] || roleModules[c].size,
-        topics: roleTopics[c] || [], thin: thinOf(roleTopics[c] || []),
-    });
-    // GAP order: least-covered (largest gap) first, so rolled-up groups sink.
-    const byGap = (a, b) => a.module_count - b.module_count || a.slug.localeCompare(b.slug);
-
-    const parents = Object.entries(ROLE_HIERARCHY).map(([label, children]) => {
-        const present = children.filter(c => roleModules[c]);
-        const set = new Set();
-        present.forEach(c => roleModules[c].forEach(s => set.add(s)));
-        const topics = [];
+    const topicsForSet = set => {
+        const out = [];
         DATA.topics.forEach(t => {
             let n = 0;
             for (const p of t.provenance) if (set.has(p.sid)) n++;
-            if (n) topics.push({ label: t.label, count: n });
+            if (n) out.push({ label: t.label, count: n });
         });
-        topics.sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
-        return { label, moduleCount: set.size, topics, thin: thinOf(topics),
-                 children: present.map(roleOf).sort(byGap) };
-    }).filter(p => p.children.length);
+        return out.sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+    };
 
-    // Roles in no family render as standalone top-level rows.
-    const grouped = new Set(Object.values(ROLE_HIERARCHY).flat());
-    const ungrouped = DATA.roles.map(r => r.slug).filter(s => !grouped.has(s)).map(roleOf);
+    const nodes = DATA.roles.map(r => {
+        const slug = r.slug;
+        if (ROLE_ROLLUPS[slug]) {
+            const members = [slug, ...ROLE_ROLLUPS[slug]].filter(s => roleModules[s]);
+            const set = new Set();
+            members.forEach(s => roleModules[s].forEach(x => set.add(x)));
+            const topics = topicsForSet(set);
+            return { slug, members, isRollup: true, module_count: set.size, topics, thin: thinOf(topics) };
+        }
+        const topics = roleTopics[slug] || [];
+        return { slug, members: [slug], isRollup: false, module_count: rc[slug], topics, thin: thinOf(topics) };
+    });
 
-    ROLE_TREE = { parents, ungrouped };
-    return ROLE_TREE;
+    const untaggedCount = countModulesWhere(mod => !mod.roles || !mod.roles.length);
+    if (untaggedCount > 0) {
+        const topics = roleTopics["(untagged)"] || [];
+        nodes.push({ slug: "(untagged)", members: ["(untagged)"], isRollup: false, module_count: untaggedCount, topics, thin: thinOf(topics) });
+    }
+
+    ROLE_NODE_BY_SLUG = {}; nodes.forEach(n => ROLE_NODE_BY_SLUG[n.slug] = n);
+    ROLE_TREE = nodes;
+    return nodes;
 }
 
-// One role row (used for child roles and the untagged leaf): module bar +
-// lazy topic drill-down, scaled to `max` so a child can never out-fill a parent.
-function roleRowHtml(c, max) {
-    return `<details class="group role" data-role="${esc(c.slug)}">
+function roleRowHtml(n, max) {
+    const tag = n.isRollup
+        ? `<span class="rollup-tag" title="Rolled-up coverage — the deduped union of this role plus ${n.members.length - 1} related roles it supersets (${n.members.slice(1).map(roleLabel).join(", ")}). Those roles also appear as their own rows.">rollup</span>`
+        : "";
+    const members = n.isRollup ? ` data-members="${esc(n.members.join("|"))}"` : "";
+    return `<details class="group role${n.isRollup ? " is-rollup" : ""}" data-role="${esc(n.slug)}"${members}>
         <summary><span class="tri">▶</span>
-            <h3>${esc(roleLabel(c.slug))}</h3>
-            <span class="g-bar"><i style="width:${Math.max(100 * c.module_count / max, 1)}%"></i></span>
-            <span class="g-meta">${c.module_count.toLocaleString()} modules · ${c.topics.length.toLocaleString()} topics · ${c.thin.toLocaleString()} topics with ≤ ${THIN_MAX} MS Learn modules</span></summary>
+            <h3>${esc(roleLabel(n.slug))}</h3>${tag}
+            <span class="g-bar"><i style="width:${Math.max(100 * n.module_count / max, 1)}%"></i></span>
+            <span class="g-meta">${n.module_count.toLocaleString()} modules · ${n.topics.length.toLocaleString()} topics · ${n.thin.toLocaleString()} topics with ≤ ${THIN_MAX} MS Learn modules</span></summary>
         <div class="role-body" data-pending="1"></div>
     </details>`;
 }
 
 // Topics render lazily on a role row's first open (each can hold hundreds).
+// A rollup role drills down against its whole member set; a plain role just itself.
 function wireRoleRows(root) {
     root.querySelectorAll("details.role").forEach(d => {
         d.addEventListener("toggle", () => {
@@ -789,9 +805,11 @@ function wireRoleRows(root) {
             if (!body || !body.dataset.pending) return;
             delete body.dataset.pending;
             const slug = d.dataset.role;
-            const topics = roleTopics[slug] || [];
-            body.innerHTML = `<div class="matches">` + topics.map(x =>
-                clusterDetails(x.label, `${x.count} of this role's modules`, slug)).join("") + `</div>`;
+            const members = d.dataset.members ? d.dataset.members.split("|") : null;
+            const topics = (ROLE_NODE_BY_SLUG[slug] || {}).topics || roleTopics[slug] || [];
+            body.innerHTML = `<div class="matches">` + topics.map(x => members
+                ? clusterDetails(x.label, `${x.count} of this role's rolled-up modules`, null, null, members)
+                : clusterDetails(x.label, `${x.count} of this role's modules`, slug)).join("") + `</div>`;
             wireClusterBodies(body);
         });
     });
@@ -799,50 +817,12 @@ function wireRoleRows(root) {
 
 function renderRoleGroups() {
     const root = document.getElementById("role-groups");
-    const { parents, ungrouped } = buildRoleTree();
-    const untaggedCount = countModulesWhere(mod => !mod.roles || !mod.roles.length);
-    const untagged = untaggedCount > 0 ? [{
-        slug: "(untagged)", module_count: untaggedCount, topics: roleTopics["(untagged)"] || [],
-        thin: (roleTopics["(untagged)"] || []).filter(x => (clusterByLabel[x.label] || {}).module_count <= THIN_MAX).length,
-    }] : [];
-    const max = Math.max(...parents.map(p => p.moduleCount),
-                         ...ungrouped.map(r => r.module_count), untaggedCount, 1);
-
-    // One top-level list mixing rolled-up families and standalone roles, sorted
-    // largest-gap-first (least coverage on top) so the heavy families sink.
-    const nodes = [
-        ...parents.map(p => ({ coverage: p.moduleCount, parent: p })),
-        ...ungrouped.map(r => ({ coverage: r.module_count, role: r })),
-        ...untagged.map(r => ({ coverage: r.module_count, role: r })),
-    ].sort((a, b) => a.coverage - b.coverage);
-
-    const pidx = parents;  // stable index for lazy expansion
-    root.innerHTML = nodes.map(n => {
-        if (n.role) return roleRowHtml(n.role, max);
-        const p = n.parent, i = pidx.indexOf(p);
-        return `
-        <details class="group role-parent" data-pidx="${i}">
-            <summary><span class="tri">▶</span>
-                <h3>${esc(p.label)}</h3>
-                <span class="g-bar"><i style="width:${Math.max(100 * p.moduleCount / max, 1)}%"></i></span>
-                <span class="g-meta">${p.moduleCount.toLocaleString()} modules · ${p.children.length} sub-roles · ${p.topics.length.toLocaleString()} topics · ${p.thin.toLocaleString()} topics with ≤ ${THIN_MAX} MS Learn modules</span></summary>
-            <div class="parent-body" data-pending="1"></div>
-        </details>`;
-    }).join("");
-
-    // parents render their child role rows lazily; child rows then render topics lazily
-    root.querySelectorAll("details.role-parent").forEach(d => {
-        d.addEventListener("toggle", () => {
-            if (!d.open) return;
-            const body = d.querySelector(".parent-body");
-            if (!body || !body.dataset.pending) return;
-            delete body.dataset.pending;
-            const p = pidx[+d.dataset.pidx];
-            body.innerHTML = p.children.map(c => roleRowHtml(c, max)).join("");
-            wireRoleRows(body);
-        });
-    });
-    wireRoleRows(root);  // wires standalone + untagged top-level leaves
+    const nodes = buildRoleNodes();
+    const max = Math.max(...nodes.map(n => n.module_count), 1);
+    // Largest gap (least coverage) first, so the rolled-up superset roles sink.
+    const sorted = [...nodes].sort((a, b) => a.module_count - b.module_count || a.slug.localeCompare(b.slug));
+    root.innerHTML = sorted.map(n => roleRowHtml(n, max)).join("");
+    wireRoleRows(root);
 }
 
 /* ---------- tab 4: solution areas ---------- */
