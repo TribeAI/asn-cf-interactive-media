@@ -21,6 +21,9 @@
     .tabs button { background: none; border: none; color: #94a3b8; font-size: 0.88em; font-weight: 600; padding: 12px 18px; cursor: pointer; border-bottom: 3px solid transparent; }
     .tabs button:hover { color: #e2e8f0; }
     .tabs button.active { color: white; border-bottom-color: #38bdf8; }
+    .tabs .comp-switch { margin-left: auto; align-self: center; display: flex; align-items: center; gap: 6px; color: #94a3b8; font-size: 0.78em; font-weight: 600; cursor: pointer; }
+    .tabs .comp-switch:hover { color: #e2e8f0; }
+    .tabs .comp-switch input { cursor: pointer; }
 
     /* headline severity summary */
     .headline { background: #0f172a; padding: 14px 24px; display: flex; gap: 14px; flex-wrap: wrap; align-items: center; border-top: 1px solid #1e293b; }
@@ -147,11 +150,14 @@
 </div>
 
 <div class="tabs" id="tabs">
-    <button data-tab="gaps">Gaps vs the field</button>
+    <button data-tab="gaps" data-competitor>Gaps vs the field</button>
     <button data-tab="topics">Catalogue topics</button>
     <button data-tab="roles">ASN roles</button>
     <button data-tab="areas">Solution areas</button>
-    <button data-tab="sources">Sources</button>
+    <button data-tab="sources" data-competitor>Sources</button>
+    <label class="comp-switch" title="Competitor analysis compares the ASN catalogue against external vocabularies (Pluralsight, DataCamp, OpenAI Academy, Anthropic Academy, Udemy). Hidden by default — check to reveal the 'Gaps vs the field' and 'Sources' tabs.">
+        <input type="checkbox" id="competitor-analysis"> Competitor analysis
+    </label>
 </div>
 
 <div class="headline" id="headline"></div>
@@ -291,7 +297,8 @@ function termSev(r) {
 
 const VOCAB_TITLES = {
     pluralsight_topics: ["Pluralsight — derived course topics (high-fidelity comparison)", "Exact catalog scrape (2026-05-19, Kevin Wang) + Sonnet topic extraction over all 6,289 course titles; terms with ≥ 20 Pluralsight courses, sorted gaps-first. Full vocabulary on the Sources tab."],
-    datacamp_ai_topics: ["DataCamp — AI topic vocabulary", "Exact (API capture). The strongest external topic vocabulary per the comp research."],
+    datacamp_topics: ["DataCamp — topic vocabulary (course catalog)", "Exact capture (2026-06-16) of DataCamp's full course-catalog topic facet — its conceptual taxonomy."],
+    datacamp_technologies: ["DataCamp — technology / tool vocabulary", "Exact capture (2026-06-16) of DataCamp's tool/vendor facet — the tool islands MS Learn rarely names."],
     udemy_goal_labels: ["Udemy — goal labels", "Directional (landing-page read). Outcome-first goals — the front-door framing the research recommends."],
     frontier_no_external_source: ["Microsoft frontier — topics no external taxonomy names", "The ~12% slice ASN must define itself. Low coverage here means the catalogue lags Microsoft's own strategy."],
     openai_skill_stages: ["OpenAI Academy — skill-stage ladder", "Exact (API capture). Awareness → Use Cases → Builder → Deployment."],
@@ -356,8 +363,12 @@ async function init() {
     renderLegend();
     wireTabs();
     wireControls();
+    wireCompetitorToggle();
     const want = location.hash.replace("#", "");
-    switchTab(["gaps", "topics", "roles", "areas", "sources"].includes(want) ? want : "gaps");
+    const valid = ["gaps", "topics", "roles", "areas", "sources"].includes(want) ? want : "gaps";
+    const start = (!competitorTabsVisible() && (valid === "gaps" || valid === "sources")) ? "topics" : valid;
+    switchTab(start);
+    applyCompetitorTabs();
 }
 
 function countModulesWhere(pred) {
@@ -422,6 +433,24 @@ function allTerms() {
 function wireTabs() {
     document.querySelectorAll("#tabs button").forEach(b =>
         b.addEventListener("click", () => switchTab(b.dataset.tab)));
+}
+
+/* Competitor analysis is opt-in: the "Gaps vs the field" and "Sources" tabs are
+   hidden until the toggle is checked. A #gaps / #sources deep link auto-reveals. */
+function competitorTabsVisible() {
+    const el = document.getElementById("competitor-analysis");
+    return !!(el && el.checked);
+}
+function applyCompetitorTabs() {
+    const on = competitorTabsVisible();
+    document.querySelectorAll('#tabs button[data-competitor]').forEach(b => b.classList.toggle("hidden", !on));
+    if (!on && (activeTab === "gaps" || activeTab === "sources")) switchTab("topics");
+}
+function wireCompetitorToggle() {
+    const el = document.getElementById("competitor-analysis");
+    const want = location.hash.replace("#", "");
+    if (want === "gaps" || want === "sources") el.checked = true;  // deep link reveals competitors
+    el.addEventListener("change", applyCompetitorTabs);
 }
 
 function switchTab(tab) {

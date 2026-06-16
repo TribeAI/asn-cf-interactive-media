@@ -57,6 +57,12 @@
     .pill { font-size: 0.76em; padding: 3px 10px; border-radius: 12px; background: #e2e8f0; color: #475569; cursor: pointer; border: none; font-family: inherit; }
     .pill.on { background: #1e293b; color: white; }
 
+    /* competitor-analysis master toggle */
+    .comp-bar { max-width: 1280px; margin: 18px auto 0; padding: 0 24px; }
+    .comp-bar label { display: inline-flex; align-items: center; gap: 9px; font-size: 0.82em; color: #475569; cursor: pointer; background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 9px 15px; }
+    .comp-bar label b { color: #1e293b; }
+    .comp-bar input { cursor: pointer; }
+
     .tooltip {
         position: fixed; pointer-events: none; z-index: 200;
         background: #1e293b; color: #f1f5f9; padding: 8px 11px; border-radius: 6px;
@@ -94,12 +100,16 @@
     any competitor's complete topic catalogue. Read the competitor lens as directional, not exhaustive.
 </div>
 
-<div class="section">
+<div class="comp-bar">
+    <label><input type="checkbox" id="show-competitors"> <b>Competitor analysis</b> — compare the catalogue against external vocabularies (DataCamp, OpenAI Academy, Anthropic Academy, Udemy, frontier). Hidden by default.</label>
+</div>
+
+<div class="section" id="competitor-section" style="display:none">
     <h2>1 · Competitor lens — the field's vocabulary vs MS Learn coverage</h2>
     <div class="sec-sub">
-        Terms sorted by MS module coverage, gaps first. Each vocabulary is a <b>sample/subset</b> of that
-        source's topics captured during the comp research — not its full catalogue. DataCamp's AI topic
-        vocabulary and the OpenAI / Anthropic frames are exact API captures; Udemy goal labels are
+        Terms sorted by MS module coverage, gaps first. <b>DataCamp</b> is the full course-catalog facet
+        vocabulary — its conceptual <b>topics</b> and its <b>technology/tool</b> axis (re-captured 2026-06-16
+        from the public catalog). The OpenAI / Anthropic frames are exact captures; Udemy goal labels are
         directional. The "frontier" list is the ~12% of AI topics no external taxonomy names — coverage
         there shows where Microsoft's own catalogue stands on its own frontier.
     </div>
@@ -156,7 +166,8 @@ const DOMAIN_COLORS = {
 };
 
 const VOCAB_TITLES = {
-    datacamp_ai_topics: ["DataCamp — AI topic vocabulary", "Exact (API capture). The strongest external topic vocabulary per the comp research."],
+    datacamp_topics: ["DataCamp — topic vocabulary (course catalog)", "Exact capture (2026-06-16) of DataCamp's full course-catalog topic facet — its conceptual taxonomy."],
+    datacamp_technologies: ["DataCamp — technology / tool vocabulary", "Exact capture (2026-06-16) of DataCamp's tool/vendor facet — the tool islands MS Learn rarely names."],
     udemy_goal_labels: ["Udemy — goal labels", "Directional (landing-page read). Outcome-first goals; the front-door framing the research recommends."],
     frontier_no_external_source: ["Microsoft frontier — topics no external taxonomy names", "The ~12% slice ASN must define itself. Coverage shows how much of its own frontier the catalogue already teaches."],
     openai_skill_stages: ["OpenAI Academy — skill-stage ladder", "Exact (API capture). Awareness → Use Cases → Builder → Deployment."],
@@ -173,6 +184,11 @@ async function init() {
     renderThin("all");
     document.querySelectorAll('input[name="tm-mode"]').forEach(el =>
         el.addEventListener("change", e => renderTreemap(e.target.value)));
+    // Competitor analysis is opt-in: the competitor lens stays hidden until checked.
+    const showComp = document.getElementById("show-competitors");
+    showComp.addEventListener("change", () => {
+        document.getElementById("competitor-section").style.display = showComp.checked ? "" : "none";
+    });
 }
 
 function renderStats() {
