@@ -131,7 +131,7 @@ const DOMAIN_COLORS = {
 };
 const ROLE_COLOR = "#7c3aed";
 
-const state = { graph: null, showWeak: true, selected: null, minShared: 8,
+const state = { graph: null, showWeak: true, selected: null,
     tierFilter: { role: true, job: true, topic: true } };
 
 // NOTE: d3-sankey overwrites node.layer with a numeric column index, so we
@@ -148,8 +148,6 @@ async function init() {
             return r.json();
         });
         computeDomainModel();
-        const m = state.graph.meta;
-        if (m.default_min_shared) state.minShared = m.default_min_shared;
         renderAggStats();
         renderLegend();
         render();
@@ -246,10 +244,11 @@ function render() {
     // nodes that have at least one (weak-aware) link in the FULL graph — drops
     // globally-isolated nodes; computed before the tier filter so single-tier
     // views still show that tier's full connected set.
-    // density slider: keep only links above the association cutoff (shared
-    // modules), so each role fans out in proportion to the space it spans.
-    const assocOk = l => (l.value || 0) >= state.minShared;
-    const weakOk = l => (state.showWeak || l.strength !== "weak") && assocOk(l);
+    // keep only each role's strongest topics (role_rank <= cap), so generic
+    // hub topics don't tangle every role into the centre.
+    const cap = state.graph.meta.topics_per_role_cap || 25;
+    const capOk = l => l.role_rank == null || l.role_rank <= cap;
+    const weakOk = l => (state.showWeak || l.strength !== "weak") && capOk(l);
     const linkedIds = new Set();
     state.graph.links.forEach(l => { if (weakOk(l)) { linkedIds.add(l.source); linkedIds.add(l.target); } });
 
