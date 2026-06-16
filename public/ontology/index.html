@@ -30,9 +30,6 @@
     .controls .hint { color: #94a3b8; font-size: 0.95em; }
     .controls button { font-family: inherit; font-size: 0.95em; padding: 4px 12px; border: 1px solid #cbd5e1; border-radius: 6px; background: white; color: #475569; cursor: pointer; }
     .controls button:hover { background: #f8fafc; }
-    .controls .topn-ctl { cursor: default; }
-    .controls .topn-ctl input[type=range] { width: 130px; cursor: pointer; accent-color: #7c3aed; }
-    .controls .topn-ctl b { color: #1e293b; min-width: 1.6em; text-align: right; }
 
     .col-headers { display: flex; justify-content: space-between; padding: 12px 40px 0; max-width: 1400px; margin: 0 auto; }
     .col-head { font-weight: 700; font-size: 0.9em; }
@@ -106,9 +103,6 @@
 
 <div class="controls">
     <button id="reset-btn">Reset highlight</button>
-    <label class="topn-ctl" title="Show only role↔topic links sharing at least this many modules. Higher = fewer, more strongly-associated topics per role. Broad roles keep more topics than niche ones (proportional).">min shared modules per link
-        <input type="range" id="topn" min="1" max="30" value="8">
-        <b id="topn-val">8</b></label>
     <span class="hint">Drag nodes to rearrange · drag background to pan · scroll to zoom · click a node to isolate its connections · hover for detail</span>
 </div>
 
@@ -156,19 +150,9 @@ async function init() {
         computeDomainModel();
         const m = state.graph.meta;
         if (m.default_min_shared) state.minShared = m.default_min_shared;
-        const topn = document.getElementById("topn");
-        if (m.max_shared) topn.max = Math.min(30, m.max_shared);
-        topn.value = state.minShared;
-        document.getElementById("topn-val").textContent = state.minShared;
         renderAggStats();
         renderLegend();
         render();
-        topn.addEventListener("input", () => {
-            state.minShared = +topn.value;
-            document.getElementById("topn-val").textContent = state.minShared;
-            state.selected = null;
-            render();
-        });
         document.getElementById("reset-btn").addEventListener("click", () => {
             state.selected = null; applyHighlight();
         });
