@@ -57,7 +57,6 @@
     .g-bar i { display: block; height: 100%; border-radius: 4px; background: #6366f1; }
 
     /* a role whose coverage is a deduped rollup of related ASN roles */
-    .rollup-tag { font-size: 0.62em; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #4338ca; background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 5px; padding: 2px 6px; margin-left: 7px; flex-shrink: 0; cursor: help; }
     details.role.is-rollup > summary .g-bar i { background: #4338ca; }
 
     /* Pluralsight head-to-head rows */
@@ -200,8 +199,7 @@
     <div class="sec-sub">
         Every row is an official ASN role (catalog metadata, joined per module — not Tribe-derived).
         Sorted <b>most-covered first</b> — the roles with the most content on top; <b>(untagged)</b> is
-        pinned to the bottom. A few generic roles marked
-        <span class="rollup-tag" style="cursor:default">rollup</span> are supersets of more specific ones
+        pinned to the bottom. A few generic roles are supersets of more specific ones
         (e.g. <b>engineering</b> covers every engineering role): their coverage is the <b>deduped union</b>
         of themselves plus those roles, so a superset is always at least as covered as any role under it.
         The rolled-up roles still appear as their own rows; nothing is nested. Open a role to see its
@@ -783,13 +781,10 @@ function buildRoleNodes() {
 }
 
 function roleRowHtml(n, max) {
-    const tag = n.isRollup
-        ? `<span class="rollup-tag" title="Rolled-up coverage — the deduped union of this role plus ${n.members.length - 1} related roles it supersets (${n.members.slice(1).map(roleLabel).join(", ")}). Those roles also appear as their own rows.">rollup</span>`
-        : "";
     const members = n.isRollup ? ` data-members="${esc(n.members.join("|"))}"` : "";
     return `<details class="group role${n.isRollup ? " is-rollup" : ""}" data-role="${esc(n.slug)}"${members}>
         <summary><span class="tri">▶</span>
-            <h3>${esc(roleLabel(n.slug))}</h3>${tag}
+            <h3>${esc(roleLabel(n.slug))}</h3>
             <span class="g-bar"><i style="width:${Math.max(100 * n.module_count / max, 1)}%"></i></span>
             <span class="g-meta">${n.module_count.toLocaleString()} modules · ${n.topics.length.toLocaleString()} topics · ${n.thin.toLocaleString()} topics with ≤ ${THIN_MAX} MS Learn modules</span></summary>
         <div class="role-body" data-pending="1"></div>
