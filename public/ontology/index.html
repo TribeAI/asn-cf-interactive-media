@@ -106,9 +106,9 @@
 
 <div class="controls">
     <button id="reset-btn">Reset highlight</button>
-    <label class="topn-ctl">top topics per role
-        <input type="range" id="topn" min="1" max="50" value="15">
-        <b id="topn-val">15</b></label>
+    <label class="topn-ctl" title="Show only role↔topic links sharing at least this many modules. Higher = fewer, more strongly-associated topics per role. Broad roles keep more topics than niche ones (proportional).">min shared modules per link
+        <input type="range" id="topn" min="1" max="30" value="8">
+        <b id="topn-val">8</b></label>
     <span class="hint">Drag nodes to rearrange · drag background to pan · scroll to zoom · click a node to isolate its connections · hover for detail</span>
 </div>
 
@@ -137,7 +137,7 @@ const DOMAIN_COLORS = {
 };
 const ROLE_COLOR = "#7c3aed";
 
-const state = { graph: null, showWeak: true, selected: null, topN: 15,
+const state = { graph: null, showWeak: true, selected: null, minShared: 8,
     tierFilter: { role: true, job: true, topic: true } };
 
 // NOTE: d3-sankey overwrites node.layer with a numeric column index, so we
@@ -155,17 +155,17 @@ async function init() {
         });
         computeDomainModel();
         const m = state.graph.meta;
-        if (m.default_topics_per_role) state.topN = m.default_topics_per_role;
+        if (m.default_min_shared) state.minShared = m.default_min_shared;
         const topn = document.getElementById("topn");
-        if (m.max_topics_per_role) topn.max = m.max_topics_per_role;
-        topn.value = state.topN;
-        document.getElementById("topn-val").textContent = state.topN;
+        if (m.max_shared) topn.max = Math.min(30, m.max_shared);
+        topn.value = state.minShared;
+        document.getElementById("topn-val").textContent = state.minShared;
         renderAggStats();
         renderLegend();
         render();
         topn.addEventListener("input", () => {
-            state.topN = +topn.value;
-            document.getElementById("topn-val").textContent = state.topN;
+            state.minShared = +topn.value;
+            document.getElementById("topn-val").textContent = state.minShared;
             state.selected = null;
             render();
         });
@@ -262,9 +262,10 @@ function render() {
     // nodes that have at least one (weak-aware) link in the FULL graph — drops
     // globally-isolated nodes; computed before the tier filter so single-tier
     // views still show that tier's full connected set.
-    // density slider: keep only each role's top-N strongest topic edges.
-    const rankOk = l => l.role_rank == null || l.role_rank <= state.topN;
-    const weakOk = l => (state.showWeak || l.strength !== "weak") && rankOk(l);
+    // density slider: keep only links above the association cutoff (shared
+    // modules), so each role fans out in proportion to the space it spans.
+    const assocOk = l => (l.value || 0) >= state.minShared;
+    const weakOk = l => (state.showWeak || l.strength !== "weak") && assocOk(l);
     const linkedIds = new Set();
     state.graph.links.forEach(l => { if (weakOk(l)) { linkedIds.add(l.source); linkedIds.add(l.target); } });
 
