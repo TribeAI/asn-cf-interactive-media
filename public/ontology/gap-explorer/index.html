@@ -199,12 +199,13 @@
     <h2>ASN roles — coverage by official role taxonomy</h2>
     <div class="sec-sub">
         Every row is an official ASN role (catalog metadata, joined per module — not Tribe-derived).
-        Sorted <b>largest gap first</b> — least-covered roles on top. A few generic roles marked
+        Sorted <b>most-covered first</b> — the roles with the most content on top; <b>(untagged)</b> is
+        pinned to the bottom. A few generic roles marked
         <span class="rollup-tag" style="cursor:default">rollup</span> are supersets of more specific ones
         (e.g. <b>engineering</b> covers every engineering role): their coverage is the <b>deduped union</b>
-        of themselves plus those roles, so a superset is always at least as covered as any role under it,
-        and these settle to the bottom. The rolled-up roles still appear as their own rows; nothing is
-        nested. Open a role to see its topics, a topic to audit the source modules with evidence.
+        of themselves plus those roles, so a superset is always at least as covered as any role under it.
+        The rolled-up roles still appear as their own rows; nothing is nested. Open a role to see its
+        topics, a topic to audit the source modules with evidence.
     </div>
     <div class="controls">
         <button data-expand="#role-groups">Expand all roles</button>
@@ -819,8 +820,11 @@ function renderRoleGroups() {
     const root = document.getElementById("role-groups");
     const nodes = buildRoleNodes();
     const max = Math.max(...nodes.map(n => n.module_count), 1);
-    // Largest gap (least coverage) first, so the rolled-up superset roles sink.
-    const sorted = [...nodes].sort((a, b) => a.module_count - b.module_count || a.slug.localeCompare(b.slug));
+    // Most-covered first (rolled-up supersets rise to the top); (untagged) is
+    // always pinned to the very bottom regardless of its coverage.
+    const isUntagged = n => n.slug === "(untagged)";
+    const sorted = [...nodes].sort((a, b) =>
+        (isUntagged(a) - isUntagged(b)) || (b.module_count - a.module_count) || a.slug.localeCompare(b.slug));
     root.innerHTML = sorted.map(n => roleRowHtml(n, max)).join("");
     wireRoleRows(root);
 }
