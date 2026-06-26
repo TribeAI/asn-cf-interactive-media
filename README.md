@@ -7,6 +7,7 @@ Static visualizations and annotation tools for the ASN content freshness scoring
 | Path | Description | Data source |
 |------|-------------|-------------|
 | `/scoring-model/` | Per-document scoring explorer: claims, ratings, excerpts, freshness scores | self-contained |
+| `/video-quality/` | Video vs module claim quality: the two problems (extraction over-pulls non-falsifiable claims; the MS Learn coverage gap), human-validated falsifiability review, and solution options | self-contained |
 | `/repro-report/` | Reproducibility report: agreement rates, score deltas across duplicate runs | self-contained |
 | `/repro-report/ethnography.html` | Side-by-side claim comparison for sampled documents | self-contained |
 | `/annotation/` | Claim annotation tool: human QA interface for grading AI claim assessments | Tornado backend |
