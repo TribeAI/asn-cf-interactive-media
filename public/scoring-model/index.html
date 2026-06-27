@@ -104,7 +104,7 @@ const PCT = x => (x*100).toFixed(1) + "%";
 const PP = d => (d>=0?"+":"") + (d*100).toFixed(1) + "pp";
 const clampBins = 40;
 
-let DATA, BYID, STATE = { denom:"chars", absOn:false, sqrt:true };
+let DATA, BYID, STATE = { denom:"words", absOn:false, sqrt:true };
 
 function activeKey(){
   return "ts_" + STATE.denom + (STATE.absOn ? "" : "_noabs");
@@ -163,7 +163,7 @@ function writeupHTML(){
     <p>The trust score is a 0–100 severity-weighted measure of how much of a module's content is in question. Production computes it per module as:</p>
     <p class="mono"><code>weighted = (1.0·major + 0.3·minor) / claims &nbsp;·&nbsp; abs = 0.5·ln(major+1) &nbsp;·&nbsp; score = clamp(0,100, 100 − (weighted + abs)·50)</code></p>
     <p>The denominator is the number of claims extracted, so the score measures problems <i>per claim</i>, not per unit of content. One major issue in a short module scores like one major issue in a long module. That breaks comparison and ranking across modules.</p>
-    <p>This page rescores the run under candidate denominators that measure <i>amount of content</i> instead — characters, words, or compressed bytes (a proxy for information content that discounts repeated boilerplate and code). Each denominator can run with the absolute penalty kept or removed. Denominators are calibrated so the corpus's total content equals its total claim count, so claims is the baseline case and scores stay on one scale (1 claim ≈ ${c.chars} chars ≈ ${c.words} words ≈ ${c.compressed} compressed bytes).</p>
+    <p>This page rescores the run under candidate denominators that measure <i>amount of content</i> instead — words (the default here) or characters. Each denominator can run with the absolute penalty kept or removed. Denominators are calibrated so the corpus's total content equals its total claim count, so claims is the baseline case and scores stay on one scale (1 claim ≈ ${c.words} words ≈ ${c.chars} chars).</p>
     <ul>
       <li><b>Swapping the denominator alone barely moves the distribution</b> while the absolute penalty stays. That term is size-independent and dominates the score.</li>
       <li><b>Removing the absolute penalty is the change that matters.</b> It cuts the flag rate and clears the pile-up of zeros.</li>
@@ -175,7 +175,7 @@ function writeupHTML(){
 
 function renderControls(){
   const el = document.getElementById("controls");
-  const denoms = [["claims","Claims"],["chars","Characters"],["words","Words"],["compressed","Compressed"]];
+  const denoms = [["claims","Claims"],["chars","Characters"],["words","Words"]];
   el.innerHTML = `
     <div class="ctl-group">
       <span class="ctl-label">Denominator</span>
