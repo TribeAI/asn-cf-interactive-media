@@ -3,1154 +3,374 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Content Freshness Explorer</title>
+<title>Content Trust Score — scoring model</title>
 <style>
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  font-family: system-ui, -apple-system, sans-serif;
-  background: #fafafa;
-  color: #333;
-  line-height: 1.6;
-}
-
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 24px 16px;
-}
-
-h1 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  margin-bottom: 8px;
-}
-
-h2 {
-  font-size: 1.35rem;
-  font-weight: 600;
-  margin-bottom: 16px;
-}
-
-h3 {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-bottom: 12px;
-}
-
-.subtitle {
-  color: #666;
-  font-size: 0.9rem;
-  margin-bottom: 24px;
-}
-
-/* Loading & Error */
-.loading-container, .error-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 60vh;
-  text-align: center;
-}
-
-.spinner {
-  width: 48px;
-  height: 48px;
-  border: 4px solid #e0e0e0;
-  border-top-color: #1a73e8;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  margin-bottom: 16px;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.error-container .error-icon {
-  font-size: 3rem;
-  margin-bottom: 16px;
-  color: #d32f2f;
-}
-
-.error-container p {
-  max-width: 500px;
-  margin-bottom: 8px;
-}
-
-.error-container code {
-  background: #eee;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 0.9rem;
-}
-
-/* Breadcrumb */
-.breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 20px;
-  font-size: 0.9rem;
-  flex-wrap: wrap;
-}
-
-.breadcrumb a {
-  color: #1a73e8;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.breadcrumb a:hover {
-  text-decoration: underline;
-}
-
-.breadcrumb .sep {
-  color: #999;
-}
-
-/* Cards */
-.card {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
-  padding: 24px;
-  margin-bottom: 20px;
-  transition: box-shadow 0.15s ease;
-}
-
-.card-clickable {
-  cursor: pointer;
-}
-
-.card-clickable:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.08);
-}
-
-/* Bucket Overview */
-.bucket-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  margin-bottom: 24px;
-}
-
-@media (max-width: 768px) {
-  .bucket-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.bucket-card {
-  border-top: 4px solid;
-}
-
-.bucket-card.worst { border-top-color: #d32f2f; }
-.bucket-card.middle { border-top-color: #f57c00; }
-.bucket-card.best { border-top-color: #388e3c; }
-
-.bucket-card .bucket-label {
-  font-weight: 700;
-  font-size: 1.1rem;
-  margin-bottom: 4px;
-}
-
-.bucket-card.worst .bucket-label { color: #d32f2f; }
-.bucket-card.middle .bucket-label { color: #f57c00; }
-.bucket-card.best .bucket-label { color: #388e3c; }
-
-.bucket-card .bucket-desc {
-  color: #666;
-  font-size: 0.85rem;
-  margin-bottom: 12px;
-}
-
-.bucket-stats {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 16px;
-  font-size: 0.85rem;
-}
-
-.bucket-stats .stat-value {
-  font-weight: 700;
-  font-size: 1rem;
-}
-
-.bucket-stats .stat-label {
-  color: #888;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-/* Dot Strip */
-.dot-strip-container {
-  width: 100%;
-  overflow: visible;
-  margin-top: 8px;
-}
-
-.dot-strip-container svg {
-  width: 100%;
-  display: block;
-}
-
-/* Bucket Detail */
-.doc-table-wrapper {
-  overflow-x: auto;
-}
-
-.doc-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.9rem;
-}
-
-.doc-table th {
-  text-align: left;
-  padding: 10px 12px;
-  border-bottom: 2px solid #e0e0e0;
-  font-weight: 600;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #666;
-  white-space: nowrap;
-}
-
-.doc-table td {
-  padding: 10px 12px;
-  border-bottom: 1px solid #f0f0f0;
-  vertical-align: middle;
-}
-
-.doc-table tr {
-  cursor: pointer;
-  transition: background 0.1s;
-}
-
-.doc-table tbody tr:hover {
-  background: #f5f8ff;
-}
-
-.doc-table .title-cell {
-  max-width: 350px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: #1a73e8;
-  font-weight: 500;
-}
-
-.score-cell {
-  font-weight: 700;
-  border-radius: 4px;
-  padding: 4px 10px !important;
-  text-align: center;
-  white-space: nowrap;
-}
-
-.topic-chip {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 12px;
-  background: #e8eaf6;
-  color: #3949ab;
-  font-size: 0.78rem;
-  white-space: nowrap;
-}
-
-/* Document Detail */
-.doc-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin-bottom: 20px;
-}
-
-.doc-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  flex: 1;
-  min-width: 200px;
-}
-
-.score-badge {
-  font-size: 1.5rem;
-  font-weight: 700;
-  padding: 8px 20px;
-  border-radius: 12px;
-  color: #fff;
-  white-space: nowrap;
-}
-
-.meta-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 24px;
-}
-
-.meta-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 12px;
-  border-radius: 16px;
-  background: #f0f0f0;
-  font-size: 0.85rem;
-  color: #555;
-}
-
-.meta-chip .meta-chip-label {
-  font-weight: 600;
-  color: #333;
-}
-
-.prose-card {
-  margin-bottom: 20px;
-}
-
-.prose-card h3 {
-  margin-bottom: 12px;
-}
-
-.prose-card .prose-body {
-  color: #444;
-  font-size: 0.95rem;
-  line-height: 1.75;
-}
-
-.prose-card .prose-body p {
-  margin-bottom: 12px;
-}
-
-.prose-card .prose-body p:last-child {
-  margin-bottom: 0;
-}
-
-/* Claims Table */
-.claims-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.88rem;
-}
-
-.claims-table th {
-  text-align: left;
-  padding: 10px 12px;
-  border-bottom: 2px solid #e0e0e0;
-  font-weight: 600;
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #666;
-}
-
-.claims-table td {
-  padding: 10px 12px;
-  border-bottom: 1px solid #f0f0f0;
-  vertical-align: top;
-}
-
-.claims-table tr.rating-grounded { background: #e8f5e9; }
-.claims-table tr.rating-outdated { background: #fff3e0; }
-.claims-table tr.rating-inaccurate { background: #ffebee; }
-.claims-table tr.rating-inconclusive { background: #f5f5f5; }
-
-.severity-badge {
-  display: inline-block;
-  padding: 2px 10px;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.severity-major {
-  background: #d32f2f;
-  color: #fff;
-}
-
-.severity-minor {
-  background: #ffc107;
-  color: #333;
-}
-
-.rating-badge {
-  display: inline-block;
-  padding: 2px 10px;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.rating-grounded-badge { background: #388e3c; color: #fff; }
-.rating-outdated-badge { background: #f57c00; color: #fff; }
-.rating-inaccurate-badge { background: #d32f2f; color: #fff; }
-.rating-inconclusive-badge { background: #9e9e9e; color: #fff; }
-
-.reasoning-cell {
-  max-width: 300px;
-}
-
-.reasoning-text {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.reasoning-text.expanded {
-  display: block;
-  -webkit-line-clamp: unset;
-}
-
-.excerpt-toggle {
-  display: inline-block;
-  margin-top: 6px;
-  color: #1a73e8;
-  cursor: pointer;
-  font-size: 0.8rem;
-  user-select: none;
-}
-
-.excerpt-toggle:hover {
-  text-decoration: underline;
-}
-
-.excerpt-content {
-  display: none;
-  margin-top: 8px;
-  padding: 8px 12px;
-  background: rgba(0,0,0,0.04);
-  border-radius: 6px;
-  font-size: 0.85rem;
-  color: #555;
-  line-height: 1.6;
-}
-
-.excerpt-content.visible {
-  display: block;
-}
-
-.claim-text {
-  min-width: 200px;
-}
-
-.category-cell {
-  white-space: nowrap;
-  font-size: 0.82rem;
-}
-
-/* Tooltip */
-.dot-tooltip {
-  position: fixed;
-  background: #333;
-  color: #fff;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  pointer-events: none;
-  z-index: 1000;
-  max-width: 320px;
-  white-space: normal;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-  display: none;
-}
-
-.back-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  color: #1a73e8;
-  cursor: pointer;
-  font-size: 0.9rem;
-  text-decoration: none;
-  margin-bottom: 16px;
-}
-
-.back-btn:hover {
-  text-decoration: underline;
-}
-
-/* Responsive claims table */
-@media (max-width: 768px) {
-  .claims-table, .doc-table {
-    font-size: 0.8rem;
-  }
-  .claims-table td, .claims-table th,
-  .doc-table td, .doc-table th {
-    padding: 8px 6px;
-  }
-}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, -apple-system, sans-serif; background: #fafafa; color: #2a2a2a; line-height: 1.55; }
+.container { max-width: 1120px; margin: 0 auto; padding: 32px 20px 80px; }
+h1 { font-size: 1.7rem; font-weight: 700; margin-bottom: 4px; }
+h2 { font-size: 1.2rem; font-weight: 600; margin: 36px 0 12px; padding-bottom: 6px; border-bottom: 2px solid #ececec; }
+h3 { font-size: 1rem; font-weight: 600; margin-bottom: 8px; }
+.subtitle { color: #666; font-size: 0.92rem; margin-bottom: 20px; }
+p { margin-bottom: 10px; }
+a { color: #1a56db; }
+code { background: #eef1f5; padding: 1px 6px; border-radius: 4px; font-size: 0.86em; }
+.mono { font-variant-numeric: tabular-nums; }
+
+/* loading / error */
+.loading, .error { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:55vh; text-align:center; color:#666; }
+.spinner { width:42px; height:42px; border:4px solid #e0e0e0; border-top-color:#1a73e8; border-radius:50%; animation:spin .8s linear infinite; margin-bottom:14px; }
+@keyframes spin { to { transform: rotate(360deg);} }
+
+/* writeup */
+.writeup { background:#fff; border:1px solid #e6e6e6; border-radius:10px; padding:18px 22px; margin-bottom:8px; font-size:0.92rem; }
+.writeup p { margin-bottom:8px; }
+.writeup ul { margin:6px 0 8px 20px; } .writeup li { margin:3px 0; }
+details.writeup > summary { cursor:pointer; font-weight:600; list-style:none; }
+details.writeup > summary::-webkit-details-marker { display:none; }
+details.writeup > summary::before { content:"▸ "; color:#888; }
+details.writeup[open] > summary::before { content:"▾ "; }
+
+/* controls */
+.controls { position:sticky; top:0; z-index:5; background:#fafafa; padding:14px 0 10px; margin-bottom:8px; border-bottom:1px solid #ececec; display:flex; flex-wrap:wrap; gap:22px; align-items:flex-end; }
+.ctl-group { display:flex; flex-direction:column; gap:5px; }
+.ctl-label { font-size:0.72rem; text-transform:uppercase; letter-spacing:0.04em; color:#888; font-weight:600; }
+.seg { display:flex; border:1px solid #cdd3da; border-radius:8px; overflow:hidden; }
+.seg button { border:0; background:#fff; padding:7px 13px; font-size:0.85rem; cursor:pointer; color:#444; border-right:1px solid #e3e6ea; }
+.seg button:last-child { border-right:0; }
+.seg button.on { background:#1a56db; color:#fff; font-weight:600; }
+.active-name { font-size:0.85rem; color:#555; }
+.active-name b { color:#1a56db; }
+
+/* summary cards */
+.cards { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin:6px 0 4px; }
+.metric { background:#fff; border:1px solid #e6e6e6; border-radius:10px; padding:14px 16px; }
+.metric .k { font-size:0.74rem; text-transform:uppercase; letter-spacing:0.03em; color:#888; }
+.metric .v { font-size:1.55rem; font-weight:700; font-variant-numeric:tabular-nums; margin-top:2px; }
+.metric .b { font-size:0.76rem; color:#999; margin-top:1px; }
+.metric .d { font-size:0.8rem; font-weight:600; margin-top:3px; }
+.up { color:#15803d; } .down { color:#b91c1c; } .flat { color:#999; }
+@media (max-width:720px){ .cards{ grid-template-columns:repeat(2,1fr);} }
+
+.card { background:#fff; border:1px solid #e6e6e6; border-radius:10px; padding:18px 20px; margin-bottom:14px; }
+.legend { font-size:0.82rem; color:#666; margin:4px 0 0; }
+.swatch { display:inline-block; width:11px; height:11px; border-radius:2px; vertical-align:middle; margin:0 3px 0 12px; }
+.toggle-mini { font-size:0.78rem; color:#1a56db; cursor:pointer; user-select:none; margin-left:6px; }
+
+svg { display:block; width:100%; height:auto; }
+.dot { cursor:pointer; transition: cx .6s cubic-bezier(.4,0,.2,1), fill .3s; }
+.lane-label { font-size:11px; fill:#666; }
+
+/* featured + table */
+.fcard { border:1px solid #e6e6e6; border-radius:10px; margin-bottom:12px; overflow:hidden; }
+.fhead { display:flex; align-items:center; gap:12px; padding:12px 16px; cursor:pointer; background:#fff; }
+.fhead:hover { background:#f6f8fb; }
+.ftitle { flex:1; font-weight:600; font-size:0.95rem; }
+.ftag { font-size:0.72rem; color:#777; background:#f0f2f5; border-radius:20px; padding:2px 9px; white-space:nowrap; }
+.fscore { font-variant-numeric:tabular-nums; font-size:0.85rem; color:#555; white-space:nowrap; }
+.fscore b { font-size:1.05rem; }
+.fbody { padding:0 16px 14px; display:none; border-top:1px solid #eee; }
+.fcard.open .fbody { display:block; }
+.varbar { display:flex; flex-wrap:wrap; gap:6px; margin:12px 0; }
+.chip { font-size:0.76rem; border:1px solid #e0e4e8; border-radius:7px; padding:4px 8px; font-variant-numeric:tabular-nums; }
+.chip .cl { color:#888; } .chip.bk { border-color:#f0b3bd; background:#fff5f6; } .chip.ak { border-color:#9ec3f5; background:#eef5ff; }
+.claim { border-top:1px dashed #ececec; padding:9px 0; font-size:0.85rem; }
+.claim .cmeta { font-size:0.74rem; font-weight:600; margin-bottom:2px; }
+.sev-major { color:#b91c1c; } .sev-minor { color:#b45309; } .sev-none { color:#15803d; }
+.excerpt { color:#555; font-style:italic; border-left:3px solid #eee; padding-left:9px; margin:3px 0; }
+.reason { color:#666; font-size:0.82rem; }
+
+.search { width:100%; padding:9px 12px; border:1px solid #cdd3da; border-radius:8px; font-size:0.9rem; margin-bottom:10px; }
+table.tbl { width:100%; border-collapse:collapse; font-size:0.84rem; }
+table.tbl th, table.tbl td { padding:6px 9px; border-bottom:1px solid #eee; text-align:right; }
+table.tbl th:first-child, table.tbl td:first-child { text-align:left; }
+table.tbl th { color:#666; font-weight:600; position:sticky; top:64px; background:#fafafa; }
+table.tbl tr.detail { cursor:pointer; } table.tbl tr.detail:hover { background:#f6f8fb; }
+.tnum { font-variant-numeric:tabular-nums; }
+.tip { position:fixed; pointer-events:none; background:#1f2937; color:#fff; font-size:0.78rem; padding:6px 9px; border-radius:6px; max-width:280px; opacity:0; transition:opacity .12s; z-index:50; }
 </style>
 </head>
 <body>
-
-<div class="container" id="app"></div>
-<div class="dot-tooltip" id="tooltip"></div>
+<div class="container">
+  <div id="app">
+    <div class="loading"><div class="spinner"></div><p>Loading scoring data…</p></div>
+  </div>
+</div>
+<div class="tip" id="tip"></div>
 
 <script>
-(function() {
-  "use strict";
+const FMT = n => n.toLocaleString("en-US");
+const PCT = x => (x*100).toFixed(1) + "%";
+const PP = d => (d>=0?"+":"") + (d*100).toFixed(1) + "pp";
+const clampBins = 40;
 
-  let DATA = null;
-  let GLOBAL_MIN = 0;
-  let GLOBAL_MAX = 1;
+let DATA, BYID, STATE = { denom:"chars", absOn:false, sqrt:true };
 
-  // --- Utility ---
+function activeKey(){
+  return "ts_" + STATE.denom + (STATE.absOn ? "" : "_noabs");
+}
+function scores(key){ return DATA.docs.map(d=>d.s[key]).filter(v=>v!==null && v!==undefined); }
+function stats(key){
+  const v = scores(key).sort((a,b)=>a-b); const n=v.length;
+  const q = p => v[Math.min(Math.floor(p*n), n-1)];
+  return { n, mean:v.reduce((a,b)=>a+b,0)/n, median:q(.5), p25:q(.25), p5:q(.05),
+           flag:v.filter(x=>x<90).length, zero:v.filter(x=>x===0).length };
+}
+function hist(key, nbins=clampBins){
+  const c = new Array(nbins).fill(0), w=100/nbins;
+  for(const x of scores(key)){ let b=Math.floor(x/w); if(b>=nbins)b=nbins-1; if(b<0)b=0; c[b]++; }
+  return c;
+}
 
-  function escapeHtml(str) {
-    if (str == null) return "";
-    const div = document.createElement("div");
-    div.textContent = String(str);
-    return div.innerHTML;
-  }
+/* ---------- render ---------- */
+function render(){
+  const app = document.getElementById("app");
+  app.innerHTML = `
+    <h1>Content Trust Score — scoring model</h1>
+    <p class="subtitle">Run <b>${DATA.meta.run}</b> · ${FMT(DATA.meta.n_modules)} modules · ${FMT(DATA.meta.n_claims)} claims
+      (${FMT(DATA.meta.n_major)} major, ${FMT(DATA.meta.n_minor)} minor). Re-scoring only — extraction and validation unchanged.</p>
+    ${writeupHTML()}
+    <div class="controls" id="controls"></div>
+    <div class="cards" id="cards"></div>
+    <h2>Score distribution</h2>
+    <div class="card">
+      <p class="legend"><span class="swatch" style="background:#e11d48"></span><b>red outline</b> = production (claims denominator + abs penalty)
+        <span class="swatch" style="background:#2563eb;opacity:.55"></span><b>blue bars</b> = active variant
+        <span class="toggle-mini" id="sqrtToggle"></span></p>
+      <div id="histWrap"></div>
+    </div>
+    <h2>The same-score group</h2>
+    <p class="subtitle" id="clusterSub"></p>
+    <div class="card"><div id="beeswarm"></div></div>
+    <h2>Featured documents</h2>
+    <p class="subtitle">A handful spanning the failure modes — the same-score cluster, baseline zeros, minor-heavy and clean modules. Click to expand the claims that drove each score.</p>
+    <div id="featured"></div>
+    <h2>All modules</h2>
+    <p class="subtitle">Search any module. Score columns update with the controls above. Claim detail is bundled for featured and same-score modules.</p>
+    <input class="search" id="search" placeholder="Search ${FMT(DATA.meta.n_modules)} modules by title…">
+    <div id="tableWrap"></div>
+  `;
+  renderControls(); renderCards(); renderHist(); renderCluster(); renderFeatured(); renderTable("");
+  document.getElementById("sqrtToggle").onclick = ()=>{ STATE.sqrt=!STATE.sqrt; renderHist(); };
+  document.getElementById("search").oninput = e => renderTable(e.target.value.toLowerCase());
+}
 
-  function scoreColor(score, min, max) {
-    if (max === min) return "#888";
-    const t = Math.min(1, Math.max(0, (score - min) / (max - min)));
-    // green (0) -> yellow (0.5) -> red (1)
-    const r = Math.round(t < 0.5 ? t * 2 * 255 : 255);
-    const g = Math.round(t < 0.5 ? 255 : (1 - (t - 0.5) * 2) * 200);
-    const b = Math.round(30);
-    return `rgb(${r},${g},${b})`;
-  }
+function writeupHTML(){
+  const c = DATA.calibration;
+  return `
+  <details class="writeup" open>
+    <summary>How the score works, and what this is testing</summary>
+    <p>The trust score is a 0–100 severity-weighted measure of how much of a module's content is in question. Production computes it per module as:</p>
+    <p class="mono"><code>weighted = (1.0·major + 0.3·minor) / claims &nbsp;·&nbsp; abs = 0.5·ln(major+1) &nbsp;·&nbsp; score = clamp(0,100, 100 − (weighted + abs)·50)</code></p>
+    <p>The denominator is the number of claims extracted, so the score measures problems <i>per claim</i>, not per unit of content. One major issue in a short module scores like one major issue in a long module. That breaks comparison and ranking across modules.</p>
+    <p>This page rescores the run under candidate denominators that measure <i>amount of content</i> instead — characters, words, or compressed bytes (a proxy for information content that discounts repeated boilerplate and code). Each denominator can run with the absolute penalty kept or removed. Denominators are calibrated so the corpus's total content equals its total claim count, so claims is the baseline case and scores stay on one scale (1 claim ≈ ${c.chars} chars ≈ ${c.words} words ≈ ${c.compressed} compressed bytes).</p>
+    <ul>
+      <li><b>Swapping the denominator alone barely moves the distribution</b> while the absolute penalty stays. That term is size-independent and dominates the score.</li>
+      <li><b>Removing the absolute penalty is the change that matters.</b> It cuts the flag rate and clears the pile-up of zeros.</li>
+      <li><b>Comparability needs both</b> — a content denominator and no absolute penalty — to spread modules by content size instead of pinning every single-major module to the same score.</li>
+    </ul>
+    <p>Use the controls to pick a denominator and toggle the penalty. Every number, the histogram, and the same-score group update live.</p>
+  </details>`;
+}
 
-  function scoreBgColor(score, min, max) {
-    if (max === min) return "#f5f5f5";
-    const t = Math.min(1, Math.max(0, (score - min) / (max - min)));
-    const r = Math.round(232 + t * (255 - 232));
-    const g = Math.round(245 - t * (245 - 235));
-    const b = Math.round(233 - t * (233 - 238));
-    // light green to light red
-    if (t < 0.5) {
-      const r2 = Math.round(232 + t * 2 * (255 - 232));
-      const g2 = Math.round(245 - t * 2 * (245 - 243));
-      const b2 = Math.round(233 - t * 2 * (233 - 224));
-      return `rgb(${r2},${g2},${b2})`;
-    } else {
-      const t2 = (t - 0.5) * 2;
-      const r2 = Math.round(255);
-      const g2 = Math.round(243 - t2 * (243 - 235));
-      const b2 = Math.round(224 - t2 * (224 - 238));
-      return `rgb(${r2},${g2},${b2})`;
-    }
-  }
-
-  function mean(arr) {
-    if (!arr.length) return 0;
-    return arr.reduce((a, b) => a + b, 0) / arr.length;
-  }
-
-  function renderParagraphs(text) {
-    if (!text) return "";
-    return text.split(/\n\n+/).map(p => {
-      return "<p>" + escapeHtml(p.trim()) + "</p>";
-    }).join("");
-  }
-
-  function bucketColor(bucket) {
-    if (bucket === "worst") return "#d32f2f";
-    if (bucket === "middle") return "#f57c00";
-    return "#388e3c";
-  }
-
-  function navigate(hash) {
-    window.location.hash = hash;
-  }
-
-  // --- Dot Strip SVG ---
-
-  function renderDotStrip(docIds, bucketName, min, max, height, dotRadius, showLabels) {
-    height = height || 50;
-    dotRadius = dotRadius || 5;
-    const padLeft = 30;
-    const padRight = 30;
-    const padTop = dotRadius + 4;
-    const padBottom = 20;
-    const svgHeight = height + padTop + padBottom;
-    const color = bucketColor(bucketName);
-
-    const docs = docIds
-      .map(id => DATA.documents[id])
-      .filter(Boolean);
-
-    // Axis
-    const range = max - min || 1;
-    const axisY = padTop + height / 2;
-
-    let svgContent = "";
-
-    // Axis line
-    svgContent += `<line x1="${padLeft}" y1="${axisY}" x2="calc(100% - ${padRight}px)" y2="${axisY}" stroke="#ddd" stroke-width="1"/>`;
-
-    // Tick marks
-    const nTicks = 5;
-    for (let i = 0; i <= nTicks; i++) {
-      const val = min + (range * i / nTicks);
-      const pct = (i / nTicks) * 100;
-      svgContent += `<line x1="calc(${padLeft}px + ${pct}% * (1 - ${(padLeft + padRight)}/ 1000))" y1="${axisY - 4}" x2="calc(${padLeft}px + ${pct}% * (1 - ${(padLeft + padRight)}/1000))" y2="${axisY + 4}" stroke="#ccc" stroke-width="1"/>`;
-    }
-
-    // We need to return an element with JS-bindable dots, so we use a container approach
-    const id = "strip-" + bucketName + "-" + Math.random().toString(36).slice(2, 8);
-
-    const wrapper = document.createElement("div");
-    wrapper.className = "dot-strip-container";
-
-    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("viewBox", `0 0 600 ${svgHeight}`);
-    svg.setAttribute("preserveAspectRatio", "none");
-    svg.style.width = "100%";
-    svg.style.height = svgHeight + "px";
-
-    // Axis line
-    const axisLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    axisLine.setAttribute("x1", padLeft);
-    axisLine.setAttribute("y1", axisY);
-    axisLine.setAttribute("x2", 600 - padRight);
-    axisLine.setAttribute("y2", axisY);
-    axisLine.setAttribute("stroke", "#ddd");
-    axisLine.setAttribute("stroke-width", "1");
-    svg.appendChild(axisLine);
-
-    // Ticks and labels
-    for (let i = 0; i <= nTicks; i++) {
-      const val = min + (range * i / nTicks);
-      const x = padLeft + (i / nTicks) * (600 - padLeft - padRight);
-
-      const tick = document.createElementNS("http://www.w3.org/2000/svg", "line");
-      tick.setAttribute("x1", x);
-      tick.setAttribute("y1", axisY - 4);
-      tick.setAttribute("x2", x);
-      tick.setAttribute("y2", axisY + 4);
-      tick.setAttribute("stroke", "#bbb");
-      tick.setAttribute("stroke-width", "1");
-      svg.appendChild(tick);
-
-      const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
-      label.setAttribute("x", x);
-      label.setAttribute("y", axisY + 18);
-      label.setAttribute("text-anchor", "middle");
-      label.setAttribute("font-size", "10");
-      label.setAttribute("fill", "#999");
-      label.textContent = val.toFixed(2);
-      svg.appendChild(label);
-    }
-
-    // Dots with jitter to avoid overlap
-    const positions = [];
-    docs.forEach(doc => {
-      const t = range > 0 ? (doc.simple_score - min) / range : 0.5;
-      const cx = padLeft + t * (600 - padLeft - padRight);
-
-      // Vertical jitter based on nearby dots
-      let jitter = 0;
-      const nearby = positions.filter(p => Math.abs(p - cx) < dotRadius * 2);
-      jitter = (nearby.length % 2 === 0 ? 1 : -1) * Math.ceil(nearby.length / 2) * (dotRadius * 1.5);
-      positions.push(cx);
-
-      const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-      circle.setAttribute("cx", cx);
-      circle.setAttribute("cy", axisY + jitter);
-      circle.setAttribute("r", dotRadius);
-      circle.setAttribute("fill", color);
-      circle.setAttribute("fill-opacity", "0.8");
-      circle.setAttribute("stroke", "#fff");
-      circle.setAttribute("stroke-width", "1");
-      circle.style.cursor = "pointer";
-      circle.setAttribute("data-title", doc.title || "Untitled");
-      circle.setAttribute("data-score", doc.simple_score.toFixed(3));
-
-      circle.addEventListener("mouseenter", function(e) {
-        const tooltip = document.getElementById("tooltip");
-        tooltip.textContent = this.getAttribute("data-title") + " — Score: " + this.getAttribute("data-score");
-        tooltip.style.display = "block";
-        tooltip.style.left = (e.clientX + 12) + "px";
-        tooltip.style.top = (e.clientY - 30) + "px";
-      });
-
-      circle.addEventListener("mousemove", function(e) {
-        const tooltip = document.getElementById("tooltip");
-        tooltip.style.left = (e.clientX + 12) + "px";
-        tooltip.style.top = (e.clientY - 30) + "px";
-      });
-
-      circle.addEventListener("mouseleave", function() {
-        document.getElementById("tooltip").style.display = "none";
-      });
-
-      svg.appendChild(circle);
-    });
-
-    wrapper.appendChild(svg);
-    return wrapper;
-  }
-
-  // --- Views ---
-
-  function renderLoading() {
-    return `
-      <div class="loading-container">
-        <div class="spinner"></div>
-        <p>Loading document data...</p>
+function renderControls(){
+  const el = document.getElementById("controls");
+  const denoms = [["claims","Claims"],["chars","Characters"],["words","Words"],["compressed","Compressed"]];
+  el.innerHTML = `
+    <div class="ctl-group">
+      <span class="ctl-label">Denominator</span>
+      <div class="seg" id="segDenom">${denoms.map(([k,l])=>`<button data-d="${k}" class="${STATE.denom===k?'on':''}">${l}</button>`).join("")}</div>
+    </div>
+    <div class="ctl-group">
+      <span class="ctl-label">Absolute penalty</span>
+      <div class="seg" id="segAbs">
+        <button data-a="1" class="${STATE.absOn?'on':''}">Kept</button>
+        <button data-a="0" class="${!STATE.absOn?'on':''}">Removed</button>
       </div>
-    `;
-  }
+    </div>
+    <div class="ctl-group"><span class="ctl-label">Active variant</span>
+      <span class="active-name">normalize by <b id="anDenom"></b>, abs penalty <b id="anAbs"></b></span></div>
+  `;
+  document.querySelectorAll("#segDenom button").forEach(b=> b.onclick=()=>{ STATE.denom=b.dataset.d; update(); });
+  document.querySelectorAll("#segAbs button").forEach(b=> b.onclick=()=>{ STATE.absOn=b.dataset.a==="1"; update(); });
+  syncActiveName();
+}
+function syncActiveName(){
+  document.getElementById("anDenom").textContent = STATE.denom;
+  document.getElementById("anAbs").textContent = STATE.absOn ? "kept" : "removed";
+}
+function update(){
+  document.querySelectorAll("#segDenom button").forEach(b=> b.classList.toggle("on", b.dataset.d===STATE.denom));
+  document.querySelectorAll("#segAbs button").forEach(b=> b.classList.toggle("on", (b.dataset.a==="1")===STATE.absOn));
+  syncActiveName();
+  renderCards(); renderHist(); renderCluster(); renderFeatured();
+  renderTable(document.getElementById("search").value.toLowerCase());
+}
 
-  function renderError(msg) {
-    return `
-      <div class="error-container">
-        <div class="error-icon">!</div>
-        <h2>Failed to load data</h2>
-        <p>${escapeHtml(msg)}</p>
-        <p style="margin-top:16px; color:#666;">Make sure you have generated the data file and are serving the directory:</p>
-        <p><code>python generate_explorer_data.py</code></p>
-        <p><code>python -m http.server</code></p>
+function renderCards(){
+  const a = stats(activeKey()), b = stats(DATA.baseline_key);
+  const isBase = activeKey()===DATA.baseline_key;
+  const delta = (av,bv,lowerIsBetter,fmt)=>{
+    if(isBase) return `<div class="d flat">baseline</div>`;
+    const d = av-bv; const good = lowerIsBetter ? d<0 : d>0;
+    const cls = Math.abs(d)<1e-9 ? "flat" : (good?"up":"down");
+    return `<div class="d ${cls}">${fmt(d)} vs baseline</div>`;
+  };
+  document.getElementById("cards").innerHTML = `
+    <div class="metric"><div class="k">Mean score</div><div class="v">${a.mean.toFixed(1)}</div><div class="b">baseline ${b.mean.toFixed(1)}</div>${delta(a.mean,b.mean,false,d=>(d>=0?'+':'')+d.toFixed(1))}</div>
+    <div class="metric"><div class="k">Median</div><div class="v">${a.median.toFixed(1)}</div><div class="b">baseline ${b.median.toFixed(1)}</div>${delta(a.median,b.median,false,d=>(d>=0?'+':'')+d.toFixed(1))}</div>
+    <div class="metric"><div class="k">Flagged &lt; 90</div><div class="v">${PCT(a.flag/a.n)}</div><div class="b">baseline ${PCT(b.flag/b.n)} · ${FMT(a.flag)} modules</div>${delta(a.flag/a.n,b.flag/b.n,true,d=>PP(d))}</div>
+    <div class="metric"><div class="k">Scored exactly 0</div><div class="v">${FMT(a.zero)}</div><div class="b">baseline ${FMT(b.zero)}</div>${delta(a.zero,b.zero,true,d=>(d>=0?'+':'')+FMT(Math.round(d)))}</div>
+  `;
+}
+
+function renderHist(){
+  const W=1040, H=240, pad=34, nb=clampBins;
+  const base = hist(DATA.baseline_key), act = hist(activeKey());
+  const maxc = Math.max(...base, ...act, 1);
+  const sc = STATE.sqrt ? (c=> Math.sqrt(c)/Math.sqrt(maxc)) : (c=> c/maxc);
+  const pw=W-2*pad, ph=H-2*pad, bw=pw/nb;
+  const x=i=>pad+i*bw, y=c=>pad+ph*(1-sc(c));
+  let s=`<svg viewBox="0 0 ${W} ${H}">`;
+  s+=`<line x1="${pad}" y1="${pad+ph}" x2="${pad+pw}" y2="${pad+ph}" stroke="#ccc"/>`;
+  s+=`<line x1="${pad}" y1="${pad}" x2="${pad}" y2="${pad+ph}" stroke="#ccc"/>`;
+  act.forEach((c,i)=>{ if(c>0) s+=`<rect x="${(x(i)+0.5).toFixed(1)}" y="${y(c).toFixed(1)}" width="${(bw-1).toFixed(1)}" height="${(pad+ph-y(c)).toFixed(1)}" fill="#2563eb" fill-opacity="0.55"/>`; });
+  let pts=[]; base.forEach((c,i)=>{ pts.push(`${x(i).toFixed(1)},${y(c).toFixed(1)}`); pts.push(`${x(i+1).toFixed(1)},${y(c).toFixed(1)}`); });
+  s+=`<polyline points="${pts.join(" ")}" fill="none" stroke="#e11d48" stroke-width="1.6"/>`;
+  [0,50,80,90,100].forEach(t=>{ const xx=pad+pw*t/100; s+=`<text x="${xx}" y="${H-10}" font-size="11" fill="#777" text-anchor="middle">${t}</text>`; });
+  s+=`<text x="${pad}" y="${pad-12}" font-size="11" fill="#999">modules · ${STATE.sqrt?"√":"linear "}y-scale (max ${maxc})</text></svg>`;
+  document.getElementById("histWrap").innerHTML=s;
+  document.getElementById("sqrtToggle").textContent = STATE.sqrt ? "switch to linear y" : "switch to √ y";
+}
+
+function renderCluster(){
+  const ids = DATA.cluster81; const ak=activeKey();
+  const sub = document.getElementById("clusterSub");
+  const span = ids.length ? `${FMT(BYID[ids[0]].chars)}–${FMT(BYID[ids[ids.length-1]].chars)} chars` : "";
+  const ratio = ids.length ? Math.round(BYID[ids[ids.length-1]].chars/BYID[ids[0]].chars) : 0;
+  sub.innerHTML = `${ids.length} modules the production score pins to ~81. Every one has a single major issue; their content spans ${span} (a ${ratio}× range) yet production collapses them into one band. The top lane is production; the bottom lane is the active variant. Larger modules should land higher — the same one issue matters less in more content.`;
+  const W=1040, H=210, pad=40, axW=W-2*pad;
+  const X=v=>pad+axW*v/100;
+  const laneA=64, laneB=150;
+  let s=`<svg viewBox="0 0 ${W} ${H}">`;
+  s+=`<line x1="${pad}" y1="${H-22}" x2="${pad+axW}" y2="${H-22}" stroke="#ddd"/>`;
+  [0,20,40,60,80,100].forEach(t=>{ s+=`<line x1="${X(t)}" y1="40" x2="${X(t)}" y2="${H-22}" stroke="#f0f0f0"/><text x="${X(t)}" y="${H-8}" font-size="10" fill="#999" text-anchor="middle">${t}</text>`; });
+  s+=`<text x="${pad}" y="${laneA-26}" class="lane-label">Production (claims + abs)</text>`;
+  s+=`<text x="${pad}" y="${laneB-26}" class="lane-label">Active: normalize by ${STATE.denom}, abs ${STATE.absOn?"kept":"removed"}</text>`;
+  ids.forEach((id,i)=>{
+    const d=BYID[id]; const off=((i%7)-3)*5;
+    const xb=X(d.s[DATA.baseline_key]); const xa=X(d.s[ak]??0);
+    s+=`<circle class="dot" data-id="${id}" cx="${xb.toFixed(1)}" cy="${laneA+off}" r="4.5" fill="#e11d48" fill-opacity="0.75"/>`;
+    s+=`<circle class="dot act" data-id="${id}" cx="${xb.toFixed(1)}" cy="${laneB+off}" r="4.5" fill="#2563eb" fill-opacity="0.7"/>`;
+  });
+  s+=`</svg>`;
+  document.getElementById("beeswarm").innerHTML=s;
+  document.querySelectorAll("#beeswarm .dot").forEach(c=>{
+    c.onmousemove=ev=>{ const d=BYID[c.dataset.id]; showTip(ev, `${esc(d.title||d.id)}<br>${FMT(d.chars)} chars · ${d.claims} claims · ${d.major} major / ${d.minor} minor<br>production ${d.s[DATA.baseline_key].toFixed(1)} → active ${(d.s[ak]??0).toFixed(1)}`); };
+    c.onmouseleave=hideTip;
+  });
+  requestAnimationFrame(()=> document.querySelectorAll("#beeswarm .dot.act").forEach(c=>{ c.setAttribute("cx", X(BYID[c.dataset.id].s[ak]??0).toFixed(1)); }));
+}
+
+function scoreChips(d){
+  const ak=activeKey(), bk=DATA.baseline_key;
+  return DATA.variants.map(v=>{
+    const val=d.s[v.key]; const cls = v.key===bk?"bk":(v.key===ak?"ak":"");
+    return `<span class="chip ${cls}"><span class="cl">${v.label.replace(' (production)','')}${v.abs?'':' ·noabs'}</span> ${val===null?'—':val.toFixed(1)}</span>`;
+  }).join("");
+}
+function claimsHTML(id){
+  const cl = DATA.claims[id]; if(!cl) return `<p class="reason">Claim detail not bundled for this module.</p>`;
+  const sevcls = s => s==="major"?"sev-major":(s==="minor"?"sev-minor":"sev-none");
+  const issues = cl.filter(c=>c.severity);
+  const list = (issues.length?issues:cl).slice(0,40);
+  return `<p class="reason" style="margin-top:10px"><b>${cl.length}</b> claims · showing ${issues.length?issues.length+" with issues":"all"}</p>` +
+    list.map(c=>`<div class="claim">
+      <div class="cmeta ${sevcls(c.severity)}">${esc(c.rating)}${c.severity?` · ${esc(c.severity)}`:""}</div>
+      <div>${esc(c.claim)}</div>
+      ${c.excerpt?`<div class="excerpt">${esc(c.excerpt)}</div>`:""}
+      ${c.reasoning?`<div class="reason">${esc(c.reasoning)}</div>`:""}
+    </div>`).join("");
+}
+function renderFeatured(){
+  const ak=activeKey();
+  const el=document.getElementById("featured");
+  el.innerHTML = DATA.featured.map(id=>{
+    const d=BYID[id];
+    const b=d.s[DATA.baseline_key], a=d.s[ak];
+    return `<div class="fcard" data-id="${id}">
+      <div class="fhead">
+        <span class="ftitle">${esc(d.title||d.id)}</span>
+        <span class="ftag">${FMT(d.chars)} chars · ${d.claims} claims · ${d.major}maj/${d.minor}min</span>
+        <span class="fscore">prod <b>${b===null?'—':b.toFixed(0)}</b> → active <b style="color:#1a56db">${a===null?'—':a.toFixed(0)}</b></span>
       </div>
-    `;
+      <div class="fbody">
+        <div class="varbar">${scoreChips(d)}</div>
+        ${d.url?`<p class="reason"><a href="${d.url}" target="_blank" rel="noopener">open module ↗</a></p>`:""}
+        <div class="claimwrap"></div>
+      </div>
+    </div>`;
+  }).join("");
+  document.querySelectorAll("#featured .fcard").forEach(card=>{
+    card.querySelector(".fhead").onclick=()=>{
+      card.classList.toggle("open");
+      const w=card.querySelector(".claimwrap");
+      if(card.classList.contains("open") && !w.dataset.loaded){ w.innerHTML=claimsHTML(card.dataset.id); w.dataset.loaded="1"; }
+    };
+  });
+}
+
+function renderTable(qraw){
+  const ak=activeKey(), bk=DATA.baseline_key, q=(qraw||"").trim();
+  let rows = DATA.docs;
+  if(q) rows = rows.filter(d=>(d.title||"").toLowerCase().includes(q));
+  const shown = rows.slice(0,60);
+  let h = `<table class="tbl"><thead><tr><th>module</th><th>chars</th><th>claims</th><th>maj/min</th><th>production</th><th>active</th><th>Δ</th></tr></thead><tbody>`;
+  for(const d of shown){
+    const b=d.s[bk], a=d.s[ak]; const dl = (a!==null&&b!==null)?(a-b):null;
+    const dcls = dl===null?"":(Math.abs(dl)<0.05?"flat":(dl>0?"up":"down"));
+    const hasC = !!DATA.claims[d.id];
+    h += `<tr class="detail" data-id="${d.id}">
+      <td>${esc((d.title||d.id).slice(0,70))}${hasC?' <span class="ftag">claims</span>':''}</td>
+      <td class="tnum">${FMT(d.chars)}</td><td class="tnum">${d.claims}</td><td class="tnum">${d.major}/${d.minor}</td>
+      <td class="tnum">${b===null?'—':b.toFixed(1)}</td><td class="tnum">${a===null?'—':a.toFixed(1)}</td>
+      <td class="tnum ${dcls}">${dl===null?'—':(dl>=0?'+':'')+dl.toFixed(1)}</td></tr>`;
   }
+  h += `</tbody></table>`;
+  if(rows.length>shown.length) h += `<p class="reason" style="margin-top:8px">showing ${shown.length} of ${FMT(rows.length)} matches — refine the search</p>`;
+  document.getElementById("tableWrap").innerHTML=h;
+  document.querySelectorAll("#tableWrap tr.detail").forEach(tr=>{
+    tr.onclick=()=>{
+      if(!DATA.claims[tr.dataset.id]) return;
+      const ex = tr.nextElementSibling;
+      if(ex && ex.classList.contains("expand")){ ex.remove(); return; }
+      const td=document.createElement("tr"); td.className="expand";
+      td.innerHTML=`<td colspan="7" style="background:#f9fafb">${claimsHTML(tr.dataset.id)}</td>`;
+      tr.after(td);
+    };
+  });
+}
 
-  function renderOverview() {
-    const app = document.getElementById("app");
-    app.innerHTML = "";
+/* tooltip + util */
+const tip=document.getElementById("tip");
+function showTip(ev,html){ tip.innerHTML=html; tip.style.opacity=1; tip.style.left=Math.min(ev.clientX+12,window.innerWidth-300)+"px"; tip.style.top=(ev.clientY+12)+"px"; }
+function hideTip(){ tip.style.opacity=0; }
+function esc(s){ return (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
 
-    const header = document.createElement("div");
-    header.innerHTML = `
-      <h1>Content Freshness Explorer</h1>
-      <p class="subtitle">
-        Score formula: ${escapeHtml(DATA.score_formula)} &mdash;
-        Generated: ${escapeHtml(DATA.generated_at)}
-      </p>
-    `;
-    app.appendChild(header);
-
-    const grid = document.createElement("div");
-    grid.className = "bucket-grid";
-
-    for (const bucketKey of ["worst", "middle", "best"]) {
-      const bucket = DATA.buckets[bucketKey];
-      const docIds = bucket.doc_ids;
-      const docs = docIds.map(id => DATA.documents[id]).filter(Boolean);
-      const scores = docs.map(d => d.simple_score);
-      const avg = mean(scores);
-
-      const card = document.createElement("div");
-      card.className = `card card-clickable bucket-card ${bucketKey}`;
-      card.addEventListener("click", () => navigate("#/bucket/" + bucketKey));
-
-      const inner = document.createElement("div");
-      inner.innerHTML = `
-        <div class="bucket-label">${escapeHtml(bucket.label)}</div>
-        <div class="bucket-desc">${escapeHtml(docIds.length)} documents</div>
-        <div class="bucket-stats">
-          <div>
-            <div class="stat-value">${avg.toFixed(3)}</div>
-            <div class="stat-label">Mean Score</div>
-          </div>
-          <div>
-            <div class="stat-value">${Math.min(...scores).toFixed(3)}</div>
-            <div class="stat-label">Min</div>
-          </div>
-          <div>
-            <div class="stat-value">${Math.max(...scores).toFixed(3)}</div>
-            <div class="stat-label">Max</div>
-          </div>
-        </div>
-      `;
-      card.appendChild(inner);
-
-      const strip = renderDotStrip(docIds, bucketKey, GLOBAL_MIN, GLOBAL_MAX, 40, 4, false);
-      card.appendChild(strip);
-
-      grid.appendChild(card);
-    }
-
-    app.appendChild(grid);
+async function init(){
+  try{
+    const r = await fetch("explorer_data/candidates.json");
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    DATA = await r.json();
+    BYID = Object.fromEntries(DATA.docs.map(d=>[d.id,d]));
+    render();
+  }catch(e){
+    document.getElementById("app").innerHTML =
+      `<div class="error"><p>Could not load <code>explorer_data/candidates.json</code>.</p><p class="reason">${esc(e.message)}</p>
+       <p class="reason">Regenerate with <code>build_scoring_explorer_data.py</code> in the microsoft-asn-content-freshness repo.</p></div>`;
   }
-
-  function renderBucketDetail(bucketKey) {
-    const bucket = DATA.buckets[bucketKey];
-    if (!bucket) {
-      renderOverview();
-      return;
-    }
-
-    const app = document.getElementById("app");
-    app.innerHTML = "";
-
-    // Breadcrumb
-    const breadcrumb = document.createElement("div");
-    breadcrumb.className = "breadcrumb";
-    breadcrumb.innerHTML = `
-      <a onclick="window.location.hash='#/'">Overview</a>
-      <span class="sep">/</span>
-      <span>${escapeHtml(bucket.label)}</span>
-    `;
-    app.appendChild(breadcrumb);
-
-    const title = document.createElement("h2");
-    title.textContent = bucket.label;
-    title.style.color = bucketColor(bucketKey);
-    app.appendChild(title);
-
-    // Dot strip (larger)
-    const stripCard = document.createElement("div");
-    stripCard.className = "card";
-    stripCard.appendChild(renderDotStrip(bucket.doc_ids, bucketKey, GLOBAL_MIN, GLOBAL_MAX, 60, 6, true));
-    app.appendChild(stripCard);
-
-    // Document table
-    const docIds = bucket.doc_ids.slice();
-    const docs = docIds.map(id => ({ id, ...DATA.documents[id] })).filter(d => d.title !== undefined);
-
-    if (bucketKey === "worst") {
-      docs.sort((a, b) => b.simple_score - a.simple_score);
-    } else if (bucketKey === "best") {
-      docs.sort((a, b) => a.simple_score - b.simple_score);
-    } else {
-      docs.sort((a, b) => b.simple_score - a.simple_score);
-    }
-
-    const tableCard = document.createElement("div");
-    tableCard.className = "card";
-    tableCard.innerHTML = `<h3>Documents</h3>`;
-
-    const wrapper = document.createElement("div");
-    wrapper.className = "doc-table-wrapper";
-
-    const table = document.createElement("table");
-    table.className = "doc-table";
-    table.innerHTML = `
-      <thead>
-        <tr>
-          <th>Title</th>
-          <th>Score</th>
-          <th>Major</th>
-          <th>Minor</th>
-          <th>Claims</th>
-          <th>Published</th>
-          <th>Topic</th>
-        </tr>
-      </thead>
-    `;
-
-    const tbody = document.createElement("tbody");
-    docs.forEach(doc => {
-      const tr = document.createElement("tr");
-      tr.addEventListener("click", () => navigate("#/doc/" + encodeURIComponent(doc.id)));
-
-      const bgColor = scoreBgColor(doc.simple_score, GLOBAL_MIN, GLOBAL_MAX);
-      const pubDate = doc.last_updated
-        ? new Date(doc.last_updated).toLocaleDateString("en-US", { year: "numeric", month: "short" })
-        : "—";
-      tr.innerHTML = `
-        <td class="title-cell" title="${escapeHtml(doc.title)}">${escapeHtml(doc.title)}</td>
-        <td class="score-cell" style="background:${bgColor}">${doc.simple_score.toFixed(3)}</td>
-        <td>${doc.major_errors}</td>
-        <td>${doc.minor_errors}</td>
-        <td>${doc.total_claims}</td>
-        <td>${escapeHtml(pubDate)}</td>
-        <td><span class="topic-chip">${escapeHtml(doc.topic || "")}</span></td>
-      `;
-      tbody.appendChild(tr);
-    });
-
-    table.appendChild(tbody);
-    wrapper.appendChild(table);
-    tableCard.appendChild(wrapper);
-    app.appendChild(tableCard);
-  }
-
-  function renderDocDetail(docId) {
-    const doc = DATA.documents[docId];
-    if (!doc) {
-      renderOverview();
-      return;
-    }
-
-    // Find which bucket this doc belongs to
-    let parentBucket = null;
-    let parentBucketKey = null;
-    for (const key of ["worst", "middle", "best"]) {
-      if (DATA.buckets[key].doc_ids.includes(docId)) {
-        parentBucket = DATA.buckets[key];
-        parentBucketKey = key;
-        break;
-      }
-    }
-
-    const app = document.getElementById("app");
-    app.innerHTML = "";
-
-    // Breadcrumb
-    const breadcrumb = document.createElement("div");
-    breadcrumb.className = "breadcrumb";
-    let bcHtml = `<a onclick="window.location.hash='#/'">Overview</a>`;
-    if (parentBucketKey) {
-      bcHtml += `
-        <span class="sep">/</span>
-        <a onclick="window.location.hash='#/bucket/${parentBucketKey}'">${escapeHtml(parentBucket.label)}</a>
-      `;
-    }
-    bcHtml += `
-      <span class="sep">/</span>
-      <span>${escapeHtml(doc.title)}</span>
-    `;
-    breadcrumb.innerHTML = bcHtml;
-    app.appendChild(breadcrumb);
-
-    // Header
-    const headerDiv = document.createElement("div");
-    headerDiv.className = "doc-header";
-
-    const titleEl = document.createElement("div");
-    titleEl.className = "doc-title";
-    titleEl.textContent = doc.title;
-    headerDiv.appendChild(titleEl);
-
-    const badge = document.createElement("div");
-    badge.className = "score-badge";
-    badge.style.background = scoreColor(doc.simple_score, GLOBAL_MIN, GLOBAL_MAX);
-    badge.textContent = doc.simple_score.toFixed(3);
-    headerDiv.appendChild(badge);
-
-    app.appendChild(headerDiv);
-
-    // Meta chips
-    const chips = document.createElement("div");
-    chips.className = "meta-chips";
-    const lastUpdated = doc.last_updated
-      ? new Date(doc.last_updated).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
-      : "N/A";
-    const chipData = [
-      { label: "Published", value: lastUpdated },
-      { label: "Topic", value: doc.topic || "N/A" },
-      { label: "Age", value: doc.age_bucket || "N/A" },
-      { label: "Length", value: doc.length_minutes ? doc.length_minutes + " min" : "N/A" },
-      { label: "Major Errors", value: doc.major_errors },
-      { label: "Minor Errors", value: doc.minor_errors },
-      { label: "Total Claims", value: doc.total_claims },
-      { label: "Total Problems", value: doc.total_problems },
-    ];
-    chipData.forEach(c => {
-      const chip = document.createElement("span");
-      chip.className = "meta-chip";
-      chip.innerHTML = `<span class="meta-chip-label">${escapeHtml(c.label)}:</span> ${escapeHtml(String(c.value))}`;
-      chips.appendChild(chip);
-    });
-    app.appendChild(chips);
-
-    // Course Summary
-    if (doc.course_summary) {
-      const summaryCard = document.createElement("div");
-      summaryCard.className = "card prose-card";
-      summaryCard.innerHTML = `<h3>Course Summary</h3><div class="prose-body">${renderParagraphs(doc.course_summary)}</div>`;
-      app.appendChild(summaryCard);
-    }
-
-    // Issue Analysis
-    if (doc.issue_analysis) {
-      const analysisCard = document.createElement("div");
-      analysisCard.className = "card prose-card";
-      analysisCard.innerHTML = `<h3>Issue Analysis</h3><div class="prose-body">${renderParagraphs(doc.issue_analysis)}</div>`;
-      app.appendChild(analysisCard);
-    }
-
-    // Transcript (collapsed by default)
-    if (doc.transcript) {
-      const transcriptCard = document.createElement("div");
-      transcriptCard.className = "card prose-card";
-      const wordCount = doc.transcript.split(/\s+/).length;
-      const toggleBtn = document.createElement("div");
-      toggleBtn.style.cssText = "display:flex;align-items:center;justify-content:space-between;cursor:pointer;";
-      toggleBtn.innerHTML = `<h3 style="margin:0">Transcript <span style="font-weight:400;color:#888;font-size:0.85rem">(${wordCount.toLocaleString()} words)</span></h3><span class="transcript-toggle" style="font-size:0.85rem;color:#1a73e8;">Show ▼</span>`;
-      const transcriptBody = document.createElement("div");
-      transcriptBody.className = "prose-body";
-      transcriptBody.style.display = "none";
-      transcriptBody.style.maxHeight = "500px";
-      transcriptBody.style.overflowY = "auto";
-      transcriptBody.style.marginTop = "12px";
-      transcriptBody.style.padding = "12px";
-      transcriptBody.style.background = "#f8f9fa";
-      transcriptBody.style.borderRadius = "6px";
-      transcriptBody.style.fontSize = "0.85rem";
-      transcriptBody.style.lineHeight = "1.7";
-      transcriptBody.style.whiteSpace = "pre-wrap";
-      transcriptBody.textContent = doc.transcript;
-      toggleBtn.addEventListener("click", () => {
-        const visible = transcriptBody.style.display !== "none";
-        transcriptBody.style.display = visible ? "none" : "block";
-        toggleBtn.querySelector(".transcript-toggle").textContent = visible ? "Show ▼" : "Hide ▲";
-      });
-      transcriptCard.appendChild(toggleBtn);
-      transcriptCard.appendChild(transcriptBody);
-      app.appendChild(transcriptCard);
-    }
-
-    // Claims table
-    if (doc.claims && doc.claims.length > 0) {
-      const claimsCard = document.createElement("div");
-      claimsCard.className = "card";
-      claimsCard.innerHTML = `<h3>Claims (${doc.claims.length})</h3>`;
-
-      const wrapper = document.createElement("div");
-      wrapper.className = "doc-table-wrapper";
-
-      const table = document.createElement("table");
-      table.className = "claims-table";
-      table.innerHTML = `
-        <thead>
-          <tr>
-            <th>Claim</th>
-            <th>Category</th>
-            <th>Rating</th>
-            <th>Severity</th>
-            <th>Reasoning</th>
-          </tr>
-        </thead>
-      `;
-
-      const tbody = document.createElement("tbody");
-      doc.claims.forEach((claim, idx) => {
-        const ratingClass = "rating-" + (claim.rating || "").toLowerCase();
-
-        const tr = document.createElement("tr");
-        tr.className = ratingClass;
-
-        // Claim cell with excerpt toggle
-        const claimTd = document.createElement("td");
-        claimTd.className = "claim-text";
-        const claimSpan = document.createElement("span");
-        claimSpan.textContent = claim.claim || "";
-        claimTd.appendChild(claimSpan);
-
-        if (claim.excerpt) {
-          const toggle = document.createElement("span");
-          toggle.className = "excerpt-toggle";
-          toggle.textContent = "Show excerpt";
-          const excerptDiv = document.createElement("div");
-          excerptDiv.className = "excerpt-content";
-          excerptDiv.textContent = claim.excerpt;
-          toggle.addEventListener("click", function(e) {
-            e.stopPropagation();
-            const visible = excerptDiv.classList.toggle("visible");
-            toggle.textContent = visible ? "Hide excerpt" : "Show excerpt";
-          });
-          claimTd.appendChild(toggle);
-          claimTd.appendChild(excerptDiv);
-        }
-        tr.appendChild(claimTd);
-
-        // Category
-        const catTd = document.createElement("td");
-        catTd.className = "category-cell";
-        catTd.textContent = (claim.category || "").replace(/_/g, " ");
-        tr.appendChild(catTd);
-
-        // Rating badge
-        const ratingTd = document.createElement("td");
-        const ratingBadge = document.createElement("span");
-        const ratingVal = (claim.rating || "").toLowerCase();
-        ratingBadge.className = "rating-badge rating-" + ratingVal + "-badge";
-        ratingBadge.textContent = claim.rating || "";
-        ratingTd.appendChild(ratingBadge);
-        tr.appendChild(ratingTd);
-
-        // Severity badge
-        const sevTd = document.createElement("td");
-        if (claim.severity) {
-          const sevBadge = document.createElement("span");
-          sevBadge.className = "severity-badge severity-" + claim.severity.toLowerCase();
-          sevBadge.textContent = claim.severity;
-          sevTd.appendChild(sevBadge);
-        }
-        tr.appendChild(sevTd);
-
-        // Reasoning (truncated, expandable)
-        const reasonTd = document.createElement("td");
-        reasonTd.className = "reasoning-cell";
-        const reasonText = document.createElement("div");
-        reasonText.className = "reasoning-text";
-        reasonText.textContent = claim.reasoning || "";
-        reasonText.addEventListener("click", function() {
-          this.classList.toggle("expanded");
-        });
-        reasonTd.appendChild(reasonText);
-        tr.appendChild(reasonTd);
-
-        tbody.appendChild(tr);
-      });
-
-      table.appendChild(tbody);
-      wrapper.appendChild(table);
-      claimsCard.appendChild(wrapper);
-      app.appendChild(claimsCard);
-    }
-  }
-
-  // --- Router ---
-
-  function route() {
-    if (!DATA) return;
-
-    const hash = window.location.hash || "#/";
-    const tooltip = document.getElementById("tooltip");
-    if (tooltip) tooltip.style.display = "none";
-
-    if (hash.startsWith("#/doc/")) {
-      const docId = decodeURIComponent(hash.slice(6));
-      renderDocDetail(docId);
-    } else if (hash.startsWith("#/bucket/")) {
-      const bucketKey = hash.slice(9);
-      renderBucketDetail(bucketKey);
-    } else {
-      renderOverview();
-    }
-
-    window.scrollTo(0, 0);
-  }
-
-  // --- Init ---
-
-  async function init() {
-    const app = document.getElementById("app");
-    app.innerHTML = renderLoading();
-
-    try {
-      const resp = await fetch("explorer_data/documents.json");
-      if (!resp.ok) {
-        throw new Error("HTTP " + resp.status + ": " + resp.statusText);
-      }
-      DATA = await resp.json();
-    } catch (err) {
-      app.innerHTML = renderError(err.message);
-      return;
-    }
-
-    // Compute global score range
-    const allScores = Object.values(DATA.documents).map(d => d.simple_score);
-    GLOBAL_MIN = Math.min(...allScores);
-    GLOBAL_MAX = Math.max(...allScores);
-
-    window.addEventListener("hashchange", route);
-    route();
-  }
-
-  init();
-})();
+}
+init();
 </script>
 </body>
 </html>
