@@ -6,7 +6,7 @@ Static visualizations and annotation tools for the ASN content freshness scoring
 
 | Path | Description | Data source |
 |------|-------------|-------------|
-| `/scoring-model/` | Per-document scoring explorer: claims, ratings, excerpts, freshness scores | self-contained |
+| `/scoring-model/` | Trust-score model explorer: candidate denominators (claims / characters / words / compressed bytes) with the absolute penalty kept or removed, live corpus averages + histogram, the same-score (81) cluster shown diverging, and per-document claim drill-down | [microsoft-asn-content-freshness](https://github.com/TribeAI/microsoft-asn-content-freshness) (`scripts/eval/build_scoring_explorer_data.py`) |
 | `/video-quality/` | Video vs module claim quality: the two problems (extraction over-pulls non-falsifiable claims; the MS Learn coverage gap), human-validated falsifiability review, and solution options | self-contained |
 | `/repro-report/` | Reproducibility report: agreement rates, score deltas across duplicate runs | self-contained |
 | `/repro-report/ethnography.html` | Side-by-side claim comparison for sampled documents | self-contained |
@@ -92,10 +92,18 @@ Right now there's no mock-provider mode wired in. If you need to iterate on a st
 ## Fetching data
 
 The visualizations that depend on external pipelines (currently
-`/ontology-extraction/` and `/jobs-to-be-done/`) load JSON/JSONL data files
-from `public/<slug>/`. Those files are **mirrored from sibling repos** by `make
-data` rather than authored here, so the upstream pipeline stays the source of
-truth.
+`/ontology-extraction/`, `/jobs-to-be-done/`, `/ontology/`, `/ontology/gaps/`,
+and `/scoring-model/`) load JSON/JSONL data files from `public/<slug>/`. Those
+files are **produced by sibling repos** and pulled in by `make data` rather than
+authored here, so the upstream pipeline stays the source of truth. The ontology
+pages copy pre-built files; `/scoring-model/` is **built** by the
+content-freshness repo (`make data-scoring`, or `make data` which includes it):
+
+```bash
+# rebuild /scoring-model/ candidates.json from the CF repo's latest run
+make data-scoring                      # CF repo at ../microsoft-asn-content-freshness
+make data-scoring CF_REPO=/path/to/microsoft-asn-content-freshness
+```
 
 ```bash
 # default: looks for asn-content-ontology at ../asn-content-ontology
