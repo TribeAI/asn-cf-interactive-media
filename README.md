@@ -6,7 +6,7 @@ Static visualizations and annotation tools for the ASN content freshness scoring
 
 | Path | Description | Data source |
 |------|-------------|-------------|
-| `/scoring-model/` | Trust-score model explorer: candidate denominators (claims / characters / words / compressed bytes) with the absolute penalty kept or removed, live corpus averages + histogram, the same-score (81) cluster shown diverging, and per-document claim drill-down | [microsoft-asn-content-freshness](https://github.com/TribeAI/microsoft-asn-content-freshness) (`scripts/eval/build_scoring_explorer_data.py`) |
+| `/scoring-model/` | Trust-score model explorer: candidate denominators (claims / words / characters; words is the default) with the absolute penalty kept or removed, live corpus averages + histogram, the same-score (81) cluster shown diverging, and per-document claim drill-down | [microsoft-asn-content-freshness](https://github.com/TribeAI/microsoft-asn-content-freshness) (`scripts/eval/build_scoring_explorer_data.py`) |
 | `/video-quality/` | Video vs module claim quality: the two problems (extraction over-pulls non-falsifiable claims; the MS Learn coverage gap), human-validated falsifiability review, and solution options | self-contained |
 | `/repro-report/` | Reproducibility report: agreement rates, score deltas across duplicate runs | self-contained |
 | `/repro-report/ethnography.html` | Side-by-side claim comparison for sampled documents | self-contained |
