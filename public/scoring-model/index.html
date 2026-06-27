@@ -17,12 +17,10 @@ a { color: #1a56db; }
 code { background: #eef1f5; padding: 1px 6px; border-radius: 4px; font-size: 0.86em; }
 .mono { font-variant-numeric: tabular-nums; }
 
-/* loading / error */
 .loading, .error { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:55vh; text-align:center; color:#666; }
 .spinner { width:42px; height:42px; border:4px solid #e0e0e0; border-top-color:#1a73e8; border-radius:50%; animation:spin .8s linear infinite; margin-bottom:14px; }
 @keyframes spin { to { transform: rotate(360deg);} }
 
-/* writeup */
 .writeup { background:#fff; border:1px solid #e6e6e6; border-radius:10px; padding:18px 22px; margin-bottom:8px; font-size:0.92rem; }
 .writeup p { margin-bottom:8px; }
 .writeup ul { margin:6px 0 8px 20px; } .writeup li { margin:3px 0; }
@@ -31,18 +29,17 @@ details.writeup > summary::-webkit-details-marker { display:none; }
 details.writeup > summary::before { content:"▸ "; color:#888; }
 details.writeup[open] > summary::before { content:"▾ "; }
 
-/* controls */
-.controls { position:sticky; top:0; z-index:5; background:#fafafa; padding:14px 0 10px; margin-bottom:8px; border-bottom:1px solid #ececec; display:flex; flex-wrap:wrap; gap:22px; align-items:flex-end; }
+.controls { position:sticky; top:0; z-index:5; background:#fafafa; padding:14px 0 12px; margin-bottom:8px; border-bottom:1px solid #ececec; display:flex; flex-wrap:wrap; gap:22px 26px; align-items:flex-end; }
 .ctl-group { display:flex; flex-direction:column; gap:5px; }
 .ctl-label { font-size:0.72rem; text-transform:uppercase; letter-spacing:0.04em; color:#888; font-weight:600; }
 .seg { display:flex; border:1px solid #cdd3da; border-radius:8px; overflow:hidden; }
 .seg button { border:0; background:#fff; padding:7px 13px; font-size:0.85rem; cursor:pointer; color:#444; border-right:1px solid #e3e6ea; }
 .seg button:last-child { border-right:0; }
 .seg button.on { background:#1a56db; color:#fff; font-weight:600; }
-.active-name { font-size:0.85rem; color:#555; }
-.active-name b { color:#1a56db; }
+.spreadrow { display:flex; align-items:center; gap:10px; }
+.spreadrow input[type=range] { width:200px; accent-color:#1a56db; }
+.note { font-size:0.82rem; color:#666; } .note b { color:#1a56db; }
 
-/* summary cards */
 .cards { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin:6px 0 4px; }
 .metric { background:#fff; border:1px solid #e6e6e6; border-radius:10px; padding:14px 16px; }
 .metric .k { font-size:0.74rem; text-transform:uppercase; letter-spacing:0.03em; color:#888; }
@@ -58,10 +55,9 @@ details.writeup[open] > summary::before { content:"▾ "; }
 .toggle-mini { font-size:0.78rem; color:#1a56db; cursor:pointer; user-select:none; margin-left:6px; }
 
 svg { display:block; width:100%; height:auto; }
-.dot { cursor:pointer; transition: cx .6s cubic-bezier(.4,0,.2,1), fill .3s; }
+.dot { cursor:pointer; transition: cx .55s cubic-bezier(.4,0,.2,1), fill .3s; }
 .lane-label { font-size:11px; fill:#666; }
 
-/* featured + table */
 .fcard { border:1px solid #e6e6e6; border-radius:10px; margin-bottom:12px; overflow:hidden; }
 .fhead { display:flex; align-items:center; gap:12px; padding:12px 16px; cursor:pointer; background:#fff; }
 .fhead:hover { background:#f6f8fb; }
@@ -84,17 +80,15 @@ svg { display:block; width:100%; height:auto; }
 table.tbl { width:100%; border-collapse:collapse; font-size:0.84rem; }
 table.tbl th, table.tbl td { padding:6px 9px; border-bottom:1px solid #eee; text-align:right; }
 table.tbl th:first-child, table.tbl td:first-child { text-align:left; }
-table.tbl th { color:#666; font-weight:600; position:sticky; top:64px; background:#fafafa; }
+table.tbl th { color:#666; font-weight:600; position:sticky; top:74px; background:#fafafa; }
 table.tbl tr.detail { cursor:pointer; } table.tbl tr.detail:hover { background:#f6f8fb; }
 .tnum { font-variant-numeric:tabular-nums; }
-.tip { position:fixed; pointer-events:none; background:#1f2937; color:#fff; font-size:0.78rem; padding:6px 9px; border-radius:6px; max-width:280px; opacity:0; transition:opacity .12s; z-index:50; }
+.tip { position:fixed; pointer-events:none; background:#1f2937; color:#fff; font-size:0.78rem; padding:6px 9px; border-radius:6px; max-width:300px; opacity:0; transition:opacity .12s; z-index:50; }
 </style>
 </head>
 <body>
 <div class="container">
-  <div id="app">
-    <div class="loading"><div class="spinner"></div><p>Loading scoring data…</p></div>
-  </div>
+  <div id="app"><div class="loading"><div class="spinner"></div><p>Loading scoring data…</p></div></div>
 </div>
 <div class="tip" id="tip"></div>
 
@@ -102,30 +96,46 @@ table.tbl tr.detail { cursor:pointer; } table.tbl tr.detail:hover { background:#
 const FMT = n => n.toLocaleString("en-US");
 const PCT = x => (x*100).toFixed(1) + "%";
 const PP = d => (d>=0?"+":"") + (d*100).toFixed(1) + "pp";
-const clampBins = 40;
+const NBINS = 40;
 
-let DATA, BYID, STATE = { denom:"words", absOn:false, sqrt:true };
+// Score model. penalty = MULT * spread * (major + 0.3*minor) * K[denom] / size[denom].
+// K calibrates each denominator so the corpus's total content equals its total claim
+// count -> claims is the spread=1 case and the denominators share a scale. The spread
+// multiplier stretches the penalty so the distribution fills 0-100. The optional
+// absolute penalty (MULT*0.5*ln(major+1)) is the production term, off by default.
+const MULT = 50, MINORW = 0.3;
+const DEFAULT_SPREAD = 3.43;   // words -> ~35 pts per weighted issue / 1,000 words
+let DATA, BYID, KCAL, STATE = { denom:"words", absOn:false, spread:DEFAULT_SPREAD, sqrt:true };
 
-function activeKey(){
-  return "ts_" + STATE.denom + (STATE.absOn ? "" : "_noabs");
+function sizeOf(d, denom){ return denom==="claims" ? d.claims : (denom==="chars" ? d.chars : d.words); }
+function score(d, denom, absOn, spread){
+  const size = sizeOf(d, denom);
+  if(!size || size<=0) return null;
+  const pen = MULT * spread * (d.major + MINORW*d.minor) * KCAL[denom] / size;
+  const abs = absOn ? MULT * 0.5 * Math.log(d.major + 1) : 0;
+  return Math.max(0, Math.min(100, 100 - pen - abs));
 }
-function scores(key){ return DATA.docs.map(d=>d.s[key]).filter(v=>v!==null && v!==undefined); }
-function stats(key){
-  const v = scores(key).sort((a,b)=>a-b); const n=v.length;
+const baseScore = d => score(d, "claims", true, 1);              // production reference (fixed)
+const activeScore = d => score(d, STATE.denom, STATE.absOn, STATE.spread);
+
+// scale in interpretable units for the active words/chars denominator
+function ptsPerThousand(){ return MULT * STATE.spread * KCAL[STATE.denom] / 1000; }
+
+function stats(vals){
+  const v = vals.filter(x=>x!==null).sort((a,b)=>a-b); const n=v.length;
   const q = p => v[Math.min(Math.floor(p*n), n-1)];
   return { n, mean:v.reduce((a,b)=>a+b,0)/n, median:q(.5), p25:q(.25), p5:q(.05),
-           flag:v.filter(x=>x<90).length, zero:v.filter(x=>x===0).length };
+           ge90:v.filter(x=>x>=90).length, flag:v.filter(x=>x<90).length,
+           lt30:v.filter(x=>x<30).length, zero:v.filter(x=>x===0).length };
 }
-function hist(key, nbins=clampBins){
-  const c = new Array(nbins).fill(0), w=100/nbins;
-  for(const x of scores(key)){ let b=Math.floor(x/w); if(b>=nbins)b=nbins-1; if(b<0)b=0; c[b]++; }
+function hist(vals, nbins=NBINS){
+  const c=new Array(nbins).fill(0), w=100/nbins;
+  for(const x of vals){ if(x===null) continue; let b=Math.floor(x/w); if(b>=nbins)b=nbins-1; if(b<0)b=0; c[b]++; }
   return c;
 }
 
-/* ---------- render ---------- */
 function render(){
-  const app = document.getElementById("app");
-  app.innerHTML = `
+  document.getElementById("app").innerHTML = `
     <h1>Content Trust Score — scoring model</h1>
     <p class="subtitle">Run <b>${DATA.meta.run}</b> · ${FMT(DATA.meta.n_modules)} modules · ${FMT(DATA.meta.n_claims)} claims
       (${FMT(DATA.meta.n_major)} major, ${FMT(DATA.meta.n_minor)} minor). Re-scoring only — extraction and validation unchanged.</p>
@@ -134,8 +144,8 @@ function render(){
     <div class="cards" id="cards"></div>
     <h2>Score distribution</h2>
     <div class="card">
-      <p class="legend"><span class="swatch" style="background:#e11d48"></span><b>red outline</b> = production (claims denominator + abs penalty)
-        <span class="swatch" style="background:#2563eb;opacity:.55"></span><b>blue bars</b> = active variant
+      <p class="legend"><span class="swatch" style="background:#e11d48"></span><b>red outline</b> = production (claims + abs penalty)
+        <span class="swatch" style="background:#2563eb;opacity:.55"></span><b>blue bars</b> = active score
         <span class="toggle-mini" id="sqrtToggle"></span></p>
       <div id="histWrap"></div>
     </div>
@@ -143,231 +153,193 @@ function render(){
     <p class="subtitle" id="clusterSub"></p>
     <div class="card"><div id="beeswarm"></div></div>
     <h2>Featured documents</h2>
-    <p class="subtitle">A handful spanning the failure modes — the same-score cluster, baseline zeros, minor-heavy and clean modules. Click to expand the claims that drove each score.</p>
+    <p class="subtitle">A handful across the failure modes — the same-score cluster, the worst documents, minor-heavy and clean modules. Click to expand the claims that drove each score.</p>
     <div id="featured"></div>
     <h2>All modules</h2>
-    <p class="subtitle">Search any module. Score columns update with the controls above. Claim detail is bundled for featured and same-score modules.</p>
+    <p class="subtitle">Search any module. Scores update with the controls above. Claim detail is bundled for featured and same-score modules.</p>
     <input class="search" id="search" placeholder="Search ${FMT(DATA.meta.n_modules)} modules by title…">
-    <div id="tableWrap"></div>
-  `;
-  renderControls(); renderCards(); renderHist(); renderCluster(); renderFeatured(); renderTable("");
+    <div id="tableWrap"></div>`;
+  renderControls(); renderAll();
   document.getElementById("sqrtToggle").onclick = ()=>{ STATE.sqrt=!STATE.sqrt; renderHist(); };
   document.getElementById("search").oninput = e => renderTable(e.target.value.toLowerCase());
 }
+function renderAll(){ renderCards(); renderHist(); renderCluster(); renderFeatured(); renderTable(document.getElementById("search")?.value.toLowerCase()||""); }
 
 function writeupHTML(){
-  const c = DATA.calibration;
   return `
   <details class="writeup" open>
-    <summary>How the score works, and what this is testing</summary>
-    <p>The trust score is a 0–100 severity-weighted measure of how much of a module's content is in question. Production computes it per module as:</p>
-    <p class="mono"><code>weighted = (1.0·major + 0.3·minor) / claims &nbsp;·&nbsp; abs = 0.5·ln(major+1) &nbsp;·&nbsp; score = clamp(0,100, 100 − (weighted + abs)·50)</code></p>
-    <p>The denominator is the number of claims extracted, so the score measures problems <i>per claim</i>, not per unit of content. One major issue in a short module scores like one major issue in a long module. That breaks comparison and ranking across modules.</p>
-    <p>This page rescores the run under candidate denominators that measure <i>amount of content</i> instead — words (the default here) or characters. Each denominator can run with the absolute penalty kept or removed. Denominators are calibrated so the corpus's total content equals its total claim count, so claims is the baseline case and scores stay on one scale (1 claim ≈ ${c.words} words ≈ ${c.chars} chars).</p>
+    <summary>How the score works, and how to tune it</summary>
+    <p>The trust score is a 0–100 measure of error density: how many severity-weighted issues a module carries per unit of content. Higher is better; a clean module is 100.</p>
+    <p class="mono"><code>penalty = spread · (1.0·major + 0.3·minor) per 1,000 words &nbsp;·&nbsp; score = clamp(0, 100, 100 − penalty)</code></p>
+    <p>Production normalizes by <i>claim count</i> and adds an absolute <code>ln(major)</code> penalty, which pins every single-major module near 81 regardless of size and slams many-major modules to 0. This page normalizes by <i>content</i> (words by default) so size is comparable, and replaces the absolute penalty with a single <b>spread</b> control that stretches the distribution to fill 0–100.</p>
     <ul>
-      <li><b>Swapping the denominator alone barely moves the distribution</b> while the absolute penalty stays. That term is size-independent and dominates the score.</li>
-      <li><b>Removing the absolute penalty is the change that matters.</b> It cuts the flag rate and clears the pile-up of zeros.</li>
-      <li><b>Comparability needs both</b> — a content denominator and no absolute penalty — to spread modules by content size instead of pinning every single-major module to the same score.</li>
+      <li>A long module with <b>many</b> major issues scores <b>low</b> (high error density); a long module with <b>few</b> scores high. Length no longer rescues a major-heavy module, and no longer flattens the difference.</li>
+      <li>At the default spread, roughly <b>1 weighted major-equivalent per 500 words → 30</b> ("really bad"), per 1,000 → 65, per 2,000 → 82, and the corpus median (~1 per 5,000) stays in the 90s. Most modules remain &gt; 80.</li>
+      <li>Raise the spread to flag more aggressively; lower it to keep the distribution near the top.</li>
     </ul>
-    <p>Use the controls to pick a denominator and toggle the penalty. Every number, the histogram, and the same-score group update live.</p>
   </details>`;
 }
 
 function renderControls(){
-  const el = document.getElementById("controls");
-  const denoms = [["claims","Claims"],["chars","Characters"],["words","Words"]];
-  el.innerHTML = `
-    <div class="ctl-group">
-      <span class="ctl-label">Denominator</span>
-      <div class="seg" id="segDenom">${denoms.map(([k,l])=>`<button data-d="${k}" class="${STATE.denom===k?'on':''}">${l}</button>`).join("")}</div>
-    </div>
-    <div class="ctl-group">
-      <span class="ctl-label">Absolute penalty</span>
+  const denoms = [["claims","Claims"],["words","Words"],["chars","Characters"]];
+  document.getElementById("controls").innerHTML = `
+    <div class="ctl-group"><span class="ctl-label">Denominator</span>
+      <div class="seg" id="segDenom">${denoms.map(([k,l])=>`<button data-d="${k}" class="${STATE.denom===k?'on':''}">${l}</button>`).join("")}</div></div>
+    <div class="ctl-group"><span class="ctl-label">Absolute penalty</span>
       <div class="seg" id="segAbs">
-        <button data-a="1" class="${STATE.absOn?'on':''}">Kept</button>
         <button data-a="0" class="${!STATE.absOn?'on':''}">Removed</button>
-      </div>
-    </div>
-    <div class="ctl-group"><span class="ctl-label">Active variant</span>
-      <span class="active-name">normalize by <b id="anDenom"></b>, abs penalty <b id="anAbs"></b></span></div>
-  `;
-  document.querySelectorAll("#segDenom button").forEach(b=> b.onclick=()=>{ STATE.denom=b.dataset.d; update(); });
-  document.querySelectorAll("#segAbs button").forEach(b=> b.onclick=()=>{ STATE.absOn=b.dataset.a==="1"; update(); });
-  syncActiveName();
+        <button data-a="1" class="${STATE.absOn?'on':''}">Kept</button></div></div>
+    <div class="ctl-group"><span class="ctl-label">Spread (penalty scale)</span>
+      <div class="spreadrow"><input type="range" id="spread" min="1" max="6" step="0.05" value="${STATE.spread}">
+        <span class="mono" id="spreadVal"></span></div>
+      <span class="note" id="spreadNote"></span></div>`;
+  document.querySelectorAll("#segDenom button").forEach(b=> b.onclick=()=>{ STATE.denom=b.dataset.d; syncControls(); renderAll(); });
+  document.querySelectorAll("#segAbs button").forEach(b=> b.onclick=()=>{ STATE.absOn=b.dataset.a==="1"; syncControls(); renderAll(); });
+  document.getElementById("spread").oninput = e=>{ STATE.spread=parseFloat(e.target.value); syncControls(); renderAll(); };
+  syncControls();
 }
-function syncActiveName(){
-  document.getElementById("anDenom").textContent = STATE.denom;
-  document.getElementById("anAbs").textContent = STATE.absOn ? "kept" : "removed";
-}
-function update(){
+function syncControls(){
   document.querySelectorAll("#segDenom button").forEach(b=> b.classList.toggle("on", b.dataset.d===STATE.denom));
   document.querySelectorAll("#segAbs button").forEach(b=> b.classList.toggle("on", (b.dataset.a==="1")===STATE.absOn));
-  syncActiveName();
-  renderCards(); renderHist(); renderCluster(); renderFeatured();
-  renderTable(document.getElementById("search").value.toLowerCase());
+  document.getElementById("spreadVal").textContent = "×" + STATE.spread.toFixed(2);
+  const note = document.getElementById("spreadNote");
+  if(STATE.denom==="claims"){ note.innerHTML = `penalty = <b>×${STATE.spread.toFixed(2)}</b> of the production per-claim penalty`; }
+  else {
+    const ppt = ptsPerThousand();
+    const reallyBad = Math.max(0, 100 - (MULT*STATE.spread*KCAL[STATE.denom]) * 0.002); // 1 weighted issue per 500 words
+    note.innerHTML = `≈ <b>${ppt.toFixed(0)} pts</b> per weighted issue / 1,000 ${STATE.denom} · 1 per 500 ${STATE.denom} ≈ <b>${reallyBad.toFixed(0)}</b>`;
+  }
 }
 
 function renderCards(){
-  const a = stats(activeKey()), b = stats(DATA.baseline_key);
-  const isBase = activeKey()===DATA.baseline_key;
-  const delta = (av,bv,lowerIsBetter,fmt)=>{
-    if(isBase) return `<div class="d flat">baseline</div>`;
-    const d = av-bv; const good = lowerIsBetter ? d<0 : d>0;
-    const cls = Math.abs(d)<1e-9 ? "flat" : (good?"up":"down");
-    return `<div class="d ${cls}">${fmt(d)} vs baseline</div>`;
+  const a = stats(DATA.docs.map(activeScore)), b = stats(DATA.docs.map(baseScore));
+  const isBase = STATE.denom==="claims" && STATE.absOn && Math.abs(STATE.spread-1)<1e-9;
+  const delta = (av,bv,lowerBetter,fmt)=>{
+    if(isBase) return `<div class="d flat">= production</div>`;
+    const d=av-bv, good=lowerBetter?d<0:d>0, cls=Math.abs(d)<1e-9?"flat":(good?"up":"down");
+    return `<div class="d ${cls}">${fmt(d)} vs production</div>`;
   };
   document.getElementById("cards").innerHTML = `
-    <div class="metric"><div class="k">Mean score</div><div class="v">${a.mean.toFixed(1)}</div><div class="b">baseline ${b.mean.toFixed(1)}</div>${delta(a.mean,b.mean,false,d=>(d>=0?'+':'')+d.toFixed(1))}</div>
-    <div class="metric"><div class="k">Median</div><div class="v">${a.median.toFixed(1)}</div><div class="b">baseline ${b.median.toFixed(1)}</div>${delta(a.median,b.median,false,d=>(d>=0?'+':'')+d.toFixed(1))}</div>
-    <div class="metric"><div class="k">Flagged &lt; 90</div><div class="v">${PCT(a.flag/a.n)}</div><div class="b">baseline ${PCT(b.flag/b.n)} · ${FMT(a.flag)} modules</div>${delta(a.flag/a.n,b.flag/b.n,true,d=>PP(d))}</div>
-    <div class="metric"><div class="k">Scored exactly 0</div><div class="v">${FMT(a.zero)}</div><div class="b">baseline ${FMT(b.zero)}</div>${delta(a.zero,b.zero,true,d=>(d>=0?'+':'')+FMT(Math.round(d)))}</div>
-  `;
+    <div class="metric"><div class="k">Mean score</div><div class="v">${a.mean.toFixed(1)}</div><div class="b">production ${b.mean.toFixed(1)}</div>${delta(a.mean,b.mean,false,d=>(d>=0?'+':'')+d.toFixed(1))}</div>
+    <div class="metric"><div class="k">Median</div><div class="v">${a.median.toFixed(1)}</div><div class="b">production ${b.median.toFixed(1)}</div>${delta(a.median,b.median,false,d=>(d>=0?'+':'')+d.toFixed(1))}</div>
+    <div class="metric"><div class="k">≥ 90 (low density)</div><div class="v">${PCT(a.ge90/a.n)}</div><div class="b">flagged &lt;90: ${PCT(a.flag/a.n)} · ${FMT(a.flag)}</div>${delta(a.ge90/a.n,b.ge90/b.n,false,d=>PP(d))}</div>
+    <div class="metric"><div class="k">Really bad (&lt; 30)</div><div class="v">${FMT(a.lt30)}</div><div class="b">at zero: ${FMT(a.zero)} · prod &lt;30: ${FMT(b.lt30)}</div>${delta(a.lt30,b.lt30,false,d=>(d>=0?'+':'')+FMT(Math.round(d)))}</div>`;
 }
 
 function renderHist(){
-  const W=1040, H=240, pad=34, nb=clampBins;
-  const base = hist(DATA.baseline_key), act = hist(activeKey());
-  const maxc = Math.max(...base, ...act, 1);
-  const sc = STATE.sqrt ? (c=> Math.sqrt(c)/Math.sqrt(maxc)) : (c=> c/maxc);
-  const pw=W-2*pad, ph=H-2*pad, bw=pw/nb;
-  const x=i=>pad+i*bw, y=c=>pad+ph*(1-sc(c));
+  const W=1040,H=240,pad=34,nb=NBINS;
+  const base=hist(DATA.docs.map(baseScore)), act=hist(DATA.docs.map(activeScore));
+  const maxc=Math.max(...base,...act,1), root=Math.sqrt(maxc);
+  const sc = STATE.sqrt ? (c=>Math.sqrt(c)/root) : (c=>c/maxc);
+  const pw=W-2*pad, ph=H-2*pad, bw=pw/nb, x=i=>pad+i*bw, y=c=>pad+ph*(1-sc(c));
   let s=`<svg viewBox="0 0 ${W} ${H}">`;
-  s+=`<line x1="${pad}" y1="${pad+ph}" x2="${pad+pw}" y2="${pad+ph}" stroke="#ccc"/>`;
-  s+=`<line x1="${pad}" y1="${pad}" x2="${pad}" y2="${pad+ph}" stroke="#ccc"/>`;
+  s+=`<line x1="${pad}" y1="${pad+ph}" x2="${pad+pw}" y2="${pad+ph}" stroke="#ccc"/><line x1="${pad}" y1="${pad}" x2="${pad}" y2="${pad+ph}" stroke="#ccc"/>`;
   act.forEach((c,i)=>{ if(c>0) s+=`<rect x="${(x(i)+0.5).toFixed(1)}" y="${y(c).toFixed(1)}" width="${(bw-1).toFixed(1)}" height="${(pad+ph-y(c)).toFixed(1)}" fill="#2563eb" fill-opacity="0.55"/>`; });
-  let pts=[]; base.forEach((c,i)=>{ pts.push(`${x(i).toFixed(1)},${y(c).toFixed(1)}`); pts.push(`${x(i+1).toFixed(1)},${y(c).toFixed(1)}`); });
+  let pts=[]; base.forEach((c,i)=>{ pts.push(`${x(i).toFixed(1)},${y(c).toFixed(1)}`,`${x(i+1).toFixed(1)},${y(c).toFixed(1)}`); });
   s+=`<polyline points="${pts.join(" ")}" fill="none" stroke="#e11d48" stroke-width="1.6"/>`;
-  [0,50,80,90,100].forEach(t=>{ const xx=pad+pw*t/100; s+=`<text x="${xx}" y="${H-10}" font-size="11" fill="#777" text-anchor="middle">${t}</text>`; });
+  [0,30,50,80,90,100].forEach(t=>{ const xx=pad+pw*t/100; s+=`<line x1="${xx}" y1="${pad}" x2="${xx}" y2="${pad+ph}" stroke="#f3f3f3"/><text x="${xx}" y="${H-10}" font-size="11" fill="#777" text-anchor="middle">${t}</text>`; });
   s+=`<text x="${pad}" y="${pad-12}" font-size="11" fill="#999">modules · ${STATE.sqrt?"√":"linear "}y-scale (max ${maxc})</text></svg>`;
   document.getElementById("histWrap").innerHTML=s;
   document.getElementById("sqrtToggle").textContent = STATE.sqrt ? "switch to linear y" : "switch to √ y";
 }
 
 function renderCluster(){
-  const ids = DATA.cluster81; const ak=activeKey();
-  const sub = document.getElementById("clusterSub");
+  const ids=DATA.cluster81;
   const span = ids.length ? `${FMT(BYID[ids[0]].chars)}–${FMT(BYID[ids[ids.length-1]].chars)} chars` : "";
   const ratio = ids.length ? Math.round(BYID[ids[ids.length-1]].chars/BYID[ids[0]].chars) : 0;
-  sub.innerHTML = `${ids.length} modules the production score pins to ~81. Every one has a single major issue; their content spans ${span} (a ${ratio}× range) yet production collapses them into one band. The top lane is production; the bottom lane is the active variant. Larger modules should land higher — the same one issue matters less in more content.`;
-  const W=1040, H=210, pad=40, axW=W-2*pad;
-  const X=v=>pad+axW*v/100;
-  const laneA=64, laneB=150;
+  document.getElementById("clusterSub").innerHTML =
+    `${ids.length} modules production pins to ~81. Every one has a single major issue; their content spans ${span} (a ${ratio}× range) yet production collapses them into one band. Top lane = production; bottom lane = active score. Larger modules land higher — the same one issue matters less in more content.`;
+  const W=1040,H=210,pad=40,axW=W-2*pad,X=v=>pad+axW*v/100,laneA=64,laneB=150;
   let s=`<svg viewBox="0 0 ${W} ${H}">`;
   s+=`<line x1="${pad}" y1="${H-22}" x2="${pad+axW}" y2="${H-22}" stroke="#ddd"/>`;
   [0,20,40,60,80,100].forEach(t=>{ s+=`<line x1="${X(t)}" y1="40" x2="${X(t)}" y2="${H-22}" stroke="#f0f0f0"/><text x="${X(t)}" y="${H-8}" font-size="10" fill="#999" text-anchor="middle">${t}</text>`; });
   s+=`<text x="${pad}" y="${laneA-26}" class="lane-label">Production (claims + abs)</text>`;
-  s+=`<text x="${pad}" y="${laneB-26}" class="lane-label">Active: normalize by ${STATE.denom}, abs ${STATE.absOn?"kept":"removed"}</text>`;
-  ids.forEach((id,i)=>{
-    const d=BYID[id]; const off=((i%7)-3)*5;
-    const xb=X(d.s[DATA.baseline_key]); const xa=X(d.s[ak]??0);
+  s+=`<text x="${pad}" y="${laneB-26}" class="lane-label">Active: ${STATE.denom}, abs ${STATE.absOn?"kept":"removed"}, spread ×${STATE.spread.toFixed(2)}</text>`;
+  ids.forEach((id,i)=>{ const d=BYID[id], off=((i%7)-3)*5, xb=X(baseScore(d));
     s+=`<circle class="dot" data-id="${id}" cx="${xb.toFixed(1)}" cy="${laneA+off}" r="4.5" fill="#e11d48" fill-opacity="0.75"/>`;
-    s+=`<circle class="dot act" data-id="${id}" cx="${xb.toFixed(1)}" cy="${laneB+off}" r="4.5" fill="#2563eb" fill-opacity="0.7"/>`;
-  });
+    s+=`<circle class="dot act" data-id="${id}" cx="${xb.toFixed(1)}" cy="${laneB+off}" r="4.5" fill="#2563eb" fill-opacity="0.7"/>`; });
   s+=`</svg>`;
   document.getElementById("beeswarm").innerHTML=s;
   document.querySelectorAll("#beeswarm .dot").forEach(c=>{
-    c.onmousemove=ev=>{ const d=BYID[c.dataset.id]; showTip(ev, `${esc(d.title||d.id)}<br>${FMT(d.chars)} chars · ${d.claims} claims · ${d.major} major / ${d.minor} minor<br>production ${d.s[DATA.baseline_key].toFixed(1)} → active ${(d.s[ak]??0).toFixed(1)}`); };
-    c.onmouseleave=hideTip;
-  });
-  requestAnimationFrame(()=> document.querySelectorAll("#beeswarm .dot.act").forEach(c=>{ c.setAttribute("cx", X(BYID[c.dataset.id].s[ak]??0).toFixed(1)); }));
+    c.onmousemove=ev=>{ const d=BYID[c.dataset.id]; showTip(ev,`${esc(d.title||d.id)}<br>${FMT(d.chars)} chars · ${d.claims} claims · ${d.major} major / ${d.minor} minor<br>production ${baseScore(d).toFixed(1)} → active ${(activeScore(d)??0).toFixed(1)}`); };
+    c.onmouseleave=hideTip; });
+  requestAnimationFrame(()=> document.querySelectorAll("#beeswarm .dot.act").forEach(c=> c.setAttribute("cx", X(activeScore(BYID[c.dataset.id])??0).toFixed(1))));
 }
 
+function chipConfigs(){
+  return [
+    {label:"production", denom:"claims", abs:true, spread:1, base:true},
+    {label:"words", denom:"words", abs:false, spread:STATE.spread},
+    {label:"words +abs", denom:"words", abs:true, spread:STATE.spread},
+    {label:"chars", denom:"chars", abs:false, spread:STATE.spread},
+    {label:"claims", denom:"claims", abs:false, spread:STATE.spread},
+  ];
+}
 function scoreChips(d){
-  const ak=activeKey(), bk=DATA.baseline_key;
-  return DATA.variants.map(v=>{
-    const val=d.s[v.key]; const cls = v.key===bk?"bk":(v.key===ak?"ak":"");
-    return `<span class="chip ${cls}"><span class="cl">${v.label.replace(' (production)','')}${v.abs?'':' ·noabs'}</span> ${val===null?'—':val.toFixed(1)}</span>`;
+  const isActive = c => !c.base && c.denom===STATE.denom && c.abs===STATE.absOn;
+  return chipConfigs().map(c=>{
+    const v=score(d,c.denom,c.abs,c.spread);
+    const cls = c.base?"bk":(isActive(c)?"ak":"");
+    return `<span class="chip ${cls}"><span class="cl">${c.label}</span> ${v===null?'—':v.toFixed(1)}</span>`;
   }).join("");
 }
 function claimsHTML(id){
-  const cl = DATA.claims[id]; if(!cl) return `<p class="reason">Claim detail not bundled for this module.</p>`;
-  const sevcls = s => s==="major"?"sev-major":(s==="minor"?"sev-minor":"sev-none");
-  const issues = cl.filter(c=>c.severity);
-  const list = (issues.length?issues:cl).slice(0,40);
-  return `<p class="reason" style="margin-top:10px"><b>${cl.length}</b> claims · showing ${issues.length?issues.length+" with issues":"all"}</p>` +
-    list.map(c=>`<div class="claim">
-      <div class="cmeta ${sevcls(c.severity)}">${esc(c.rating)}${c.severity?` · ${esc(c.severity)}`:""}</div>
-      <div>${esc(c.claim)}</div>
-      ${c.excerpt?`<div class="excerpt">${esc(c.excerpt)}</div>`:""}
-      ${c.reasoning?`<div class="reason">${esc(c.reasoning)}</div>`:""}
-    </div>`).join("");
+  const cl=DATA.claims[id]; if(!cl) return `<p class="reason">Claim detail not bundled for this module.</p>`;
+  const sevcls=s=>s==="major"?"sev-major":(s==="minor"?"sev-minor":"sev-none");
+  const issues=cl.filter(c=>c.severity), list=(issues.length?issues:cl).slice(0,40);
+  return `<p class="reason" style="margin-top:10px"><b>${cl.length}</b> claims · showing ${issues.length?issues.length+" with issues":"all"}</p>`+
+    list.map(c=>`<div class="claim"><div class="cmeta ${sevcls(c.severity)}">${esc(c.rating)}${c.severity?` · ${esc(c.severity)}`:""}</div>
+      <div>${esc(c.claim)}</div>${c.excerpt?`<div class="excerpt">${esc(c.excerpt)}</div>`:""}${c.reasoning?`<div class="reason">${esc(c.reasoning)}</div>`:""}</div>`).join("");
 }
 function renderFeatured(){
-  const ak=activeKey();
-  const el=document.getElementById("featured");
-  el.innerHTML = DATA.featured.map(id=>{
-    const d=BYID[id];
-    const b=d.s[DATA.baseline_key], a=d.s[ak];
-    return `<div class="fcard" data-id="${id}">
-      <div class="fhead">
+  document.getElementById("featured").innerHTML = DATA.featured.map(id=>{
+    const d=BYID[id], b=baseScore(d), a=activeScore(d);
+    return `<div class="fcard" data-id="${id}"><div class="fhead">
         <span class="ftitle">${esc(d.title||d.id)}</span>
-        <span class="ftag">${FMT(d.chars)} chars · ${d.claims} claims · ${d.major}maj/${d.minor}min</span>
+        <span class="ftag">${FMT(d.chars)} chars · ${FMT(d.words)} words · ${d.major}maj/${d.minor}min</span>
         <span class="fscore">prod <b>${b===null?'—':b.toFixed(0)}</b> → active <b style="color:#1a56db">${a===null?'—':a.toFixed(0)}</b></span>
-      </div>
-      <div class="fbody">
-        <div class="varbar">${scoreChips(d)}</div>
+      </div><div class="fbody"><div class="varbar">${scoreChips(d)}</div>
         ${d.url?`<p class="reason"><a href="${d.url}" target="_blank" rel="noopener">open module ↗</a></p>`:""}
-        <div class="claimwrap"></div>
-      </div>
-    </div>`;
+        <div class="claimwrap"></div></div></div>`;
   }).join("");
   document.querySelectorAll("#featured .fcard").forEach(card=>{
-    card.querySelector(".fhead").onclick=()=>{
-      card.classList.toggle("open");
-      const w=card.querySelector(".claimwrap");
-      if(card.classList.contains("open") && !w.dataset.loaded){ w.innerHTML=claimsHTML(card.dataset.id); w.dataset.loaded="1"; }
-    };
+    card.querySelector(".fhead").onclick=()=>{ card.classList.toggle("open");
+      const w=card.querySelector(".claimwrap"); if(card.classList.contains("open") && !w.dataset.loaded){ w.innerHTML=claimsHTML(card.dataset.id); w.dataset.loaded="1"; } };
   });
 }
 
 function renderTable(qraw){
-  const ak=activeKey(), bk=DATA.baseline_key, q=(qraw||"").trim();
-  let rows = DATA.docs;
-  if(q) rows = rows.filter(d=>(d.title||"").toLowerCase().includes(q));
-  const shown = rows.slice(0,60);
-  let h = `<table class="tbl"><thead><tr><th>module</th><th>chars</th><th>claims</th><th>maj/min</th><th>production</th><th>active</th><th>Δ</th></tr></thead><tbody>`;
-  for(const d of shown){
-    const b=d.s[bk], a=d.s[ak]; const dl = (a!==null&&b!==null)?(a-b):null;
-    const dcls = dl===null?"":(Math.abs(dl)<0.05?"flat":(dl>0?"up":"down"));
-    const hasC = !!DATA.claims[d.id];
-    h += `<tr class="detail" data-id="${d.id}">
-      <td>${esc((d.title||d.id).slice(0,70))}${hasC?' <span class="ftag">claims</span>':''}</td>
-      <td class="tnum">${FMT(d.chars)}</td><td class="tnum">${d.claims}</td><td class="tnum">${d.major}/${d.minor}</td>
+  const q=(qraw||"").trim();
+  let rows=DATA.docs; if(q) rows=rows.filter(d=>(d.title||"").toLowerCase().includes(q));
+  const shown=rows.slice(0,60);
+  let h=`<table class="tbl"><thead><tr><th>module</th><th>words</th><th>claims</th><th>maj/min</th><th>production</th><th>active</th><th>Δ</th></tr></thead><tbody>`;
+  for(const d of shown){ const b=baseScore(d), a=activeScore(d), dl=(a!==null&&b!==null)?a-b:null;
+    const dcls=dl===null?"":(Math.abs(dl)<0.05?"flat":(dl>0?"up":"down")), hasC=!!DATA.claims[d.id];
+    h+=`<tr class="detail" data-id="${d.id}"><td>${esc((d.title||d.id).slice(0,70))}${hasC?' <span class="ftag">claims</span>':''}</td>
+      <td class="tnum">${FMT(d.words)}</td><td class="tnum">${d.claims}</td><td class="tnum">${d.major}/${d.minor}</td>
       <td class="tnum">${b===null?'—':b.toFixed(1)}</td><td class="tnum">${a===null?'—':a.toFixed(1)}</td>
-      <td class="tnum ${dcls}">${dl===null?'—':(dl>=0?'+':'')+dl.toFixed(1)}</td></tr>`;
-  }
-  h += `</tbody></table>`;
-  if(rows.length>shown.length) h += `<p class="reason" style="margin-top:8px">showing ${shown.length} of ${FMT(rows.length)} matches — refine the search</p>`;
+      <td class="tnum ${dcls}">${dl===null?'—':(dl>=0?'+':'')+dl.toFixed(1)}</td></tr>`; }
+  h+=`</tbody></table>`;
+  if(rows.length>shown.length) h+=`<p class="reason" style="margin-top:8px">showing ${shown.length} of ${FMT(rows.length)} matches — refine the search</p>`;
   document.getElementById("tableWrap").innerHTML=h;
-  document.querySelectorAll("#tableWrap tr.detail").forEach(tr=>{
-    tr.onclick=()=>{
-      if(!DATA.claims[tr.dataset.id]) return;
-      const ex = tr.nextElementSibling;
-      if(ex && ex.classList.contains("expand")){ ex.remove(); return; }
-      const td=document.createElement("tr"); td.className="expand";
-      td.innerHTML=`<td colspan="7" style="background:#f9fafb">${claimsHTML(tr.dataset.id)}</td>`;
-      tr.after(td);
-    };
-  });
+  document.querySelectorAll("#tableWrap tr.detail").forEach(tr=>{ tr.onclick=()=>{ if(!DATA.claims[tr.dataset.id]) return;
+    const ex=tr.nextElementSibling; if(ex&&ex.classList.contains("expand")){ ex.remove(); return; }
+    const td=document.createElement("tr"); td.className="expand"; td.innerHTML=`<td colspan="7" style="background:#f9fafb">${claimsHTML(tr.dataset.id)}</td>`; tr.after(td); }; });
 }
 
-/* tooltip + util */
 const tip=document.getElementById("tip");
-function showTip(ev,html){ tip.innerHTML=html; tip.style.opacity=1; tip.style.left=Math.min(ev.clientX+12,window.innerWidth-300)+"px"; tip.style.top=(ev.clientY+12)+"px"; }
+function showTip(ev,html){ tip.innerHTML=html; tip.style.opacity=1; tip.style.left=Math.min(ev.clientX+12,window.innerWidth-310)+"px"; tip.style.top=(ev.clientY+12)+"px"; }
 function hideTip(){ tip.style.opacity=0; }
 function esc(s){ return (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
 
 async function init(){
   try{
-    const r = await fetch("explorer_data/candidates.json");
-    if(!r.ok) throw new Error("HTTP "+r.status);
-    DATA = await r.json();
-    BYID = Object.fromEntries(DATA.docs.map(d=>[d.id,d]));
+    const r=await fetch("explorer_data/candidates.json"); if(!r.ok) throw new Error("HTTP "+r.status);
+    DATA=await r.json(); BYID=Object.fromEntries(DATA.docs.map(d=>[d.id,d]));
+    KCAL={ claims:1, chars:DATA.calibration.chars, words:DATA.calibration.words };
     render();
   }catch(e){
-    document.getElementById("app").innerHTML =
-      `<div class="error"><p>Could not load <code>explorer_data/candidates.json</code>.</p><p class="reason">${esc(e.message)}</p>
-       <p class="reason">Regenerate with <code>build_scoring_explorer_data.py</code> in the microsoft-asn-content-freshness repo.</p></div>`;
+    document.getElementById("app").innerHTML=`<div class="error"><p>Could not load <code>explorer_data/candidates.json</code>.</p><p class="reason">${esc(e.message)}</p></div>`;
   }
 }
 init();
