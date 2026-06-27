@@ -10,7 +10,6 @@ body { font-family: system-ui, -apple-system, sans-serif; background: #fafafa; c
 .container { max-width: 1120px; margin: 0 auto; padding: 32px 20px 80px; }
 h1 { font-size: 1.7rem; font-weight: 700; margin-bottom: 4px; }
 h2 { font-size: 1.2rem; font-weight: 600; margin: 36px 0 12px; padding-bottom: 6px; border-bottom: 2px solid #ececec; }
-h3 { font-size: 1rem; font-weight: 600; margin-bottom: 8px; }
 .subtitle { color: #666; font-size: 0.92rem; margin-bottom: 20px; }
 p { margin-bottom: 10px; }
 a { color: #1a56db; }
@@ -33,12 +32,12 @@ details.writeup[open] > summary::before { content:"▾ "; }
 .ctl-group { display:flex; flex-direction:column; gap:5px; }
 .ctl-label { font-size:0.72rem; text-transform:uppercase; letter-spacing:0.04em; color:#888; font-weight:600; }
 .seg { display:flex; border:1px solid #cdd3da; border-radius:8px; overflow:hidden; }
-.seg button { border:0; background:#fff; padding:7px 13px; font-size:0.85rem; cursor:pointer; color:#444; border-right:1px solid #e3e6ea; }
+.seg button { border:0; background:#fff; padding:7px 14px; font-size:0.85rem; cursor:pointer; color:#444; border-right:1px solid #e3e6ea; }
 .seg button:last-child { border-right:0; }
 .seg button.on { background:#1a56db; color:#fff; font-weight:600; }
 .spreadrow { display:flex; align-items:center; gap:10px; }
 .spreadrow input[type=range] { width:200px; accent-color:#1a56db; }
-.note { font-size:0.82rem; color:#666; } .note b { color:#1a56db; }
+.note { font-size:0.82rem; color:#666; max-width:560px; } .note b { color:#1a56db; }
 
 .cards { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin:6px 0 4px; }
 .metric { background:#fff; border:1px solid #e6e6e6; border-radius:10px; padding:14px 16px; }
@@ -52,7 +51,6 @@ details.writeup[open] > summary::before { content:"▾ "; }
 .card { background:#fff; border:1px solid #e6e6e6; border-radius:10px; padding:18px 20px; margin-bottom:14px; }
 .legend { font-size:0.82rem; color:#666; margin:4px 0 0; }
 .swatch { display:inline-block; width:11px; height:11px; border-radius:2px; vertical-align:middle; margin:0 3px 0 12px; }
-.toggle-mini { font-size:0.78rem; color:#1a56db; cursor:pointer; user-select:none; margin-left:6px; }
 
 svg { display:block; width:100%; height:auto; }
 .dot { cursor:pointer; transition: cx .55s cubic-bezier(.4,0,.2,1), fill .3s; }
@@ -98,37 +96,43 @@ const PCT = x => (x*100).toFixed(1) + "%";
 const PP = d => (d>=0?"+":"") + (d*100).toFixed(1) + "pp";
 const NBINS = 40;
 
-// Score model. penalty = MULT * spread * (major + 0.3*minor) * K[denom] / size[denom].
-// K calibrates each denominator so the corpus's total content equals its total claim
-// count -> claims is the spread=1 case and the denominators share a scale. The spread
-// multiplier stretches the penalty so the distribution fills 0-100. The optional
-// absolute penalty (MULT*0.5*ln(major+1)) is the production term, off by default.
-const MULT = 50, MINORW = 0.3;
-const DEFAULT_SPREAD = 3.43;   // words -> ~35 pts per weighted issue / 1,000 words
-let DATA, BYID, KCAL, STATE = { denom:"words", absOn:false, spread:DEFAULT_SPREAD, sqrt:true };
+// Score model. The penalty is a rate: RATE points per weighted major-equivalent
+// issue (major=1.0, minor=0.3) per 1,000 words. score = clamp(0,100, 100 - penalty
+// - abs). Normalizing by characters instead uses each module's character count,
+// calibrated so the rate stays expressed per 1,000 words. The optional absolute
+// penalty (50*0.5*ln(major+1)) is the production term, off by default. Production
+// (the red reference) normalizes by claim count and always keeps the abs penalty.
+const CLAIM_MULT = 50, MINORW = 0.3;
+const DEFAULT_RATE = 35;   // points per weighted major-equivalent per 1,000 words
+let DATA, BYID, KCAL, STATE = { scaleBy:"words", absOn:false, rate:DEFAULT_RATE };
 
-function sizeOf(d, denom){ return denom==="claims" ? d.claims : (denom==="chars" ? d.chars : d.words); }
-function score(d, denom, absOn, spread){
-  const size = sizeOf(d, denom);
+// effective points multiplier on (weighted issues / size). For words: rate*1000.
+// For chars: rescaled by avg chars-per-word so the rate keeps its per-1,000-words meaning.
+function effScale(scaleBy, rate){
+  return rate * 1000 * (scaleBy==="chars" ? KCAL.chars/KCAL.words : 1);
+}
+function scoreWith(d, scaleBy, absOn, rate){
+  const size = scaleBy==="chars" ? d.chars : d.words;
   if(!size || size<=0) return null;
-  const pen = MULT * spread * (d.major + MINORW*d.minor) * KCAL[denom] / size;
-  const abs = absOn ? MULT * 0.5 * Math.log(d.major + 1) : 0;
+  const pen = effScale(scaleBy, rate) * (d.major + MINORW*d.minor) / size;
+  const abs = absOn ? CLAIM_MULT * 0.5 * Math.log(d.major + 1) : 0;
   return Math.max(0, Math.min(100, 100 - pen - abs));
 }
-const baseScore = d => score(d, "claims", true, 1);              // production reference (fixed)
-const activeScore = d => score(d, STATE.denom, STATE.absOn, STATE.spread);
-
-// scale in interpretable units for the active words/chars denominator
-function ptsPerThousand(){ return MULT * STATE.spread * KCAL[STATE.denom] / 1000; }
+const activeScore = d => scoreWith(d, STATE.scaleBy, STATE.absOn, STATE.rate);
+function baseScore(d){          // production: claims denominator + abs penalty (fixed)
+  if(!d.claims) return null;
+  const pen = CLAIM_MULT*(d.major+MINORW*d.minor)/d.claims, abs = CLAIM_MULT*0.5*Math.log(d.major+1);
+  return Math.max(0, Math.min(100, 100 - pen - abs));
+}
 
 function stats(vals){
-  const v = vals.filter(x=>x!==null).sort((a,b)=>a-b); const n=v.length;
-  const q = p => v[Math.min(Math.floor(p*n), n-1)];
+  const v=vals.filter(x=>x!==null).sort((a,b)=>a-b); const n=v.length;
+  const q=p=>v[Math.min(Math.floor(p*n),n-1)];
   return { n, mean:v.reduce((a,b)=>a+b,0)/n, median:q(.5), p25:q(.25), p5:q(.05),
            ge90:v.filter(x=>x>=90).length, flag:v.filter(x=>x<90).length,
            lt30:v.filter(x=>x<30).length, zero:v.filter(x=>x===0).length };
 }
-function hist(vals, nbins=NBINS){
+function hist(vals,nbins=NBINS){
   const c=new Array(nbins).fill(0), w=100/nbins;
   for(const x of vals){ if(x===null) continue; let b=Math.floor(x/w); if(b>=nbins)b=nbins-1; if(b<0)b=0; c[b]++; }
   return c;
@@ -145,8 +149,7 @@ function render(){
     <h2>Score distribution</h2>
     <div class="card">
       <p class="legend"><span class="swatch" style="background:#e11d48"></span><b>red outline</b> = production (claims + abs penalty)
-        <span class="swatch" style="background:#2563eb;opacity:.55"></span><b>blue bars</b> = active score
-        <span class="toggle-mini" id="sqrtToggle"></span></p>
+        <span class="swatch" style="background:#2563eb;opacity:.55"></span><b>blue bars</b> = active score</p>
       <div id="histWrap"></div>
     </div>
     <h2>The same-score group</h2>
@@ -160,7 +163,6 @@ function render(){
     <input class="search" id="search" placeholder="Search ${FMT(DATA.meta.n_modules)} modules by title…">
     <div id="tableWrap"></div>`;
   renderControls(); renderAll();
-  document.getElementById("sqrtToggle").onclick = ()=>{ STATE.sqrt=!STATE.sqrt; renderHist(); };
   document.getElementById("search").oninput = e => renderTable(e.target.value.toLowerCase());
 }
 function renderAll(){ renderCards(); renderHist(); renderCluster(); renderFeatured(); renderTable(document.getElementById("search")?.value.toLowerCase()||""); }
@@ -169,56 +171,51 @@ function writeupHTML(){
   return `
   <details class="writeup" open>
     <summary>How the score works, and how to tune it</summary>
-    <p>The trust score is a 0–100 measure of error density: how many severity-weighted issues a module carries per unit of content. Higher is better; a clean module is 100.</p>
-    <p class="mono"><code>penalty = spread · (1.0·major + 0.3·minor) per 1,000 words &nbsp;·&nbsp; score = clamp(0, 100, 100 − penalty)</code></p>
-    <p>Production normalizes by <i>claim count</i> and adds an absolute <code>ln(major)</code> penalty, which pins every single-major module near 81 regardless of size and slams many-major modules to 0. This page normalizes by <i>content</i> (words by default) so size is comparable, and replaces the absolute penalty with a single <b>spread</b> control that stretches the distribution to fill 0–100.</p>
+    <p>The trust score is a 0–100 measure of error density: severity-weighted issues per unit of content. Higher is better; a clean module is 100.</p>
+    <p class="mono"><code>score = clamp(0, 100, 100 − rate · (1.0·major + 0.3·minor) per 1,000 words)</code></p>
+    <p>Production normalizes by <i>claim count</i> and adds an absolute <code>ln(major)</code> penalty, which pins every single-major module near 81 regardless of size and slams many-major modules to 0. This page normalizes by <i>content</i> so size is comparable, exposes the normalization unit (<b>words</b> or <b>characters</b>) as a switch, and replaces the absolute penalty with a single <b>penalty rate</b>.</p>
     <ul>
-      <li>A long module with <b>many</b> major issues scores <b>low</b> (high error density); a long module with <b>few</b> scores high. Length no longer rescues a major-heavy module, and no longer flattens the difference.</li>
-      <li>At the default spread, roughly <b>1 weighted major-equivalent per 500 words → 30</b> ("really bad"), per 1,000 → 65, per 2,000 → 82, and the corpus median (~1 per 5,000) stays in the 90s. Most modules remain &gt; 80.</li>
-      <li>Raise the spread to flag more aggressively; lower it to keep the distribution near the top.</li>
+      <li>The rate is points lost per weighted major-equivalent issue per 1,000 words. At the default <b>35</b>, a really-bad module (≈1 major per 500 words) scores <b>30</b>; the relationship is score-when-really-bad = 100 − 2·rate.</li>
+      <li>A long module with <b>many</b> majors scores <b>low</b>; a long module with <b>few</b> scores high. Length no longer rescues a major-heavy module or flattens the difference.</li>
+      <li>Raise the rate to flag more aggressively; lower it to keep the distribution near the top. Characters vs words barely differ except on code-heavy modules.</li>
     </ul>
   </details>`;
 }
 
 function renderControls(){
-  const denoms = [["claims","Claims"],["words","Words"],["chars","Characters"]];
   document.getElementById("controls").innerHTML = `
-    <div class="ctl-group"><span class="ctl-label">Denominator</span>
-      <div class="seg" id="segDenom">${denoms.map(([k,l])=>`<button data-d="${k}" class="${STATE.denom===k?'on':''}">${l}</button>`).join("")}</div></div>
+    <div class="ctl-group"><span class="ctl-label">Scale by</span>
+      <div class="seg" id="segScale">
+        <button data-s="words" class="${STATE.scaleBy==='words'?'on':''}">Words</button>
+        <button data-s="chars" class="${STATE.scaleBy==='chars'?'on':''}">Characters</button></div></div>
+    <div class="ctl-group"><span class="ctl-label">Penalty rate</span>
+      <div class="spreadrow"><input type="range" id="rate" min="10" max="80" step="1" value="${STATE.rate}">
+        <span class="mono" id="rateVal"></span></div>
+      <span class="note" id="rateNote"></span></div>
     <div class="ctl-group"><span class="ctl-label">Absolute penalty</span>
       <div class="seg" id="segAbs">
         <button data-a="0" class="${!STATE.absOn?'on':''}">Removed</button>
-        <button data-a="1" class="${STATE.absOn?'on':''}">Kept</button></div></div>
-    <div class="ctl-group"><span class="ctl-label">Spread (penalty scale)</span>
-      <div class="spreadrow"><input type="range" id="spread" min="1" max="6" step="0.05" value="${STATE.spread}">
-        <span class="mono" id="spreadVal"></span></div>
-      <span class="note" id="spreadNote"></span></div>`;
-  document.querySelectorAll("#segDenom button").forEach(b=> b.onclick=()=>{ STATE.denom=b.dataset.d; syncControls(); renderAll(); });
+        <button data-a="1" class="${STATE.absOn?'on':''}">Kept</button></div></div>`;
+  document.querySelectorAll("#segScale button").forEach(b=> b.onclick=()=>{ STATE.scaleBy=b.dataset.s; syncControls(); renderAll(); });
   document.querySelectorAll("#segAbs button").forEach(b=> b.onclick=()=>{ STATE.absOn=b.dataset.a==="1"; syncControls(); renderAll(); });
-  document.getElementById("spread").oninput = e=>{ STATE.spread=parseFloat(e.target.value); syncControls(); renderAll(); };
+  document.getElementById("rate").oninput = e=>{ STATE.rate=parseFloat(e.target.value); syncControls(); renderAll(); };
   syncControls();
 }
 function syncControls(){
-  document.querySelectorAll("#segDenom button").forEach(b=> b.classList.toggle("on", b.dataset.d===STATE.denom));
+  document.querySelectorAll("#segScale button").forEach(b=> b.classList.toggle("on", b.dataset.s===STATE.scaleBy));
   document.querySelectorAll("#segAbs button").forEach(b=> b.classList.toggle("on", (b.dataset.a==="1")===STATE.absOn));
-  document.getElementById("spreadVal").textContent = "×" + STATE.spread.toFixed(2);
-  const note = document.getElementById("spreadNote");
-  if(STATE.denom==="claims"){ note.innerHTML = `penalty = <b>×${STATE.spread.toFixed(2)}</b> of the production per-claim penalty`; }
-  else {
-    const ppt = ptsPerThousand();
-    const reallyBad = Math.max(0, 100 - (MULT*STATE.spread*KCAL[STATE.denom]) * 0.002); // 1 weighted issue per 500 words
-    note.innerHTML = `≈ <b>${ppt.toFixed(0)} pts</b> per weighted issue / 1,000 ${STATE.denom} · 1 per 500 ${STATE.denom} ≈ <b>${reallyBad.toFixed(0)}</b>`;
-  }
+  document.getElementById("rateVal").textContent = STATE.rate + " pts";
+  const reallyBad = Math.max(0, 100 - 2*STATE.rate);
+  const med = stats(DATA.docs.map(activeScore)).median;
+  const normNote = STATE.scaleBy==="chars" ? " (normalized by characters)" : "";
+  document.getElementById("rateNote").innerHTML =
+    `<b>${STATE.rate}</b> points per weighted major-equivalent per 1,000 words${normNote} · really-bad (1 major / 500 words) → <b>${reallyBad}</b> · corpus median → <b>${med.toFixed(0)}</b>`;
 }
 
 function renderCards(){
-  const a = stats(DATA.docs.map(activeScore)), b = stats(DATA.docs.map(baseScore));
-  const isBase = STATE.denom==="claims" && STATE.absOn && Math.abs(STATE.spread-1)<1e-9;
-  const delta = (av,bv,lowerBetter,fmt)=>{
-    if(isBase) return `<div class="d flat">= production</div>`;
-    const d=av-bv, good=lowerBetter?d<0:d>0, cls=Math.abs(d)<1e-9?"flat":(good?"up":"down");
-    return `<div class="d ${cls}">${fmt(d)} vs production</div>`;
-  };
+  const a=stats(DATA.docs.map(activeScore)), b=stats(DATA.docs.map(baseScore));
+  const delta=(av,bv,lowerBetter,fmt)=>{ const d=av-bv, good=lowerBetter?d<0:d>0, cls=Math.abs(d)<1e-9?"flat":(good?"up":"down");
+    return `<div class="d ${cls}">${fmt(d)} vs production</div>`; };
   document.getElementById("cards").innerHTML = `
     <div class="metric"><div class="k">Mean score</div><div class="v">${a.mean.toFixed(1)}</div><div class="b">production ${b.mean.toFixed(1)}</div>${delta(a.mean,b.mean,false,d=>(d>=0?'+':'')+d.toFixed(1))}</div>
     <div class="metric"><div class="k">Median</div><div class="v">${a.median.toFixed(1)}</div><div class="b">production ${b.median.toFixed(1)}</div>${delta(a.median,b.median,false,d=>(d>=0?'+':'')+d.toFixed(1))}</div>
@@ -229,24 +226,22 @@ function renderCards(){
 function renderHist(){
   const W=1040,H=240,pad=34,nb=NBINS;
   const base=hist(DATA.docs.map(baseScore)), act=hist(DATA.docs.map(activeScore));
-  const maxc=Math.max(...base,...act,1), root=Math.sqrt(maxc);
-  const sc = STATE.sqrt ? (c=>Math.sqrt(c)/root) : (c=>c/maxc);
-  const pw=W-2*pad, ph=H-2*pad, bw=pw/nb, x=i=>pad+i*bw, y=c=>pad+ph*(1-sc(c));
+  const maxc=Math.max(...base,...act,1);
+  const pw=W-2*pad, ph=H-2*pad, bw=pw/nb, x=i=>pad+i*bw, y=c=>pad+ph*(1-c/maxc);
   let s=`<svg viewBox="0 0 ${W} ${H}">`;
   s+=`<line x1="${pad}" y1="${pad+ph}" x2="${pad+pw}" y2="${pad+ph}" stroke="#ccc"/><line x1="${pad}" y1="${pad}" x2="${pad}" y2="${pad+ph}" stroke="#ccc"/>`;
   act.forEach((c,i)=>{ if(c>0) s+=`<rect x="${(x(i)+0.5).toFixed(1)}" y="${y(c).toFixed(1)}" width="${(bw-1).toFixed(1)}" height="${(pad+ph-y(c)).toFixed(1)}" fill="#2563eb" fill-opacity="0.55"/>`; });
   let pts=[]; base.forEach((c,i)=>{ pts.push(`${x(i).toFixed(1)},${y(c).toFixed(1)}`,`${x(i+1).toFixed(1)},${y(c).toFixed(1)}`); });
   s+=`<polyline points="${pts.join(" ")}" fill="none" stroke="#e11d48" stroke-width="1.6"/>`;
   [0,30,50,80,90,100].forEach(t=>{ const xx=pad+pw*t/100; s+=`<line x1="${xx}" y1="${pad}" x2="${xx}" y2="${pad+ph}" stroke="#f3f3f3"/><text x="${xx}" y="${H-10}" font-size="11" fill="#777" text-anchor="middle">${t}</text>`; });
-  s+=`<text x="${pad}" y="${pad-12}" font-size="11" fill="#999">modules · ${STATE.sqrt?"√":"linear "}y-scale (max ${maxc})</text></svg>`;
+  s+=`<text x="${pad}" y="${pad-12}" font-size="11" fill="#999">modules (max ${maxc})</text></svg>`;
   document.getElementById("histWrap").innerHTML=s;
-  document.getElementById("sqrtToggle").textContent = STATE.sqrt ? "switch to linear y" : "switch to √ y";
 }
 
 function renderCluster(){
   const ids=DATA.cluster81;
-  const span = ids.length ? `${FMT(BYID[ids[0]].chars)}–${FMT(BYID[ids[ids.length-1]].chars)} chars` : "";
-  const ratio = ids.length ? Math.round(BYID[ids[ids.length-1]].chars/BYID[ids[0]].chars) : 0;
+  const span=ids.length?`${FMT(BYID[ids[0]].chars)}–${FMT(BYID[ids[ids.length-1]].chars)} chars`:"";
+  const ratio=ids.length?Math.round(BYID[ids[ids.length-1]].chars/BYID[ids[0]].chars):0;
   document.getElementById("clusterSub").innerHTML =
     `${ids.length} modules production pins to ~81. Every one has a single major issue; their content spans ${span} (a ${ratio}× range) yet production collapses them into one band. Top lane = production; bottom lane = active score. Larger modules land higher — the same one issue matters less in more content.`;
   const W=1040,H=210,pad=40,axW=W-2*pad,X=v=>pad+axW*v/100,laneA=64,laneB=150;
@@ -254,7 +249,7 @@ function renderCluster(){
   s+=`<line x1="${pad}" y1="${H-22}" x2="${pad+axW}" y2="${H-22}" stroke="#ddd"/>`;
   [0,20,40,60,80,100].forEach(t=>{ s+=`<line x1="${X(t)}" y1="40" x2="${X(t)}" y2="${H-22}" stroke="#f0f0f0"/><text x="${X(t)}" y="${H-8}" font-size="10" fill="#999" text-anchor="middle">${t}</text>`; });
   s+=`<text x="${pad}" y="${laneA-26}" class="lane-label">Production (claims + abs)</text>`;
-  s+=`<text x="${pad}" y="${laneB-26}" class="lane-label">Active: ${STATE.denom}, abs ${STATE.absOn?"kept":"removed"}, spread ×${STATE.spread.toFixed(2)}</text>`;
+  s+=`<text x="${pad}" y="${laneB-26}" class="lane-label">Active: ${STATE.scaleBy}, abs ${STATE.absOn?"kept":"removed"}, ${STATE.rate} pts/1k words</text>`;
   ids.forEach((id,i)=>{ const d=BYID[id], off=((i%7)-3)*5, xb=X(baseScore(d));
     s+=`<circle class="dot" data-id="${id}" cx="${xb.toFixed(1)}" cy="${laneA+off}" r="4.5" fill="#e11d48" fill-opacity="0.75"/>`;
     s+=`<circle class="dot act" data-id="${id}" cx="${xb.toFixed(1)}" cy="${laneB+off}" r="4.5" fill="#2563eb" fill-opacity="0.7"/>`; });
@@ -268,18 +263,17 @@ function renderCluster(){
 
 function chipConfigs(){
   return [
-    {label:"production", denom:"claims", abs:true, spread:1, base:true},
-    {label:"words", denom:"words", abs:false, spread:STATE.spread},
-    {label:"words +abs", denom:"words", abs:true, spread:STATE.spread},
-    {label:"chars", denom:"chars", abs:false, spread:STATE.spread},
-    {label:"claims", denom:"claims", abs:false, spread:STATE.spread},
+    {label:"production", base:true},
+    {label:"words", sb:"words", abs:false},
+    {label:"words +abs", sb:"words", abs:true},
+    {label:"characters", sb:"chars", abs:false},
   ];
 }
 function scoreChips(d){
-  const isActive = c => !c.base && c.denom===STATE.denom && c.abs===STATE.absOn;
   return chipConfigs().map(c=>{
-    const v=score(d,c.denom,c.abs,c.spread);
-    const cls = c.base?"bk":(isActive(c)?"ak":"");
+    const v = c.base ? baseScore(d) : scoreWith(d, c.sb, c.abs, STATE.rate);
+    const isActive = !c.base && c.sb===STATE.scaleBy && c.abs===STATE.absOn;
+    const cls = c.base?"bk":(isActive?"ak":"");
     return `<span class="chip ${cls}"><span class="cl">${c.label}</span> ${v===null?'—':v.toFixed(1)}</span>`;
   }).join("");
 }
@@ -336,7 +330,7 @@ async function init(){
   try{
     const r=await fetch("explorer_data/candidates.json"); if(!r.ok) throw new Error("HTTP "+r.status);
     DATA=await r.json(); BYID=Object.fromEntries(DATA.docs.map(d=>[d.id,d]));
-    KCAL={ claims:1, chars:DATA.calibration.chars, words:DATA.calibration.words };
+    KCAL={ chars:DATA.calibration.chars, words:DATA.calibration.words };
     render();
   }catch(e){
     document.getElementById("app").innerHTML=`<div class="error"><p>Could not load <code>explorer_data/candidates.json</code>.</p><p class="reason">${esc(e.message)}</p></div>`;
