@@ -13,33 +13,34 @@ h2 { font-size: 1.2rem; font-weight: 600; margin: 36px 0 12px; padding-bottom: 6
 .subtitle { color: #666; font-size: 0.92rem; margin-bottom: 20px; }
 p { margin-bottom: 10px; }
 a { color: #1a56db; }
-code { background: #eef1f5; padding: 1px 6px; border-radius: 4px; font-size: 0.86em; }
 .mono { font-variant-numeric: tabular-nums; }
 
 .loading, .error { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:55vh; text-align:center; color:#666; }
 .spinner { width:42px; height:42px; border:4px solid #e0e0e0; border-top-color:#1a73e8; border-radius:50%; animation:spin .8s linear infinite; margin-bottom:14px; }
 @keyframes spin { to { transform: rotate(360deg);} }
 
-.writeup { background:#fff; border:1px solid #e6e6e6; border-radius:10px; padding:18px 22px; margin-bottom:8px; font-size:0.92rem; }
-.writeup p { margin-bottom:8px; }
-.writeup ul { margin:6px 0 8px 20px; } .writeup li { margin:3px 0; }
-details.writeup > summary { cursor:pointer; font-weight:600; list-style:none; }
+.writeup { background:#fff; border:1px solid #e6e6e6; border-radius:10px; padding:18px 22px; margin-bottom:14px; font-size:0.92rem; }
+.writeup p:last-child { margin-bottom:0; }
+details.writeup > summary { cursor:pointer; font-weight:600; list-style:none; margin-bottom:8px; }
 details.writeup > summary::-webkit-details-marker { display:none; }
 details.writeup > summary::before { content:"▸ "; color:#888; }
 details.writeup[open] > summary::before { content:"▾ "; }
 
-.controls { position:sticky; top:0; z-index:5; background:#fafafa; padding:14px 0 12px; margin-bottom:8px; border-bottom:1px solid #ececec; display:flex; flex-wrap:wrap; gap:22px 26px; align-items:flex-end; }
+.controls { display:flex; flex-wrap:wrap; gap:14px 26px; align-items:flex-end; margin-bottom:14px; }
 .ctl-group { display:flex; flex-direction:column; gap:5px; }
 .ctl-label { font-size:0.72rem; text-transform:uppercase; letter-spacing:0.04em; color:#888; font-weight:600; }
-.seg { display:flex; border:1px solid #cdd3da; border-radius:8px; overflow:hidden; }
-.seg button { border:0; background:#fff; padding:7px 14px; font-size:0.85rem; cursor:pointer; color:#444; border-right:1px solid #e3e6ea; }
+.seg { display:flex; border:1px solid #cdd3da; border-radius:8px; overflow:hidden; width:max-content; }
+.seg button { border:0; background:#fff; padding:7px 16px; font-size:0.85rem; cursor:pointer; color:#444; border-right:1px solid #e3e6ea; }
 .seg button:last-child { border-right:0; }
 .seg button.on { background:#1a56db; color:#fff; font-weight:600; }
-.spreadrow { display:flex; align-items:center; gap:10px; }
-.spreadrow input[type=range] { width:200px; accent-color:#1a56db; }
-.note { font-size:0.82rem; color:#666; max-width:560px; } .note b { color:#1a56db; }
 
-.cards { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin:6px 0 4px; }
+.eq { background:#f6f8fb; border:1px solid #e6e6e6; border-radius:10px; padding:16px 20px; margin-bottom:16px; }
+.eq .row { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:0.9rem; line-height:2.1; white-space:nowrap; overflow-x:auto; }
+.eq .row b { color:#1a56db; font-weight:700; }
+.eq .cons { font-size:0.85rem; color:#555; margin-top:10px; padding-top:10px; border-top:1px solid #ececec; }
+.eq .cons b { color:#1a1a1a; font-variant-numeric:tabular-nums; }
+
+.cards { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:4px; }
 .metric { background:#fff; border:1px solid #e6e6e6; border-radius:10px; padding:14px 16px; }
 .metric .k { font-size:0.74rem; text-transform:uppercase; letter-spacing:0.03em; color:#888; }
 .metric .v { font-size:1.55rem; font-weight:700; font-variant-numeric:tabular-nums; margin-top:2px; }
@@ -78,7 +79,7 @@ svg { display:block; width:100%; height:auto; }
 table.tbl { width:100%; border-collapse:collapse; font-size:0.84rem; }
 table.tbl th, table.tbl td { padding:6px 9px; border-bottom:1px solid #eee; text-align:right; }
 table.tbl th:first-child, table.tbl td:first-child { text-align:left; }
-table.tbl th { color:#666; font-weight:600; position:sticky; top:74px; background:#fafafa; }
+table.tbl th { color:#666; font-weight:600; }
 table.tbl tr.detail { cursor:pointer; } table.tbl tr.detail:hover { background:#f6f8fb; }
 .tnum { font-variant-numeric:tabular-nums; }
 .tip { position:fixed; pointer-events:none; background:#1f2937; color:#fff; font-size:0.78rem; padding:6px 9px; border-radius:6px; max-width:300px; opacity:0; transition:opacity .12s; z-index:50; }
@@ -96,30 +97,21 @@ const PCT = x => (x*100).toFixed(1) + "%";
 const PP = d => (d>=0?"+":"") + (d*100).toFixed(1) + "pp";
 const NBINS = 40;
 
-// Score model. The penalty is a rate: RATE points per weighted major-equivalent
-// issue (major=1.0, minor=0.3) per 1,000 words. score = clamp(0,100, 100 - penalty
-// - abs). Normalizing by characters instead uses each module's character count,
-// calibrated so the rate stays expressed per 1,000 words. The optional absolute
-// penalty (50*0.5*ln(major+1)) is the production term, off by default. Production
-// (the red reference) normalizes by claim count and always keeps the abs penalty.
-const CLAIM_MULT = 50, MINORW = 0.3;
-const DEFAULT_RATE = 35;   // points per weighted major-equivalent per 1,000 words
-let DATA, BYID, KCAL, STATE = { scaleBy:"words", absOn:false, rate:DEFAULT_RATE };
+// Fixed model: RATE points lost per weighted major-equivalent issue (major=1.0,
+// minor=0.3) per 1,000 words. Normalizing by characters uses each module's
+// character count with a coefficient calibrated to the same scale. Production
+// (the red reference) divides by claim count and adds an absolute ln(major) penalty.
+const RATE = 30, MINORW = 0.3, CLAIM_MULT = 50;
+let DATA, BYID, KCAL, CHARS_COEF, STATE = { scaleBy:"words" };
 
-// effective points multiplier on (weighted issues / size). For words: rate*1000.
-// For chars: rescaled by avg chars-per-word so the rate keeps its per-1,000-words meaning.
-function effScale(scaleBy, rate){
-  return rate * 1000 * (scaleBy==="chars" ? KCAL.chars/KCAL.words : 1);
-}
-function scoreWith(d, scaleBy, absOn, rate){
+function coefOf(scaleBy){ return scaleBy==="chars" ? CHARS_COEF : RATE; }   // pts per issue per 1,000 units
+function contentScore(d, scaleBy){
   const size = scaleBy==="chars" ? d.chars : d.words;
   if(!size || size<=0) return null;
-  const pen = effScale(scaleBy, rate) * (d.major + MINORW*d.minor) / size;
-  const abs = absOn ? CLAIM_MULT * 0.5 * Math.log(d.major + 1) : 0;
-  return Math.max(0, Math.min(100, 100 - pen - abs));
+  return Math.max(0, Math.min(100, 100 - coefOf(scaleBy)*1000*(d.major + MINORW*d.minor)/size));
 }
-const activeScore = d => scoreWith(d, STATE.scaleBy, STATE.absOn, STATE.rate);
-function baseScore(d){          // production: claims denominator + abs penalty (fixed)
+const activeScore = d => contentScore(d, STATE.scaleBy);
+function baseScore(d){          // production: claims denominator + abs penalty (fixed reference)
   if(!d.claims) return null;
   const pen = CLAIM_MULT*(d.major+MINORW*d.minor)/d.claims, abs = CLAIM_MULT*0.5*Math.log(d.major+1);
   return Math.max(0, Math.min(100, 100 - pen - abs));
@@ -145,11 +137,12 @@ function render(){
       (${FMT(DATA.meta.n_major)} major, ${FMT(DATA.meta.n_minor)} minor). Re-scoring only — extraction and validation unchanged.</p>
     ${writeupHTML()}
     <div class="controls" id="controls"></div>
+    <div class="eq" id="eq"></div>
     <div class="cards" id="cards"></div>
     <h2>Score distribution</h2>
     <div class="card">
       <p class="legend"><span class="swatch" style="background:#e11d48"></span><b>red outline</b> = production (claims + abs penalty)
-        <span class="swatch" style="background:#2563eb;opacity:.55"></span><b>blue bars</b> = active score</p>
+        <span class="swatch" style="background:#2563eb;opacity:.55"></span><b>blue bars</b> = this model</p>
       <div id="histWrap"></div>
     </div>
     <h2>The same-score group</h2>
@@ -159,26 +152,21 @@ function render(){
     <p class="subtitle">A handful across the failure modes — the same-score cluster, the worst documents, minor-heavy and clean modules. Click to expand the claims that drove each score.</p>
     <div id="featured"></div>
     <h2>All modules</h2>
-    <p class="subtitle">Search any module. Scores update with the controls above. Claim detail is bundled for featured and same-score modules.</p>
+    <p class="subtitle">Search any module. Scores update with the scale-by control above. Claim detail is bundled for featured and same-score modules.</p>
     <input class="search" id="search" placeholder="Search ${FMT(DATA.meta.n_modules)} modules by title…">
     <div id="tableWrap"></div>`;
   renderControls(); renderAll();
   document.getElementById("search").oninput = e => renderTable(e.target.value.toLowerCase());
 }
-function renderAll(){ renderCards(); renderHist(); renderCluster(); renderFeatured(); renderTable(document.getElementById("search")?.value.toLowerCase()||""); }
+function renderAll(){ renderEq(); renderCards(); renderHist(); renderCluster(); renderFeatured(); renderTable(document.getElementById("search")?.value.toLowerCase()||""); }
 
 function writeupHTML(){
   return `
   <details class="writeup" open>
-    <summary>How the score works, and how to tune it</summary>
-    <p>The trust score is a 0–100 measure of error density: severity-weighted issues per unit of content. Higher is better; a clean module is 100.</p>
-    <p class="mono"><code>score = clamp(0, 100, 100 − rate · (1.0·major + 0.3·minor) per 1,000 words)</code></p>
-    <p>Production normalizes by <i>claim count</i> and adds an absolute <code>ln(major)</code> penalty, which pins every single-major module near 81 regardless of size and slams many-major modules to 0. This page normalizes by <i>content</i> so size is comparable, exposes the normalization unit (<b>words</b> or <b>characters</b>) as a switch, and replaces the absolute penalty with a single <b>penalty rate</b>.</p>
-    <ul>
-      <li>The rate is points lost per weighted major-equivalent issue per 1,000 words. At the default <b>35</b>, a really-bad module (≈1 major per 500 words) scores <b>30</b>; the relationship is score-when-really-bad = 100 − 2·rate.</li>
-      <li>A long module with <b>many</b> majors scores <b>low</b>; a long module with <b>few</b> scores high. Length no longer rescues a major-heavy module or flattens the difference.</li>
-      <li>Raise the rate to flag more aggressively; lower it to keep the distribution near the top. Characters vs words barely differ except on code-heavy modules.</li>
-    </ul>
+    <summary>What the trust score measures</summary>
+    <p>The trust score rates each module from 0 to 100 by its error density — how many severity-weighted issues it carries per 1,000 words of content. A module with no flagged issues scores 100, and the score falls as error density rises. Major issues count fully; minor issues count 0.3. The exact formula is below.</p>
+    <p>Normalizing by content rather than by claim count makes modules of different lengths comparable. A long module with many major issues scores low; a long module with few stays high — length neither rescues a major-heavy module nor flattens the difference between them. At 30 points per weighted issue per 1,000 words, a really-bad module (about one major issue every 500 words) scores 40, while a typical module stays in the 90s.</p>
+    <p>Production — the red reference throughout this page — instead divides by claim count and adds an absolute <span class="mono">ln(major)</span> penalty. That penalty does not depend on length, so it pins every single-major module near 81 regardless of size and forces many-major modules to 0. This model removes it.</p>
   </details>`;
 }
 
@@ -187,29 +175,21 @@ function renderControls(){
     <div class="ctl-group"><span class="ctl-label">Scale by</span>
       <div class="seg" id="segScale">
         <button data-s="words" class="${STATE.scaleBy==='words'?'on':''}">Words</button>
-        <button data-s="chars" class="${STATE.scaleBy==='chars'?'on':''}">Characters</button></div></div>
-    <div class="ctl-group"><span class="ctl-label">Penalty rate</span>
-      <div class="spreadrow"><input type="range" id="rate" min="10" max="80" step="1" value="${STATE.rate}">
-        <span class="mono" id="rateVal"></span></div>
-      <span class="note" id="rateNote"></span></div>
-    <div class="ctl-group"><span class="ctl-label">Absolute penalty</span>
-      <div class="seg" id="segAbs">
-        <button data-a="0" class="${!STATE.absOn?'on':''}">Removed</button>
-        <button data-a="1" class="${STATE.absOn?'on':''}">Kept</button></div></div>`;
-  document.querySelectorAll("#segScale button").forEach(b=> b.onclick=()=>{ STATE.scaleBy=b.dataset.s; syncControls(); renderAll(); });
-  document.querySelectorAll("#segAbs button").forEach(b=> b.onclick=()=>{ STATE.absOn=b.dataset.a==="1"; syncControls(); renderAll(); });
-  document.getElementById("rate").oninput = e=>{ STATE.rate=parseFloat(e.target.value); syncControls(); renderAll(); };
-  syncControls();
+        <button data-s="chars" class="${STATE.scaleBy==='chars'?'on':''}">Characters</button></div></div>`;
+  document.querySelectorAll("#segScale button").forEach(b=> b.onclick=()=>{ STATE.scaleBy=b.dataset.s;
+    document.querySelectorAll("#segScale button").forEach(x=>x.classList.toggle("on",x.dataset.s===STATE.scaleBy)); renderAll(); });
 }
-function syncControls(){
-  document.querySelectorAll("#segScale button").forEach(b=> b.classList.toggle("on", b.dataset.s===STATE.scaleBy));
-  document.querySelectorAll("#segAbs button").forEach(b=> b.classList.toggle("on", (b.dataset.a==="1")===STATE.absOn));
-  document.getElementById("rateVal").textContent = STATE.rate + " pts";
-  const reallyBad = Math.max(0, 100 - 2*STATE.rate);
-  const med = stats(DATA.docs.map(activeScore)).median;
-  const normNote = STATE.scaleBy==="chars" ? " (normalized by characters)" : "";
-  document.getElementById("rateNote").innerHTML =
-    `<b>${STATE.rate}</b> points per weighted major-equivalent per 1,000 words${normNote} · really-bad (1 major / 500 words) → <b>${reallyBad}</b> · corpus median → <b>${med.toFixed(0)}</b>`;
+
+function renderEq(){
+  const unit = STATE.scaleBy==="chars" ? "characters" : "words";
+  const coef = coefOf(STATE.scaleBy);
+  const a = stats(DATA.docs.map(activeScore));
+  const reallyBad = Math.max(0, 100 - 2*RATE);                 // reference "really bad" score (40)
+  const perIssue = Math.round(coef*1000/(100-reallyBad));      // content per issue at that score: 500 words / 3,650 chars
+  document.getElementById("eq").innerHTML = `
+    <div class="row">errors per 1,000 ${unit} &nbsp;=&nbsp; ( 1.0 × major &nbsp;+&nbsp; 0.3 × minor ) &nbsp;÷&nbsp; ${unit} &nbsp;×&nbsp; 1,000</div>
+    <div class="row">trust score &nbsp;=&nbsp; max( 0, &nbsp; min( 100, &nbsp; 100 &nbsp;−&nbsp; <b>${coef}</b> × errors per 1,000 ${unit} ) )</div>
+    <div class="cons">clean module → <b>100</b> &nbsp;·&nbsp; really-bad (≈1 major / ${FMT(perIssue)} ${unit}) → <b>${reallyBad}</b> &nbsp;·&nbsp; corpus median → <b>${a.median.toFixed(0)}</b> &nbsp;·&nbsp; ${PCT(a.ge90/a.n)} of modules ≥ 90</div>`;
 }
 
 function renderCards(){
@@ -243,38 +223,30 @@ function renderCluster(){
   const span=ids.length?`${FMT(BYID[ids[0]].chars)}–${FMT(BYID[ids[ids.length-1]].chars)} chars`:"";
   const ratio=ids.length?Math.round(BYID[ids[ids.length-1]].chars/BYID[ids[0]].chars):0;
   document.getElementById("clusterSub").innerHTML =
-    `${ids.length} modules production pins to ~81. Every one has a single major issue; their content spans ${span} (a ${ratio}× range) yet production collapses them into one band. Top lane = production; bottom lane = active score. Larger modules land higher — the same one issue matters less in more content.`;
+    `${ids.length} modules production pins to ~81. Every one has a single major issue; their content spans ${span} (a ${ratio}× range) yet production collapses them into one band. Top lane = production; bottom lane = this model. Larger modules land higher — the same one issue matters less in more content.`;
   const W=1040,H=210,pad=40,axW=W-2*pad,X=v=>pad+axW*v/100,laneA=64,laneB=150;
   let s=`<svg viewBox="0 0 ${W} ${H}">`;
   s+=`<line x1="${pad}" y1="${H-22}" x2="${pad+axW}" y2="${H-22}" stroke="#ddd"/>`;
   [0,20,40,60,80,100].forEach(t=>{ s+=`<line x1="${X(t)}" y1="40" x2="${X(t)}" y2="${H-22}" stroke="#f0f0f0"/><text x="${X(t)}" y="${H-8}" font-size="10" fill="#999" text-anchor="middle">${t}</text>`; });
   s+=`<text x="${pad}" y="${laneA-26}" class="lane-label">Production (claims + abs)</text>`;
-  s+=`<text x="${pad}" y="${laneB-26}" class="lane-label">Active: ${STATE.scaleBy}, abs ${STATE.absOn?"kept":"removed"}, ${STATE.rate} pts/1k words</text>`;
+  s+=`<text x="${pad}" y="${laneB-26}" class="lane-label">This model: ${STATE.scaleBy}, ${coefOf(STATE.scaleBy)} pts per issue / 1,000 ${STATE.scaleBy}</text>`;
   ids.forEach((id,i)=>{ const d=BYID[id], off=((i%7)-3)*5, xb=X(baseScore(d));
     s+=`<circle class="dot" data-id="${id}" cx="${xb.toFixed(1)}" cy="${laneA+off}" r="4.5" fill="#e11d48" fill-opacity="0.75"/>`;
     s+=`<circle class="dot act" data-id="${id}" cx="${xb.toFixed(1)}" cy="${laneB+off}" r="4.5" fill="#2563eb" fill-opacity="0.7"/>`; });
   s+=`</svg>`;
   document.getElementById("beeswarm").innerHTML=s;
   document.querySelectorAll("#beeswarm .dot").forEach(c=>{
-    c.onmousemove=ev=>{ const d=BYID[c.dataset.id]; showTip(ev,`${esc(d.title||d.id)}<br>${FMT(d.chars)} chars · ${d.claims} claims · ${d.major} major / ${d.minor} minor<br>production ${baseScore(d).toFixed(1)} → active ${(activeScore(d)??0).toFixed(1)}`); };
+    c.onmousemove=ev=>{ const d=BYID[c.dataset.id]; showTip(ev,`${esc(d.title||d.id)}<br>${FMT(d.chars)} chars · ${d.claims} claims · ${d.major} major / ${d.minor} minor<br>production ${baseScore(d).toFixed(1)} → this model ${(activeScore(d)??0).toFixed(1)}`); };
     c.onmouseleave=hideTip; });
   requestAnimationFrame(()=> document.querySelectorAll("#beeswarm .dot.act").forEach(c=> c.setAttribute("cx", X(activeScore(BYID[c.dataset.id])??0).toFixed(1))));
 }
 
-function chipConfigs(){
-  return [
-    {label:"production", base:true},
-    {label:"words", sb:"words", abs:false},
-    {label:"words +abs", sb:"words", abs:true},
-    {label:"characters", sb:"chars", abs:false},
-  ];
-}
 function scoreChips(d){
-  return chipConfigs().map(c=>{
-    const v = c.base ? baseScore(d) : scoreWith(d, c.sb, c.abs, STATE.rate);
-    const isActive = !c.base && c.sb===STATE.scaleBy && c.abs===STATE.absOn;
-    const cls = c.base?"bk":(isActive?"ak":"");
-    return `<span class="chip ${cls}"><span class="cl">${c.label}</span> ${v===null?'—':v.toFixed(1)}</span>`;
+  const cfg=[{label:"production",base:true},{label:"words",sb:"words"},{label:"characters",sb:"chars"}];
+  return cfg.map(c=>{
+    const v = c.base ? baseScore(d) : contentScore(d, c.sb);
+    const isActive = !c.base && c.sb===STATE.scaleBy;
+    return `<span class="chip ${c.base?"bk":(isActive?"ak":"")}"><span class="cl">${c.label}</span> ${v===null?'—':v.toFixed(1)}</span>`;
   }).join("");
 }
 function claimsHTML(id){
@@ -291,7 +263,7 @@ function renderFeatured(){
     return `<div class="fcard" data-id="${id}"><div class="fhead">
         <span class="ftitle">${esc(d.title||d.id)}</span>
         <span class="ftag">${FMT(d.chars)} chars · ${FMT(d.words)} words · ${d.major}maj/${d.minor}min</span>
-        <span class="fscore">prod <b>${b===null?'—':b.toFixed(0)}</b> → active <b style="color:#1a56db">${a===null?'—':a.toFixed(0)}</b></span>
+        <span class="fscore">prod <b>${b===null?'—':b.toFixed(0)}</b> → <b style="color:#1a56db">${a===null?'—':a.toFixed(0)}</b></span>
       </div><div class="fbody"><div class="varbar">${scoreChips(d)}</div>
         ${d.url?`<p class="reason"><a href="${d.url}" target="_blank" rel="noopener">open module ↗</a></p>`:""}
         <div class="claimwrap"></div></div></div>`;
@@ -306,7 +278,7 @@ function renderTable(qraw){
   const q=(qraw||"").trim();
   let rows=DATA.docs; if(q) rows=rows.filter(d=>(d.title||"").toLowerCase().includes(q));
   const shown=rows.slice(0,60);
-  let h=`<table class="tbl"><thead><tr><th>module</th><th>words</th><th>claims</th><th>maj/min</th><th>production</th><th>active</th><th>Δ</th></tr></thead><tbody>`;
+  let h=`<table class="tbl"><thead><tr><th>module</th><th>words</th><th>claims</th><th>maj/min</th><th>production</th><th>this model</th><th>Δ</th></tr></thead><tbody>`;
   for(const d of shown){ const b=baseScore(d), a=activeScore(d), dl=(a!==null&&b!==null)?a-b:null;
     const dcls=dl===null?"":(Math.abs(dl)<0.05?"flat":(dl>0?"up":"down")), hasC=!!DATA.claims[d.id];
     h+=`<tr class="detail" data-id="${d.id}"><td>${esc((d.title||d.id).slice(0,70))}${hasC?' <span class="ftag">claims</span>':''}</td>
@@ -331,6 +303,7 @@ async function init(){
     const r=await fetch("explorer_data/candidates.json"); if(!r.ok) throw new Error("HTTP "+r.status);
     DATA=await r.json(); BYID=Object.fromEntries(DATA.docs.map(d=>[d.id,d]));
     KCAL={ chars:DATA.calibration.chars, words:DATA.calibration.words };
+    CHARS_COEF = Math.round(RATE * KCAL.chars / KCAL.words);   // ~219: equivalent rate per 1,000 chars
     render();
   }catch(e){
     document.getElementById("app").innerHTML=`<div class="error"><p>Could not load <code>explorer_data/candidates.json</code>.</p><p class="reason">${esc(e.message)}</p></div>`;
