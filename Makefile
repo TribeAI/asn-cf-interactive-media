@@ -69,7 +69,7 @@ COVERAGE_FILES := \
 	public/ontology/gap-explorer/topic_coverage.json \
 	public/ontology/gap-explorer/external_coverage.json
 
-.PHONY: help data data-ontology data-jtbd data-ontology-graph data-coverage data-scoring data-refresh serve clean check-ontology-repo check-cf-repo
+.PHONY: help data data-ontology data-jtbd data-ontology-graph data-coverage data-scoring data-refresh serve clean package-scoring check-ontology-repo check-cf-repo
 
 help:
 	@echo "Targets:"
@@ -77,6 +77,7 @@ help:
 	@echo "  make data-scoring   Build /scoring-model/ candidates.json from the CF repo."
 	@echo "  make data-refresh   Regenerate viz data in the source repos, then pull."
 	@echo "  make serve          Run a local static server on port 8000."
+	@echo "  make package-scoring  Build a self-contained, shareable /scoring-model/ zip in dist/."
 	@echo "  make clean          Remove externally-sourced data files from public/."
 	@echo ""
 	@echo "Variables:"
@@ -199,6 +200,9 @@ data-refresh: check-ontology-repo
 
 serve:
 	python3 -m http.server -d public 8000
+
+package-scoring:
+	python3 scripts/package_scoring_model.py
 
 clean:
 	rm -f $(ONTOLOGY_FILES) $(JTBD_FILES) $(ONTGRAPH_FILES)

@@ -340,15 +340,22 @@ function showTip(ev,html){ tip.innerHTML=html; tip.style.opacity=1; tip.style.le
 function hideTip(){ tip.style.opacity=0; }
 function esc(s){ return (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
 
+async function loadData(){
+  // Self-contained builds embed the data in a <script id="scoring-data"> island;
+  // the served site fetches it instead.
+  const inline=document.getElementById("scoring-data");
+  if(inline) return JSON.parse(inline.textContent);
+  const r=await fetch("explorer_data/candidates.json"); if(!r.ok) throw new Error("HTTP "+r.status);
+  return r.json();
+}
 async function init(){
   try{
-    const r=await fetch("explorer_data/candidates.json"); if(!r.ok) throw new Error("HTTP "+r.status);
-    DATA=await r.json(); BYID=Object.fromEntries(DATA.docs.map(d=>[d.id,d]));
+    DATA=await loadData(); BYID=Object.fromEntries(DATA.docs.map(d=>[d.id,d]));
     KCAL={ chars:DATA.calibration.chars, words:DATA.calibration.words };
     CHARS_COEF = Math.round(RATE * KCAL.chars / KCAL.words);   // ~219: equivalent rate per 1,000 chars
     render();
   }catch(e){
-    document.getElementById("app").innerHTML=`<div class="error"><p>Could not load <code>explorer_data/candidates.json</code>.</p><p class="reason">${esc(e.message)}</p></div>`;
+    document.getElementById("app").innerHTML=`<div class="error"><p>Could not load scoring data.</p><p class="reason">${esc(e.message)}</p><p class="reason">Open this page through a local server (<code>python3 -m http.server</code>) or use the self-contained build.</p></div>`;
   }
 }
 init();
