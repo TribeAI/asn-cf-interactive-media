@@ -291,7 +291,7 @@ function renderCluster(){
   const pv=ids.map(i=>baseScore(BYID[i])), av=ids.map(i=>activeScore(BYID[i]));
   const pmin=Math.min(...pv),pmax=Math.max(...pv),amin=Math.min(...av),amax=Math.max(...av);
   document.getElementById("clusterSub").innerHTML =
-    `These <b>${ids.length}</b> modules were one of Jesus's main complaints: production scores them <b>${pmin.toFixed(1)}–${pmax.toFixed(1)}</b> — a ${(pmax-pmin).toFixed(1)}-point band — even though their content spans ${span} (a ${ratio}× range) and each has just a single major issue. This model spreads them to <b>${amin.toFixed(0)}–${amax.toFixed(0)}</b> (${(amax-amin).toFixed(0)} points), ordered by length: the more content a single issue sits in, the less it weighs. Top lane = production; bottom lane = this model.`;
+    `These <b>${ids.length}</b> modules highlight a primary concern with the production score: it scores them <b>${pmin.toFixed(1)}–${pmax.toFixed(1)}</b> — a ${(pmax-pmin).toFixed(1)}-point band — even though their content spans ${span} (a ${ratio}× range) and each has just a single major issue. This model spreads them to <b>${amin.toFixed(0)}–${amax.toFixed(0)}</b> (${(amax-amin).toFixed(0)} points), ordered by length: the more content a single issue sits in, the less it weighs. Top lane = production; bottom lane = this model.`;
   const W=1040,H=210,pad=40,axW=W-2*pad,X=v=>pad+axW*v/100,laneA=64,laneB=150;
   let s=`<svg viewBox="0 0 ${W} ${H}">`;
   s+=`<line x1="${pad}" y1="${H-22}" x2="${pad+axW}" y2="${H-22}" stroke="#ddd"/>`;
