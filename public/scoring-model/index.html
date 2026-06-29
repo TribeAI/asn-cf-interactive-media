@@ -80,8 +80,15 @@ table.tbl { width:100%; border-collapse:collapse; font-size:0.84rem; }
 table.tbl th, table.tbl td { padding:6px 9px; border-bottom:1px solid #eee; text-align:right; }
 table.tbl th:first-child, table.tbl td:first-child { text-align:left; }
 table.tbl th { color:#666; font-weight:600; }
+table.tbl th.sortable { cursor:pointer; user-select:none; white-space:nowrap; }
+table.tbl th.sortable:hover { color:#1a56db; }
+table.tbl th .arrow { color:#1a56db; margin-left:3px; font-size:0.7rem; }
 table.tbl tr.detail { cursor:pointer; } table.tbl tr.detail:hover { background:#f6f8fb; }
 .tnum { font-variant-numeric:tabular-nums; }
+.pager { display:flex; align-items:center; gap:12px; justify-content:flex-end; margin-top:12px; font-size:0.84rem; color:#555; font-variant-numeric:tabular-nums; }
+.pager button { border:1px solid #cdd3da; background:#fff; border-radius:7px; padding:5px 12px; cursor:pointer; font-size:0.84rem; color:#333; }
+.pager button:hover:not(:disabled) { border-color:#1a56db; color:#1a56db; }
+.pager button:disabled { opacity:0.4; cursor:default; }
 .tip { position:fixed; pointer-events:none; background:#1f2937; color:#fff; font-size:0.78rem; padding:6px 9px; border-radius:6px; max-width:300px; opacity:0; transition:opacity .12s; z-index:50; }
 </style>
 </head>
@@ -101,8 +108,8 @@ const NBINS = 40;
 // minor=0.3) per 1,000 words. Normalizing by characters uses each module's
 // character count with a coefficient calibrated to the same scale. Production
 // (the red reference) divides by claim count and adds an absolute ln(major) penalty.
-const RATE = 30, MINORW = 0.3, CLAIM_MULT = 50;
-let DATA, BYID, KCAL, CHARS_COEF, STATE = { scaleBy:"words" };
+const RATE = 30, MINORW = 0.3, CLAIM_MULT = 50, PAGE_SIZE = 50;
+let DATA, BYID, KCAL, CHARS_COEF, STATE = { scaleBy:"words", sortCol:"active", sortDir:"asc", page:0 };
 
 const FLOOR_T = 25;   // at/above this the score is the raw line; below it the score eases toward 0
 function softFloor(raw){ return raw >= FLOOR_T ? Math.min(100, raw) : FLOOR_T*Math.exp((raw-FLOOR_T)/FLOOR_T); }
@@ -158,7 +165,7 @@ function render(){
     <input class="search" id="search" placeholder="Search ${FMT(DATA.meta.n_modules)} modules by title…">
     <div id="tableWrap"></div>`;
   renderControls(); renderAll();
-  document.getElementById("search").oninput = e => renderTable(e.target.value.toLowerCase());
+  document.getElementById("search").oninput = e => { STATE.page=0; renderTable(e.target.value.toLowerCase()); };
 }
 function renderAll(){ renderEq(); renderCards(); renderHist(); renderCluster(); renderFeatured(); renderTable(document.getElementById("search")?.value.toLowerCase()||""); }
 
@@ -278,11 +285,27 @@ function renderFeatured(){
   });
 }
 
+function sortVal(d,col){
+  if(col==="title") return (d.title||d.id).toLowerCase();
+  if(col==="words") return d.words;
+  if(col==="claims") return d.claims;
+  if(col==="majmin") return d.major*10000 + d.minor;
+  if(col==="prod"){ const v=baseScore(d); return v===null?-1:v; }
+  if(col==="active"){ const v=activeScore(d); return v===null?-1:v; }
+  if(col==="delta"){ const a=activeScore(d), b=baseScore(d); return (a!==null&&b!==null)?a-b:-1e9; }
+  return 0;
+}
 function renderTable(qraw){
   const q=(qraw||"").trim();
   let rows=DATA.docs; if(q) rows=rows.filter(d=>(d.title||"").toLowerCase().includes(q));
-  const shown=rows.slice(0,60);
-  let h=`<table class="tbl"><thead><tr><th>module</th><th>words</th><th>claims</th><th>maj/min</th><th>production</th><th>this model</th><th>Δ</th></tr></thead><tbody>`;
+  const col=STATE.sortCol, dir=STATE.sortDir, sgn=dir==="asc"?1:-1;
+  rows=rows.slice().sort((x,y)=>{ const vx=sortVal(x,col), vy=sortVal(y,col); return (vx<vy?-1:vx>vy?1:0)*sgn; });
+  const total=rows.length, pages=Math.max(1,Math.ceil(total/PAGE_SIZE));
+  STATE.page=Math.min(Math.max(0,STATE.page),pages-1);
+  const start=STATE.page*PAGE_SIZE, shown=rows.slice(start,start+PAGE_SIZE);
+  const arrow=c=> col===c?`<span class="arrow">${dir==="asc"?"▲":"▼"}</span>`:"";
+  const th=(c,label)=>`<th class="sortable" data-col="${c}">${label}${arrow(c)}</th>`;
+  let h=`<table class="tbl"><thead><tr>${th("title","module")}${th("words","words")}${th("claims","claims")}${th("majmin","maj/min")}${th("prod","production")}${th("active","this model")}${th("delta","Δ")}</tr></thead><tbody>`;
   for(const d of shown){ const b=baseScore(d), a=activeScore(d), dl=(a!==null&&b!==null)?a-b:null;
     const dcls=dl===null?"":(Math.abs(dl)<0.05?"flat":(dl>0?"up":"down")), hasC=!!DATA.claims[d.id];
     h+=`<tr class="detail" data-id="${d.id}"><td>${esc((d.title||d.id).slice(0,70))}${hasC?' <span class="ftag">claims</span>':''}</td>
@@ -290,8 +313,23 @@ function renderTable(qraw){
       <td class="tnum">${b===null?'—':b.toFixed(1)}</td><td class="tnum">${a===null?'—':a.toFixed(1)}</td>
       <td class="tnum ${dcls}">${dl===null?'—':(dl>=0?'+':'')+dl.toFixed(1)}</td></tr>`; }
   h+=`</tbody></table>`;
-  if(rows.length>shown.length) h+=`<p class="reason" style="margin-top:8px">showing ${shown.length} of ${FMT(rows.length)} matches — refine the search</p>`;
+  h+=`<div class="pager">
+      <button data-pg="first" ${STATE.page===0?"disabled":""}>« First</button>
+      <button data-pg="prev" ${STATE.page===0?"disabled":""}>‹ Prev</button>
+      <span>${total?FMT(start+1):0}–${FMT(Math.min(start+PAGE_SIZE,total))} of ${FMT(total)}</span>
+      <button data-pg="next" ${STATE.page>=pages-1?"disabled":""}>Next ›</button>
+      <button data-pg="last" ${STATE.page>=pages-1?"disabled":""}>Last »</button></div>`;
   document.getElementById("tableWrap").innerHTML=h;
+  document.querySelectorAll("#tableWrap th.sortable").forEach(thEl=> thEl.onclick=()=>{
+    const c=thEl.dataset.col;
+    if(STATE.sortCol===c) STATE.sortDir = STATE.sortDir==="asc"?"desc":"asc";
+    else { STATE.sortCol=c; STATE.sortDir = c==="title"?"asc":"desc"; }
+    STATE.page=0; renderTable(q);
+  });
+  document.querySelectorAll("#tableWrap .pager button").forEach(b=> b.onclick=()=>{
+    const a=b.dataset.pg; STATE.page = a==="first"?0 : a==="prev"?STATE.page-1 : a==="next"?STATE.page+1 : pages-1;
+    renderTable(q);
+  });
   document.querySelectorAll("#tableWrap tr.detail").forEach(tr=>{ tr.onclick=()=>{ if(!DATA.claims[tr.dataset.id]) return;
     const ex=tr.nextElementSibling; if(ex&&ex.classList.contains("expand")){ ex.remove(); return; }
     const td=document.createElement("tr"); td.className="expand"; td.innerHTML=`<td colspan="7" style="background:#f9fafb">${claimsHTML(tr.dataset.id)}</td>`; tr.after(td); }; });
