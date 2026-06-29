@@ -104,11 +104,13 @@ const NBINS = 40;
 const RATE = 30, MINORW = 0.3, CLAIM_MULT = 50;
 let DATA, BYID, KCAL, CHARS_COEF, STATE = { scaleBy:"words" };
 
+const FLOOR_T = 25;   // at/above this the score is the raw line; below it the score eases toward 0
+function softFloor(raw){ return raw >= FLOOR_T ? Math.min(100, raw) : FLOOR_T*Math.exp((raw-FLOOR_T)/FLOOR_T); }
 function coefOf(scaleBy){ return scaleBy==="chars" ? CHARS_COEF : RATE; }   // pts per issue per 1,000 units
 function contentScore(d, scaleBy){
   const size = scaleBy==="chars" ? d.chars : d.words;
   if(!size || size<=0) return null;
-  return Math.max(0, Math.min(100, 100 - coefOf(scaleBy)*1000*(d.major + MINORW*d.minor)/size));
+  return softFloor(100 - coefOf(scaleBy)*1000*(d.major + MINORW*d.minor)/size);
 }
 const activeScore = d => contentScore(d, STATE.scaleBy);
 function baseScore(d){          // production: claims denominator + abs penalty (fixed reference)
@@ -122,7 +124,7 @@ function stats(vals){
   const q=p=>v[Math.min(Math.floor(p*n),n-1)];
   return { n, mean:v.reduce((a,b)=>a+b,0)/n, median:q(.5), p25:q(.25), p5:q(.05),
            ge90:v.filter(x=>x>=90).length, flag:v.filter(x=>x<90).length,
-           lt30:v.filter(x=>x<30).length, zero:v.filter(x=>x===0).length };
+           lt30:v.filter(x=>x<30).length, zero:v.filter(x=>x<0.5).length };  // displayed 0 (rounds to 0)
 }
 function hist(vals,nbins=NBINS){
   const c=new Array(nbins).fill(0), w=100/nbins;
@@ -165,7 +167,7 @@ function writeupHTML(){
   <details class="writeup" open>
     <summary>What the trust score measures</summary>
     <p>The trust score rates each module from 0 to 100 by its error density — how many severity-weighted issues it carries per 1,000 words of content. A module with no flagged issues scores 100, and the score falls as error density rises. Major issues count fully; minor issues count 0.3. The exact formula is below.</p>
-    <p>Normalizing by content rather than by claim count makes modules of different lengths comparable. A long module with many major issues scores low; a long module with few stays high — length neither rescues a major-heavy module nor flattens the difference between them. At 30 points per weighted issue per 1,000 words, a really-bad module (about one major issue every 500 words) scores 40, while a typical module stays in the 90s.</p>
+    <p>Normalizing by content rather than by claim count makes modules of different lengths comparable. A long module with many major issues scores low; a long module with few stays high — length neither rescues a major-heavy module nor flattens the difference between them. At 30 points per weighted issue per 1,000 words, a really-bad module (about one major issue every 500 words) scores 40, while a typical module stays in the 90s. A soft floor keeps merely-bad modules from collapsing onto 0 — only the most error-dense modules (roughly one issue per 175 words or worse) reach 0.</p>
     <p>Production — the red reference throughout this page — instead divides by claim count and adds an absolute <span class="mono">ln(major)</span> penalty. That penalty does not depend on length, so it pins every single-major module near 81 regardless of size and forces many-major modules to 0. This model removes it.</p>
   </details>`;
 }
@@ -186,10 +188,12 @@ function renderEq(){
   const a = stats(DATA.docs.map(activeScore));
   const reallyBad = Math.max(0, 100 - 2*RATE);                 // reference "really bad" score (40)
   const perIssue = Math.round(coef*1000/(100-reallyBad));      // content per issue at that score: 500 words / 3,650 chars
+  const zeros = DATA.docs.map(activeScore).filter(s=>s!==null && s<0.5).length;
   document.getElementById("eq").innerHTML = `
     <div class="row">errors per 1,000 ${unit} &nbsp;=&nbsp; ( 1.0 × major &nbsp;+&nbsp; 0.3 × minor ) &nbsp;÷&nbsp; ${unit} &nbsp;×&nbsp; 1,000</div>
-    <div class="row">trust score &nbsp;=&nbsp; max( 0, &nbsp; min( 100, &nbsp; 100 &nbsp;−&nbsp; <b>${coef}</b> × errors per 1,000 ${unit} ) )</div>
-    <div class="cons">clean module → <b>100</b> &nbsp;·&nbsp; really-bad (≈1 major / ${FMT(perIssue)} ${unit}) → <b>${reallyBad}</b> &nbsp;·&nbsp; corpus median → <b>${a.median.toFixed(0)}</b> &nbsp;·&nbsp; ${PCT(a.ge90/a.n)} of modules ≥ 90</div>`;
+    <div class="row">raw &nbsp;=&nbsp; 100 &nbsp;−&nbsp; <b>${coef}</b> × errors per 1,000 ${unit}</div>
+    <div class="row">trust score &nbsp;=&nbsp; raw, &nbsp; or &nbsp; 25 × e<sup>(raw − 25) / 25</sup> &nbsp; when raw &lt; 25 &nbsp;&nbsp;<span style="color:#888">← soft floor</span></div>
+    <div class="cons">clean module → <b>100</b> &nbsp;·&nbsp; really-bad (≈1 major / ${FMT(perIssue)} ${unit}) → <b>${reallyBad}</b> &nbsp;·&nbsp; corpus median → <b>${a.median.toFixed(0)}</b> &nbsp;·&nbsp; only the <b>${zeros}</b> most error-dense modules reach 0</div>`;
 }
 
 function renderCards(){
