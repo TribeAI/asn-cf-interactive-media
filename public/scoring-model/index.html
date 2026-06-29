@@ -48,6 +48,18 @@ details.writeup[open] > summary::before { content:"▾ "; }
 .metric .d { font-size:0.8rem; font-weight:600; margin-top:3px; }
 .up { color:#15803d; } .down { color:#b91c1c; } .flat { color:#999; }
 @media (max-width:720px){ .cards{ grid-template-columns:repeat(2,1fr);} }
+.bands { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 16px; }
+.band { display:inline-flex; align-items:center; gap:7px; font-size:0.8rem; color:#444; border:1px solid #eaeaea; border-radius:8px; padding:5px 11px; }
+.band .sw { width:11px; height:11px; border-radius:3px; flex:none; }
+.band .rg { font-variant-numeric:tabular-nums; color:#888; font-size:0.74rem; }
+.changed { background:#fff; border:1px solid #e6e6e6; border-radius:10px; padding:15px 18px; margin-bottom:14px; }
+.changed .hd { font-size:0.72rem; text-transform:uppercase; letter-spacing:0.04em; color:#888; font-weight:600; margin-bottom:11px; }
+.chgrow { display:flex; flex-wrap:wrap; gap:30px; margin-bottom:8px; }
+.chstat { display:flex; flex-direction:column; }
+.chstat .k { font-size:0.74rem; color:#888; }
+.chstat .v { font-size:1.2rem; font-weight:700; font-variant-numeric:tabular-nums; }
+.chstat .v small { font-size:0.74rem; font-weight:400; color:#999; }
+.dot-band { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; vertical-align:middle; }
 
 .card { background:#fff; border:1px solid #e6e6e6; border-radius:10px; padding:18px 20px; margin-bottom:14px; }
 .legend { font-size:0.82rem; color:#666; margin:4px 0 0; }
@@ -109,6 +121,16 @@ const NBINS = 40;
 // character count with a coefficient calibrated to the same scale. Production
 // (the red reference) divides by claim count and adds an absolute ln(major) penalty.
 const RATE = 30, MINORW = 0.3, CLAIM_MULT = 50, PAGE_SIZE = 50;
+const PCT0 = x => Math.round(x*100) + "%";
+const SGN = x => (x>=0?"+":"") + x.toFixed(1);
+// human-readable interpretation of the 0-100 score, by error-density band
+const BANDS = [
+  {lo:90, hi:100, label:"Low issue density — broadly trustworthy", c:"#15803d"},
+  {lo:70, hi:90,  label:"Some issues for its length — worth a look", c:"#ca8a04"},
+  {lo:40, hi:70,  label:"Elevated issue density — review", c:"#ea580c"},
+  {lo:0,  hi:40,  label:"Very high issue density — likely needs rework", c:"#b91c1c"},
+];
+function bandOf(s){ return s===null||s===undefined ? null : (BANDS.find(b=>s>=b.lo) || BANDS[BANDS.length-1]); }
 let DATA, BYID, KCAL, CHARS_COEF, STATE = { scaleBy:"words", sortCol:"active", sortDir:"asc", page:0 };
 
 const FLOOR_T = 25;   // at/above this the score is the raw line; below it the score eases toward 0
@@ -147,7 +169,9 @@ function render(){
     ${writeupHTML()}
     <div class="controls" id="controls"></div>
     <div class="eq" id="eq"></div>
+    <div class="bands">${BANDS.map(b=>`<span class="band"><span class="sw" style="background:${b.c}"></span><span class="rg">${b.lo}–${b.hi}</span> ${b.label}</span>`).join("")}</div>
     <div class="cards" id="cards"></div>
+    <div class="changed" id="changed"></div>
     <h2>Score distribution</h2>
     <div class="card">
       <p class="legend"><span class="swatch" style="background:#e11d48"></span><b>red outline</b> = production (claims + abs penalty)
@@ -167,7 +191,33 @@ function render(){
   renderControls(); renderAll();
   document.getElementById("search").oninput = e => { STATE.page=0; renderTable(e.target.value.toLowerCase()); };
 }
-function renderAll(){ renderEq(); renderCards(); renderHist(); renderCluster(); renderFeatured(); renderTable(document.getElementById("search")?.value.toLowerCase()||""); }
+function renderAll(){ renderEq(); renderCards(); renderChanged(); renderHist(); renderCluster(); renderFeatured(); renderTable(document.getElementById("search")?.value.toLowerCase()||""); }
+
+function renderChanged(){
+  const rows=DATA.docs.map(d=>[baseScore(d),activeScore(d)]).filter(([p,a])=>p!==null&&a!==null);
+  const n=rows.length;
+  const pz=rows.filter(([p])=>p<0.5).length, az=rows.filter(([,a])=>a<0.5).length;
+  const dl=rows.map(([p,a])=>a-p).sort((x,y)=>x-y);
+  const changed=dl.filter(x=>Math.abs(x)>=0.5).length, moved5=dl.filter(x=>Math.abs(x)>=5).length;
+  const up=dl.filter(x=>x>0.5).length, down=dl.filter(x=>x<-0.5).length;
+  const mean=dl.reduce((s,x)=>s+x,0)/n, med=dl[Math.floor(n/2)];
+  const bdefs=[["≤−20",x=>x<=-20],["−20…−5",x=>x>-20&&x<=-5],["−5…−1",x=>x>-5&&x<=-1],["−1…+1",x=>x>-1&&x<1],["+1…+5",x=>x>=1&&x<5],["+5…+20",x=>x>=5&&x<20],["≥+20",x=>x>=20]];
+  const counts=bdefs.map(([,f])=>dl.filter(f).length), maxc=Math.max(...counts,1);
+  const W=760,H=92,base=72,maxh=40,bw=W/counts.length; let bars="";
+  counts.forEach((c,i)=>{ const h=maxh*c/maxc, col=i<3?"#b91c1c":(i===3?"#9ca3af":"#15803d");
+    bars+=`<rect x="${(i*bw+8).toFixed(1)}" y="${(base-h).toFixed(1)}" width="${(bw-16).toFixed(1)}" height="${h.toFixed(1)}" fill="${col}" fill-opacity="0.55"/>`
+        + `<text x="${(i*bw+bw/2).toFixed(1)}" y="${(base-h-3).toFixed(1)}" font-size="9.5" fill="#666" text-anchor="middle">${c}</text>`
+        + `<text x="${(i*bw+bw/2).toFixed(1)}" y="86" font-size="9.5" fill="#999" text-anchor="middle">${bdefs[i][0]}</text>`; });
+  document.getElementById("changed").innerHTML=`
+    <div class="hd">What changed vs production</div>
+    <div class="chgrow">
+      <div class="chstat"><span class="k">modules scored 0</span><span class="v">${pz} → ${az}</span></div>
+      <div class="chstat"><span class="k">scores changed</span><span class="v">${PCT0(changed/n)} <small>(${PCT0(moved5/n)} by ≥5 pts)</small></span></div>
+      <div class="chstat"><span class="k">average change</span><span class="v">${SGN(mean)} <small>(median ${SGN(med)})</small></span></div>
+      <div class="chstat"><span class="k">direction</span><span class="v"><span class="up">${PCT0(up/n)} ↑</span> &nbsp;<span class="down">${PCT0(down/n)} ↓</span></span></div>
+    </div>
+    <svg viewBox="0 0 ${W} ${H}" style="max-width:780px"><text x="8" y="12" font-size="9.5" fill="#999">distribution of change (this model − production), in points</text>${bars}</svg>`;
+}
 
 function writeupHTML(){
   return `
@@ -233,8 +283,10 @@ function renderCluster(){
   const ids=DATA.cluster81;
   const span=ids.length?`${FMT(BYID[ids[0]].chars)}–${FMT(BYID[ids[ids.length-1]].chars)} chars`:"";
   const ratio=ids.length?Math.round(BYID[ids[ids.length-1]].chars/BYID[ids[0]].chars):0;
+  const pv=ids.map(i=>baseScore(BYID[i])), av=ids.map(i=>activeScore(BYID[i]));
+  const pmin=Math.min(...pv),pmax=Math.max(...pv),amin=Math.min(...av),amax=Math.max(...av);
   document.getElementById("clusterSub").innerHTML =
-    `${ids.length} modules production pins to ~81. Every one has a single major issue; their content spans ${span} (a ${ratio}× range) yet production collapses them into one band. Top lane = production; bottom lane = this model. Larger modules land higher — the same one issue matters less in more content.`;
+    `These <b>${ids.length}</b> modules were one of Jesus's main complaints: production scores them <b>${pmin.toFixed(1)}–${pmax.toFixed(1)}</b> — a ${(pmax-pmin).toFixed(1)}-point band — even though their content spans ${span} (a ${ratio}× range) and each has just a single major issue. This model spreads them to <b>${amin.toFixed(0)}–${amax.toFixed(0)}</b> (${(amax-amin).toFixed(0)} points), ordered by length: the more content a single issue sits in, the less it weighs. Top lane = production; bottom lane = this model.`;
   const W=1040,H=210,pad=40,axW=W-2*pad,X=v=>pad+axW*v/100,laneA=64,laneB=150;
   let s=`<svg viewBox="0 0 ${W} ${H}">`;
   s+=`<line x1="${pad}" y1="${H-22}" x2="${pad+axW}" y2="${H-22}" stroke="#ddd"/>`;
@@ -274,8 +326,10 @@ function renderFeatured(){
     return `<div class="fcard" data-id="${id}"><div class="fhead">
         <span class="ftitle">${esc(d.title||d.id)}</span>
         <span class="ftag">${FMT(d.chars)} chars · ${FMT(d.words)} words · ${d.major}maj/${d.minor}min</span>
-        <span class="fscore">prod <b>${b===null?'—':b.toFixed(0)}</b> → <b style="color:#1a56db">${a===null?'—':a.toFixed(0)}</b></span>
-      </div><div class="fbody"><div class="varbar">${scoreChips(d)}</div>
+        <span class="fscore">prod <b>${b===null?'—':b.toFixed(0)}</b> → <span class="dot-band" style="background:${bandOf(a)?.c||'#ccc'}"></span><b style="color:#1a56db">${a===null?'—':a.toFixed(0)}</b></span>
+      </div><div class="fbody">
+        ${a===null?'':`<div style="font-size:0.83rem;color:${bandOf(a).c};font-weight:600;margin-top:10px">${a.toFixed(0)} — ${bandOf(a).label}</div>`}
+        <div class="varbar">${scoreChips(d)}</div>
         ${d.url?`<p class="reason"><a href="${d.url}" target="_blank" rel="noopener">open module ↗</a></p>`:""}
         <div class="claimwrap"></div></div></div>`;
   }).join("");
@@ -310,7 +364,7 @@ function renderTable(qraw){
     const dcls=dl===null?"":(Math.abs(dl)<0.05?"flat":(dl>0?"up":"down")), hasC=!!DATA.claims[d.id];
     h+=`<tr class="detail" data-id="${d.id}"><td>${esc((d.title||d.id).slice(0,70))}${hasC?' <span class="ftag">claims</span>':''}</td>
       <td class="tnum">${FMT(d.words)}</td><td class="tnum">${d.claims}</td><td class="tnum">${d.major}/${d.minor}</td>
-      <td class="tnum">${b===null?'—':b.toFixed(1)}</td><td class="tnum">${a===null?'—':a.toFixed(1)}</td>
+      <td class="tnum">${b===null?'—':b.toFixed(1)}</td><td class="tnum">${a===null?'—':`<span class="dot-band" style="background:${bandOf(a).c}"></span>${a.toFixed(1)}`}</td>
       <td class="tnum ${dcls}">${dl===null?'—':(dl>=0?'+':'')+dl.toFixed(1)}</td></tr>`; }
   h+=`</tbody></table>`;
   h+=`<div class="pager">
