@@ -166,12 +166,27 @@ function render(){
     <h1>Content Trust Score — scoring model</h1>
     <p class="subtitle">Run <b>${DATA.meta.run}</b> · ${FMT(DATA.meta.n_modules)} modules · ${FMT(DATA.meta.n_claims)} claims
       (${FMT(DATA.meta.n_major)} major, ${FMT(DATA.meta.n_minor)} minor). Re-scoring only — extraction and validation unchanged.</p>
-    ${writeupHTML()}
     <div class="controls" id="controls"></div>
+
+    <h2>What the trust score measures</h2>
+    <p>The trust score rates each module from 0 to 100 by its error density — how many severity-weighted issues it carries per 1,000 words of content. A module with no flagged issues scores 100, and the score falls as error density rises. Major issues count fully; minor issues count 0.3.</p>
+
+    <h2>How it's computed</h2>
+    <p>Normalizing by content rather than by claim count makes modules of different lengths comparable: a long module with many major issues scores low, while a long module with few stays high — length neither rescues a major-heavy module nor flattens the difference between them. A soft floor keeps merely-bad modules from collapsing onto 0; only the most error-dense modules (roughly one issue per 175 words or worse) reach 0.</p>
     <div class="eq" id="eq"></div>
+
+    <h2>Reading the score</h2>
+    <p class="subtitle">A plain-language reading of the 0–100 score, by error-density band.</p>
     <div class="bands">${BANDS.map(b=>`<span class="band"><span class="sw" style="background:${b.c}"></span><span class="rg">${b.lo}–${b.hi}</span> ${b.label}</span>`).join("")}</div>
+
+    <h2>How it differs from production</h2>
+    <p>Production — the red reference throughout this page — divides by claim count and adds an absolute <span class="mono">ln(major)</span> penalty. That penalty does not depend on length, so it pins every single-major module near 81 regardless of size and forces many-major modules to 0. This model normalizes by content and drops that penalty.</p>
+
+    <h2>What changed vs production</h2>
+    <p class="subtitle">How this model's scores move relative to the current production scores across the run.</p>
     <div class="cards" id="cards"></div>
     <div class="changed" id="changed"></div>
+
     <h2>Score distribution</h2>
     <div class="card">
       <p class="legend"><span class="swatch" style="background:#e11d48"></span><b>red outline</b> = production (claims + abs penalty)
@@ -217,16 +232,6 @@ function renderChanged(){
       <div class="chstat"><span class="k">direction</span><span class="v"><span class="up">${PCT0(up/n)} ↑</span> &nbsp;<span class="down">${PCT0(down/n)} ↓</span></span></div>
     </div>
     <svg viewBox="0 0 ${W} ${H}" style="max-width:780px"><text x="8" y="12" font-size="9.5" fill="#999">distribution of change (this model − production), in points</text>${bars}</svg>`;
-}
-
-function writeupHTML(){
-  return `
-  <details class="writeup" open>
-    <summary>What the trust score measures</summary>
-    <p>The trust score rates each module from 0 to 100 by its error density — how many severity-weighted issues it carries per 1,000 words of content. A module with no flagged issues scores 100, and the score falls as error density rises. Major issues count fully; minor issues count 0.3. The exact formula is below.</p>
-    <p>Normalizing by content rather than by claim count makes modules of different lengths comparable. A long module with many major issues scores low; a long module with few stays high — length neither rescues a major-heavy module nor flattens the difference between them. At 30 points per weighted issue per 1,000 words, a really-bad module (about one major issue every 500 words) scores 40, while a typical module stays in the 90s. A soft floor keeps merely-bad modules from collapsing onto 0 — only the most error-dense modules (roughly one issue per 175 words or worse) reach 0.</p>
-    <p>Production — the red reference throughout this page — instead divides by claim count and adds an absolute <span class="mono">ln(major)</span> penalty. That penalty does not depend on length, so it pins every single-major module near 81 regardless of size and forces many-major modules to 0. This model removes it.</p>
-  </details>`;
 }
 
 function renderControls(){
