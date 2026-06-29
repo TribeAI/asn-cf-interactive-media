@@ -641,7 +641,7 @@ $("#nav").addEventListener("click",e=>{const b=e.target.closest(".tabbtn");if(!b
    {t:"Falsifiability check in the judge", s:"draft", sl:"Explored",
     what:"Add a falsifiable yes/no/borderline output to the judge (which already runs once per claim); drop or hide the \"no\"s.",
     where:"Acts at: the judge (post-extraction QA)",
-    pro:["A measurable gate, not a leaky instruction","Nearly free — the judge already runs per claim","Promising in an early run: one judge call reproduced the rate (~19%) and matched the 5-rater model consensus at ~80% precision / 77% recall — but that's vs the model, not yet human-reviewed","Would give a tracked metric over time"],
+    pro:["A measurable gate, not a leaky instruction","Nearly free — the judge already runs per claim","Promising in an early run: one judge call reproduced the rate (~19%) and matched the 5-rater consensus at ~80% precision / 77% recall. Benchmarking it against the human labels is the next check.","Would give a tracked metric over time"],
     con:["Runs after validation, so it cleans scoring/display but doesn't save validation compute","Under-catches demo-specific claims (they read as concrete)","Still a judgment call — needs human calibration to set the bar"]},
    {t:"Standalone falsifiability classifier (pre-validation)", s:"draft", sl:"Variant",
     what:"The same check, placed between extraction and validation so non-falsifiable claims are dropped before a grounded validation call.",
@@ -685,7 +685,7 @@ $("#nav").addEventListener("click",e=>{const b=e.target.closest(".tabbtn");if(!b
   <p class="lead">The options we've explored, with trade-offs. Guiding insight: the prompt already tells the agent to skip these claims and leaks anyway, so the reliable fix is a separate <b>check</b> plus <b>scoping</b>, not just better instructions.</p>
   <div class="probcard" style="border-left-color:var(--green);margin:14px 0 22px">
     <h4>Recommended stack</h4>
-    <p>Tighten the video prompt (cheap), add the <b>falsifiability field to the judge</b> as the measurable backstop (an early run reproduced the rate at ~80/77 against the model consensus, not yet human-reviewed), and <b>gate on content type</b> for the first ship. Next step is a bake-off: run each candidate on the 130 video claims and score the drop rate <i>and</i> the recall against the human-validated labels, so we cut the noise without dropping real claims.</p>
+    <p>Tighten the video prompt (cheap), add the <b>falsifiability field to the judge</b> as the measurable backstop (an early run reproduced the rate at ~80/77 against the model consensus; benchmark against the human labels next), and <b>gate on content type</b> for the first ship. Next step is a bake-off: run each candidate on the 130 video claims and score the drop rate <i>and</i> the recall against the human-validated labels, so we cut the noise without dropping real claims.</p>
   </div>
   `+SOL.map(card).join("");
 })();
@@ -759,6 +759,11 @@ $("#nav").addEventListener("click",e=>{const b=e.target.closest(".tabbtn");if(!b
   $("#falsif").innerHTML=`
   <h2 class="secttl">Falsifiability review — are the extracted claims worth scoring?</h2>
   <p class="lead">A check on the <b>extraction</b> step — the one thing the judge's form checks (not-empty, concrete, atomic) don't capture. Of the claims the agent pulls out, how many are <b>falsifiable</b> (a specific, checkable fact that could be wrong or go out of date) versus a platitude, opinion, demo-specific detail, or event/course note that carries no freshness signal? This tab opens on the <b>review set</b>: the 26 claims the 5 raters split on plus a stratified sample of ones they agreed on, graded <b>blind</b> (the model's labels are hidden) so your call is independent. Use "Hide / show model labels" to peek, and the Show filter to see all 260, the contested set, or your graded ones. Your grades save in this browser; export with the button below.</p>
+  <div style="background:#f6f8fa;border:1px solid #e2e8f0;border-radius:8px;padding:12px 14px;margin:10px 0;font-size:0.92em;line-height:1.5">
+    <b>How this was measured.</b> Five independent raters (one human pass, four model passes, each blind to the others) labeled all 260 claims; they agreed unanimously on <b>215</b>, and <b>26</b> were genuinely contested — stable labels, not one grader's read. Strict consensus: video ~20% not-falsifiable (95% CI 18–21%), module ~12% (8–13%); ~30% / ~18% counting borderline. Claims cluster (130 video claims from 59 videos), so read as provisional.<br><br>
+    <b>Human-validated.</b> 62 claims graded by hand (35 video / 27 module), enriched for the hard cases. The human matched the 5-rater consensus on <b>all 53 clear-cut yes/no calls (100%)</b> and <b>87% overall</b> (every gap a borderline-vs-no call). Anchoring on the human calls puts video at ~23%.<br><br>
+    <b>Why video over-pulls.</b> Demo / implementation-specific narration is the largest bucket (about a third), then opinion / platitude, event / course logistics, and prediction / roadmap. The non-falsifiable claims spread across extractor categories, so a category filter can't catch them.
+  </div>
   <div class="cards" id="fa-summary"></div>
   <div class="controls"><span class="flbl">Source</span><div class="chips" id="fa-arm"></div>
     <span class="flbl">Consensus</span><div class="chips" id="fa-fp"></div>
