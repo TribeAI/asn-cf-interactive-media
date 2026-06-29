@@ -180,7 +180,13 @@ function render(){
     <div class="bands">${BANDS.map(b=>`<span class="band"><span class="sw" style="background:${b.c}"></span><span class="rg">${b.lo}–${b.hi}</span> ${b.label}</span>`).join("")}</div>
 
     <h2>How it differs from production</h2>
-    <p>Production — the red reference throughout this page — divides by claim count and adds an absolute <span class="mono">ln(major)</span> penalty. That penalty does not depend on length, so it pins every single-major module near 81 regardless of size and forces many-major modules to 0. This model normalizes by content and drops that penalty.</p>
+    <p>Production — the red reference throughout this page — divides by claim count and adds an absolute <code>ln(major)</code> penalty:</p>
+    <div class="eq">
+      <div class="row">weighted &nbsp;=&nbsp; ( 1.0 × major &nbsp;+&nbsp; 0.3 × minor ) &nbsp;÷&nbsp; claims</div>
+      <div class="row">production score &nbsp;=&nbsp; max( 0, &nbsp; 100 &nbsp;−&nbsp; 50 × weighted &nbsp;−&nbsp; 25 × ln( major + 1 ) )</div>
+    </div>
+    <p>The <code>ln(major + 1)</code> term is size-independent and dominates, which gives the production score a <b>hinge-like</b> shape rather than a smooth one. A clean module sits at <code>100</code>; the first major issue drops it about 17 points (<code>25 × ln(2)</code>) onto a plateau near <b>81</b> — the same plateau no matter how long the module is — and each additional major then adds steadily less (the <code>ln</code> flattens). Because the penalty grows without bound while the score is clamped, many-major modules collapse onto a hard <code>0</code> — a second hinge, at the floor. The net effect is a step-like function of the raw issue <i>count</i> that is largely blind to how much content those issues sit in.</p>
+    <p>This model replaces both hinges — the 81 plateau and the hard 0 — with a single straight line in error <i>density</i> (issues per 1,000 words) plus a soft floor, so size is accounted for and scores stay comparable across modules.</p>
 
     <h2>What changed vs production</h2>
     <p class="subtitle">How this model's scores move relative to the current production scores across the run.</p>
