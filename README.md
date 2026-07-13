@@ -8,6 +8,7 @@ Static visualizations and annotation tools for the ASN content freshness scoring
 |------|-------------|-------------|
 | `/scoring-model/` | Trust-score model explorer: candidate denominators (claims / words / characters; words is the default), a live spread control that stretches the penalty to fill 0–100, the absolute penalty kept or removed, live corpus averages + histogram, the same-score (81) cluster shown diverging, and per-document claim drill-down | [microsoft-asn-content-freshness](https://github.com/TribeAI/microsoft-asn-content-freshness) (`scripts/eval/build_scoring_explorer_data.py`) |
 | `/video-quality/` | Video vs module claim quality: the two problems (extraction over-pulls non-falsifiable claims; the MS Learn coverage gap), human-validated falsifiability review, and solution options | self-contained |
+| `/video-metrics-preread/` | Video extraction metrics pre-read: the headline metric (non-falsifiable rate, video 20% vs modules 12%), the rubric dimensions behind it, the recall guardrail, and the plan for moving to the rubric-based rate | self-contained |
 | `/repro-report/` | Reproducibility report: agreement rates, score deltas across duplicate runs | self-contained |
 | `/repro-report/ethnography.html` | Side-by-side claim comparison for sampled documents | self-contained |
 | `/annotation/` | Claim annotation tool: human QA interface for grading AI claim assessments | Tornado backend |
